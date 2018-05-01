@@ -87,15 +87,19 @@ def local_contrast_2D_plt(x, kernel):
 
 def create_objective_speckle(M, pix_per_speckle, seed=None):
     """
-    Generate 2-D a fully-developed objective speckle with exponential statistics
+    Generate an M x M polarized, fully-developed speckle irradiance pattern.
+    
+    The speckle pattern will have an exponential probability distribution function that
+    is spatially bandwidth-limited by the specified pixels per speckle.
+    
+    Duncan & Kirkpatrick, "Algorithms for simulation of speckle," in SPIE Vol 6855 (2008)
 
     Args:
     M                dimension of desired square speckle image 
-    pix_per_speckle  number of pixels per speckle (on average).  This is the
-                     factor by which pattern is low-pass filtered.
-                     2 means speckle pattern is at Nyquist - two pixels per speckle
-                     4 means there will be four pixels per speckle (on average)
-    seed             when non-zero, will be used to seed the random number generator to a 
+    pix_per_speckle  number of pixels per smallest speckle.
+                     pix_per_speckle=2 means sampling is at Nyquist - 
+                     pix_per_speckle=4 has four pixels per smallest speckle
+    seed             when used, will initialize the random number generator to a 
                      particular initial state (allowing reproducible speckle patterns).
 
     Returns:
@@ -123,10 +127,11 @@ def create_objective_speckle(M, pix_per_speckle, seed=None):
     x = np.fft.fftshift(np.fft.fft2(x))
     x = abs(x)**2
     
-    # extract M x M matrix and normalize before returning
+    # extract the M x M matrix and normalize
     y = x[:M, :M]
     ymax = np.max(y)
     return y/ymax
+
 
 def create_objective_speckle_square(M, pix_per_speckle, seed=None):
     """
