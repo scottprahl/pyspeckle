@@ -1,0 +1,4 @@
+include *.txt
+include *.md
+include doc/0*.ipynb
+recursive-include pypolar *.py
