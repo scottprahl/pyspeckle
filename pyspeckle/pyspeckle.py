@@ -17,6 +17,7 @@ from scipy import signal
 __all__ = ['local_contrast_2D',
            'local_contrast_2D_plot',
            'create_objective',
+           'create_subjective',
            'statistics_plot']
 
 
@@ -32,7 +33,8 @@ def _sqrt_matrix(x):
     mx = np.max(x)
     if mx == 0:
         mx = 1
-    return np.int(255 * np.sqrt(x / mx))
+    y = 255 * np.sqrt(x / mx)
+    return y.astype(int)
 
 
 def local_contrast_2D(x, kernel):
@@ -233,8 +235,8 @@ def statistics_plot(x):
     plt.subplot(2, 2, 3)
     ax[1, 0].set_aspect('equal')
     psd = np.fft.fftshift(np.fft.fft2(x))
-    psd = abs(psd)**2
-    plt.imshow(_sqrt_matrix(psd), cmap='gray', extent=[-0.5, 0.5, -0.5, 0.5])
+    psd = 2*np.log(abs(psd))
+    plt.imshow(psd, cmap='gray', extent=[-0.5, 0.5, -0.5, 0.5])
     plt.title('Log() of Power Spectral Density')
     plt.xlabel('Spatial Frequency (1/pixels)')
     plt.ylabel('Spatial Frequency (1/pixels)')
