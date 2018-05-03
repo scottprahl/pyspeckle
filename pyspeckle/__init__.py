@@ -1,9 +1,9 @@
 """
 ================================================================================
-pypolar: Design and Analysis of Polarization
+pyspeckle: Design and Analysis of Speckle
 ================================================================================
 
-    http://github.com/scottprahl/pypolar
+    http://github.com/scottprahl/pyspeckle
 """
 
 __author__ = 'Scott Prahl'

@@ -26,4 +26,4 @@
   conda develop -u .
   pip install pyspeckle
   pip uninstall pyspeckle
-  pip develop .
+  conda develop .
