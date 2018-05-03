@@ -1,8 +1,7 @@
 .DS_Store
 *.pyc
-pypolar/__pycache__/
+pyspeckle/__pycache__/
 dist/*
 doc/.ipynb_checkpoints/
-doc/omlc.org/
-doc/refractiveindex.info/
-pypolar.egg-info/
+pyspeckle.egg-info/
+simspeckle
