@@ -115,7 +115,7 @@ def _create_mask(M, x_radius, y_radius, spot='ellipse'):
     M                dimension of desired image
     x_radius         half the horizontal width of the ellipse
     y_radius         half the vertical width of the ellipse
-    spot             'ellipse' or 'square' describing the laser spot
+    spot             'ellipse', 'square', or 'annulus' describing the laser spot
 
     Returns:
                      M x M boolean array
@@ -125,11 +125,19 @@ def _create_mask(M, x_radius, y_radius, spot='ellipse'):
 
     if spot == 'square':
         dist = np.floor(X / x_radius / 2) + np.floor(Y / y_radius / 2)
+        mask = dist < 1
+    elif spot == 'annulus':
+        rmax = max(x_radius, y_radius)
+        rmin = min(x_radius, y_radius)
+        dist1 = np.sqrt((X - rmax)**2 + (Y - rmax)**2) / rmax
+        mask1 = dist1 < 1
+        dist2 = np.sqrt((X - rmax)**2 + (Y - rmax)**2) / rmin
+        mask2 = dist2 > 1
+        mask = np.logical_and(mask2, mask1)
     else:
         dist = np.sqrt((X - x_radius)**2 / x_radius**2 +
                        (Y - y_radius)**2 / y_radius**2)
-
-    mask = dist < 1
+        mask = dist < 1
     return mask
 
 
