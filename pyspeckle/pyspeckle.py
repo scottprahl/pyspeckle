@@ -1,3 +1,4 @@
+# pylint: disable=invalid-name
 """
 Useful basic routines for analyzing speckle
 
@@ -141,7 +142,7 @@ def _create_mask(M, x_radius, y_radius, spot='ellipse'):
     return mask
 
 
-def create_objective(M, pix_per_speckle, alpha=1, spot='ellipse'):
+def create_objective(M, pix_per_speckle, alpha=1, spot='ellipse', polarization=1):
     """
     Generate an M x M polarized, fully-developed speckle irradiance pattern.
 
@@ -165,6 +166,11 @@ def create_objective(M, pix_per_speckle, alpha=1, spot='ellipse'):
     Returns:
                      M x M speckle image
     """
+
+    if polarization < 1:
+        y1 = create_objective(M, pix_per_speckle, alpha=alpha, spot=spot, polarization=1)
+        y2 = create_objective(M, pix_per_speckle, alpha=alpha, spot=spot, polarization=1)
+        return 0.5*(1+polarization)*y1 + 0.5*(1-polarization)*y2
 
     x_radius = int(M / 2)
     y_radius = int(alpha * M / 2)
