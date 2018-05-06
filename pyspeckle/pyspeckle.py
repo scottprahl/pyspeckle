@@ -10,14 +10,15 @@ May 2018
 """
 
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
 from scipy import signal
-
+from scipy.stats import norm
 
 __all__ = ['local_contrast_2D',
            'local_contrast_2D_plot',
            'create_objective',
-           'create_subjective',
+           'create_rayleigh',
            'statistics_plot']
 
 
@@ -208,11 +209,22 @@ def statistics_plot(x):
     pattern.
     """
 
+    mymap = matplotlib.cm.gray
+    mymap.set_bad('blue')
+
+    try:
+        y = x.compressed()  # if masked array
+    except AttributeError:
+        y = x               # not a masked array
+
+    ave = np.mean(y)
+    std = np.std(y)
+
     fig, ax = plt.subplots(2, 2, figsize=(14, 12))
 
     # Speckle Realization
     plt.subplot(2, 2, 1)
-    plt.imshow(_sqrt_matrix(x), cmap='gray')
+    plt.imshow(_sqrt_matrix(x), cmap=mymap)
     plt.title('Sqrt() of Speckle Irradiance')
     plt.xlabel('Position (pixels)')
     plt.ylabel('Position (pixels)')
@@ -221,9 +233,7 @@ def statistics_plot(x):
     plt.subplot(2, 2, 2)
     num_bins = 30
     ax[0, 1].set_aspect('equal')
-    ave = np.mean(x)
-    std = np.std(x)
-    hist, bins = np.histogram(x, bins=num_bins, normed=True)
+    hist, bins = np.histogram(y, bins=num_bins, normed=True)
     width = 0.7 * (bins[1] - bins[0])
     center = (bins[:-1] + bins[1:]) / 2
     plt.bar(center, hist, align='center', width=width, color='gray')
@@ -235,8 +245,8 @@ def statistics_plot(x):
     plt.subplot(2, 2, 3)
     ax[1, 0].set_aspect('equal')
     psd = np.fft.fftshift(np.fft.fft2(x))
-    psd = 2*np.log(abs(psd))
-    plt.imshow(psd, cmap='gray', extent=[-0.5, 0.5, -0.5, 0.5])
+    psd = 2 * np.log(abs(psd))
+    plt.imshow(psd, cmap=mymap, extent=[-0.5, 0.5, -0.5, 0.5])
     plt.title('Log() of Power Spectral Density')
     plt.xlabel('Spatial Frequency (1/pixels)')
     plt.ylabel('Spatial Frequency (1/pixels)')
@@ -244,18 +254,17 @@ def statistics_plot(x):
     # Probability Distribution Function on Log Scale
     plt.subplot(2, 2, 4)
     ax[1, 1].set_aspect('equal')
-    K = np.std(x) / np.mean(x)
-#    pdf = hist / (np.sum(hist) * (bins[1] - bins[0]))
+ #    pdf = hist / (np.sum(hist) * (bins[1] - bins[0]))
 
     plt.semilogy(center, hist, 'r.')
-    plt.title('Speckle Contrast, K=%.3f' % K)
+    plt.title('Speckle Contrast, K=%.3f' % (std / ave))
     plt.xlabel('Irradiance')
     plt.ylabel(r'Probability Distribution Function, $p_I(i)$')
 
     return plt
 
 
-def create_subjective(N, pix_per_speckle, alpha=1, spot='ellipse'):
+def create_rayleigh(N, pix_per_speckle, alpha=1, spot='ellipse'):
     """
     Generate an M x M subjective speckle irradiance pattern.
 
@@ -278,3 +287,26 @@ def create_subjective(N, pix_per_speckle, alpha=1, spot='ellipse'):
     y1 = create_objective(N, pix_per_speckle, spot=spot, alpha=alpha)
     y2 = create_objective(N, pix_per_speckle, spot=spot, alpha=alpha)
     return (y1 + y2) / 2
+
+
+def box_muller(mu, sigma, N=1):
+    x1 = np.random.rand(N)
+    x2 = np.random.rand(N)
+    tmp = sigma * np.sqrt(-2 * np.log(x1))
+    y1 = mu + tmp * np.cos(2 * np.pi * x2)
+    y2 = mu + tmp * np.sin(2 * np.pi * x2)
+    return y1, y2
+
+
+def zvalues(r, N=1):
+    y1, y2 = box_muller(0, 1, N)
+    z1 = (np.sqrt(1 + r) * y1 - np.sqrt(1 - r) * y2) / np.sqrt(2)
+    z2 = (np.sqrt(1 + r) * y1 + np.sqrt(1 - r) * y2) / np.sqrt(2)
+    return z1, z2
+
+
+def tvalues(r, N=1):
+    z1, z2 = zvalues(r, N=N)
+    t1 = norm.cdf(z1)
+    t2 = norm.cdf(z2)
+    return t1, t2
