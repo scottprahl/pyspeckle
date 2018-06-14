@@ -16,7 +16,8 @@ import matplotlib.pyplot as plt
 from scipy import signal
 from scipy.stats import norm
 
-__all__ = ['local_contrast_2D',
+__all__ = ['create_exp_1D',
+           'local_contrast_2D',
            'local_contrast_2D_plot',
            'create_objective',
            'create_rayleigh',
@@ -142,6 +143,36 @@ def _create_mask(M, x_radius, y_radius, spot='ellipse'):
         mask = dist < 1
     return mask
 
+
+def create_exp_1D(M, mean, stdev, tau):
+    """
+    Generate an array of length M of values with exponential autocorrelation
+    
+    The returned array will the specified mean and standard deviation but
+    will also have an autocorrelation function given by exp(-1/tau)
+
+    see https://www.cmu.edu/biolphys/deserno/pdf/corr_gaussian_random.pdf
+
+    Args:
+    M     dimension of desired array
+    mean  average value of signal
+    std   standard deviation of signal
+    tau   exp(-1/tau) is the autocorrelation
+
+    Returns:
+            array of length M
+    """
+    f = np.exp(-1/tau)
+    fsqrt = np.sqrt(1-f*f)
+    
+    g = np.random.normal(size=M)  # gaussian deviates with mean=0 and variance=1
+    r = np.zeros(M)
+    
+    r[0] = g[0]
+    for i in range(1,M):
+        r[i] = f * r[i-1] + fsqrt * g[i]
+        
+    return mean + stdev * r
 
 def create_objective(M, pix_per_speckle, alpha=1, spot='ellipse', polarization=1):
     """
