@@ -19,8 +19,8 @@ from scipy.stats import norm
 __all__ = ['create_exp_1D',
            'local_contrast_2D',
            'local_contrast_2D_plot',
-           'create_objective',
-           'create_rayleigh',
+           'create_Exponential',
+           'create_Rayleigh',
            'statistics_plot']
 
 
@@ -85,7 +85,7 @@ def local_contrast_2D_plot(x, kernel):
     plt.title('Speckle Realization, Overall Contrast=%0.2f' % K)
 
     plt.subplot(222)
-    hist, bins = np.histogram(x, bins=30, normed=True)
+    hist, bins = np.histogram(x, bins=30)
     width = 0.7 * (bins[1] - bins[0])
     center = (bins[:-1] + bins[1:]) / 2
     plt.bar(center, hist, align='center', width=width)
@@ -100,7 +100,7 @@ def local_contrast_2D_plot(x, kernel):
     plt.title('Local speckle contrast')
 
     plt.subplot(224)
-    hist, bins = np.histogram(C, bins=20, normed=True)
+    hist, bins = np.histogram(C, bins=20)
     width = 0.7 * (bins[1] - bins[0])
     center = (bins[:-1] + bins[1:]) / 2
     plt.bar(center, hist, align='center', width=width)
@@ -174,9 +174,10 @@ def create_exp_1D(M, mean, stdev, tau):
         
     return mean + stdev * r
 
-def create_objective(M, pix_per_speckle, alpha=1, spot='ellipse', polarization=1):
+
+def create_Exponential(M, pix_per_speckle, alpha=1, spot='ellipse', polarization=1):
     """
-    Generate an M x M polarized, fully-developed speckle irradiance pattern.
+    Generate an M x M polarized, fully-developed speckle irradiance pattern
 
     The speckle pattern will have an exponential probability distribution
     function that is spatially bandwidth-limited by the specified pixels per
@@ -200,8 +201,8 @@ def create_objective(M, pix_per_speckle, alpha=1, spot='ellipse', polarization=1
     """
 
     if polarization < 1:
-        y1 = create_objective(M, pix_per_speckle, alpha=alpha, spot=spot, polarization=1)
-        y2 = create_objective(M, pix_per_speckle, alpha=alpha, spot=spot, polarization=1)
+        y1 = create_Exponential(M, pix_per_speckle, alpha=alpha, spot=spot, polarization=1)
+        y2 = create_Exponential(M, pix_per_speckle, alpha=alpha, spot=spot, polarization=1)
         return 0.5*(1+polarization)*y1 + 0.5*(1-polarization)*y2
 
     x_radius = int(M / 2)
@@ -278,7 +279,7 @@ def statistics_plot(x):
     plt.subplot(2, 2, 2)
     num_bins = 30
     ax[0, 1].set_aspect('equal')
-    hist, bins = np.histogram(y, bins=num_bins, normed=True)
+    hist, bins = np.histogram(y, bins=num_bins)
     width = 0.7 * (bins[1] - bins[0])
     center = (bins[:-1] + bins[1:]) / 2
     plt.bar(center, hist, align='center', width=width, color='gray')
@@ -309,11 +310,11 @@ def statistics_plot(x):
     return plt
 
 
-def create_rayleigh(N, pix_per_speckle, alpha=1, spot='ellipse'):
+def create_Rayleigh(N, pix_per_speckle, alpha=1, spot='ellipse'):
     """
-    Generate an M x M subjective speckle irradiance pattern.
+    Generate an M x M unpolarized speckle irradiance pattern.
 
-    The speckle pattern will have a Rayleigh distribution and result from
+    The speckle pattern will have a Rayleigh distribution and results from
     the incoherent sum of two speckle patterns.
 
     Args:
@@ -329,8 +330,8 @@ def create_rayleigh(N, pix_per_speckle, alpha=1, spot='ellipse'):
     Returns:
                      M x M speckle image
     """
-    y1 = create_objective(N, pix_per_speckle, spot=spot, alpha=alpha)
-    y2 = create_objective(N, pix_per_speckle, spot=spot, alpha=alpha)
+    y1 = create_Exponential(N, pix_per_speckle, spot=spot, alpha=alpha)
+    y2 = create_Exponential(N, pix_per_speckle, spot=spot, alpha=alpha)
     return (y1 + y2) / 2
 
 
