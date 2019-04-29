@@ -1,4 +1,4 @@
 include *.txt
 include *.md
-include doc/0*.ipynb
+include doc/*.ipynb
 recursive-include pypolar *.py
