@@ -13,7 +13,7 @@ from setuptools import setup
 setup(
 	name='pyspeckle',
 	packages=['pyspeckle'],
-	version='0.1.0',
+	version='0.2.0',
 	description='Routines for analysis of laser speckle',
 	url='https://github.com/scottprahl/pyspeckle.git',  
 	author='Scott Prahl',
