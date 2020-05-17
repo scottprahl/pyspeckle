@@ -17,6 +17,7 @@ import matplotlib.cm
 import matplotlib.pyplot as plt
 
 __all__ = ('create_exp_1D',
+           'create_gaussian_1D',
            'local_contrast_2D',
            'local_contrast_2D_plot',
            'create_Exponential',
@@ -188,6 +189,46 @@ def create_exp_1D(M, mean, stdev, tau):
         r[i] = f * r[i-1] + fsqrt * g[i]
 
     return mean + stdev * r
+
+
+def create_gaussian_1D(M, mean, stdev, tau):
+    """
+    Generate an array of length M of values with Gaussian autocorrelation
+
+        The returned array will the specified mean and standard deviation but
+        will also have an autocorrelation function given by exp(-1/tau**2)
+
+        see: <http://www.mysimlabs.com/matlab/surfgen/rsgeng1D.m>
+        
+        this doesn't work yet.
+        
+        Args:
+        M     dimension of desired array
+        mean  average value of signal
+        std   standard deviation of signal
+        tau   exp(-2/tau^2) is the autocorrelation
+
+        Returns:
+                array of length M
+                
+    (Still needs more testing!)
+    """
+    x = np.linspace(0, M-1, M)/tau
+    
+    # uncorrelated gaussian noise distribution with mean and stdev
+    Z = np.random.normal(0, stdev, M)
+    
+    # Gaussian filter
+    F = np.exp(-2*x**2)      
+
+    fZ = np.fft.fft(Z)
+    fF = np.fft.fft(F)
+    
+    # correlation of signal using convolution, inverse Fourier transform 
+    f = np.fft.ifft(fZ * fF)
+    
+    f *= np.sqrt(2/(np.pi * M * tau))
+    return mean + abs(f)
 
 
 def create_Exponential(M, pix_per_speckle, alpha=1, shape='ellipse', polarization=1):
