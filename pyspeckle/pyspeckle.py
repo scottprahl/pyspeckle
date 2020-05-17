@@ -1,6 +1,6 @@
 # pylint: disable=invalid-name
 """
-Useful basic routines for analyzing speckle
+Useful basic routines for analyzing speckle.
 
 To do:
     * Add more routines
@@ -16,12 +16,12 @@ import numpy as np
 import matplotlib.cm
 import matplotlib.pyplot as plt
 
-__all__ = ['create_exp_1D',
+__all__ = ('create_exp_1D',
            'local_contrast_2D',
            'local_contrast_2D_plot',
            'create_Exponential',
            'create_Rayleigh',
-           'statistics_plot']
+           'statistics_plot')
 
 
 def _sqrt_matrix(x):
@@ -56,7 +56,6 @@ def local_contrast_2D(x, kernel):
     the speckle pattern as only valid pixels resulting from the convolution are
     returned.
     """
-
     # normalization total for kernel
     Nk = np.sum(kernel)
     # contrast of raw image
@@ -81,7 +80,6 @@ def local_contrast_2D_plot(x, kernel):
     Returns:
         a plot with four subplots
     """
-
     C, K = local_contrast_2D(x, kernel)
 
     plt.subplots(2, 2, figsize=(14, 12))
@@ -134,7 +132,6 @@ def _create_mask(M, x_radius, y_radius, shape='ellipse'):
     Returns:
         M x M boolean array
     """
-
     Y, X = np.ogrid[:M, :M]
 
     if shape == 'square':
@@ -213,11 +210,11 @@ def create_Exponential(M, pix_per_speckle, alpha=1, shape='ellipse', polarizatio
         pix_per_speckle: number of pixels per smallest speckle.
         alpha:           ratio of horizontal to vertical speckle size
         shape:           'ellipse', 'square', or 'annulus'
+        polarization:    degree of polarization
 
     Returns:
                      M x M speckle image
     """
-
     if polarization < 1:
         y1 = create_Exponential(M, pix_per_speckle, alpha=alpha, shape=shape, polarization=1)
         y2 = create_Exponential(M, pix_per_speckle, alpha=alpha, shape=shape, polarization=1)
@@ -272,7 +269,6 @@ def statistics_plot(x):
     display of the intensity itself does not reveal the nuance of the
     pattern.
     """
-
     mymap = matplotlib.cm.get_cmap('gray')
     mymap.set_bad('blue')
 
