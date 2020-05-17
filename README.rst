@@ -9,7 +9,7 @@ Currently incomplete and untested
 Usage
 --------
 
-For examples, see the docs directory
+For examples, see the <https://pyspeckle2.readthedocs.io> directory
 
 Installation
 ------------
