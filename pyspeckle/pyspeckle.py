@@ -44,10 +44,13 @@ def local_contrast_2D(x, kernel):
     """
     Calculate local (2D) spatial contrast and determine first-order statistics.
 
+    The kernel is an N x N array that describes the region over which
+    contrast should be calculated.  For example, `np.ones((5,5))` would
+    represent a 5x5 square.
+
     Args:
         x:       speckle pattern for which contrast is to be calculated
         kernel:  small region over which contrast is to be calculated
-                e.g., np.ones((5,5))
 
     Returns:
         contrast_image, total_contrast
@@ -72,10 +75,13 @@ def local_contrast_2D_plot(x, kernel):
     """
     Create a graph showing local and global spatial contrast.
 
+    The kernel is an N x N array that describes the region over which
+    contrast should be calculated.  For example, `np.ones((5,5))` would
+    represent a 5x5 square.
+
     Args:
         x:       speckle pattern for which contrast is to be calculated
         kernel:  small region over which contrast is to be calculated
-                e.g., np.ones((5,5))
 
     Returns:
         a plot with four subplots
@@ -331,18 +337,24 @@ def create_Rayleigh(N, pix_per_speckle, alpha=1, shape='ellipse'):
     The speckle pattern will have a Rayleigh distribution and results from
     the incoherent sum of two speckle patterns.
 
+    The resolution is specified by the parameter `pix_per_speckle` and refers
+    to the smallest speckle size.  Thus `pix_per_speckle=2` means sampling is
+    at the Nyquist limit and `pix_per_speckle=4` will have four pixels across
+    the smallest speckle.
+
+    Non-circular speckle is supported using `alpha`.  This is defined as the
+    ratio of horizontal speckle size to vertical speckle size.  `alpha=1`
+    is circular and `alpha=2` will have speckles that are twice as tall as
+    they are wide.
+
     Args:
-    M                dimension of desired square speckle image
-    pix_per_speckle  number of pixels per smallest speckle.
-                     pix_per_speckle=2 means sampling is at Nyquist limit
-                     pix_per_speckle=4 has four pixels per smallest speckle
-    alpha            ratio of horizontal width to vertical width
-                     1 => equal
-                     2 => vertical is twice horizontal
-    shape             'ellipse' or 'square' describing the laser shape
+        M:                dimension of desired square speckle image
+        pix_per_speckle:  number of pixels per smallest speckle.
+        alpha:            ratio of horizontal width to vertical width
+        shape:            'ellipse' or 'square' describing the laser shape
 
     Returns:
-                     M x M speckle image
+        M x M speckle image
     """
     y1 = create_Exponential(N, pix_per_speckle, shape=shape, alpha=alpha)
     y2 = create_Exponential(N, pix_per_speckle, shape=shape, alpha=alpha)
