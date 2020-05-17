@@ -10,7 +10,7 @@ Scott Prahl
 May 2020
 """
 
-import scipy
+import scipy.signal
 import scipy.stats
 import numpy as np
 import matplotlib.cm
