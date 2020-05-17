@@ -7,14 +7,14 @@ To do:
     * Properly document
 
 Scott Prahl
-May 2018
+May 2020
 """
 
+import scipy
+import scipy.stats
 import numpy as np
-import matplotlib
+import matplotlib.cm
 import matplotlib.pyplot as plt
-from scipy import signal
-from scipy.stats import norm
 
 __all__ = ['create_exp_1D',
            'local_contrast_2D',
@@ -26,7 +26,7 @@ __all__ = ['create_exp_1D',
 
 def _sqrt_matrix(x):
     """
-    Generate the square root of x but scaled as integers from 0-255
+    Generate the square root of x but scaled as integers from 0-255.
 
     Args:
         x numpy array to be scaled
@@ -45,12 +45,12 @@ def local_contrast_2D(x, kernel):
     Calculate local (2D) spatial contrast and determine first-order statistics.
 
     Args:
-    x       speckle pattern for which contrast is to be calculated
-    kernel  small region over which contrast is to be calculated
-            e.g., np.ones((5,5))
+        x:       speckle pattern for which contrast is to be calculated
+        kernel:  small region over which contrast is to be calculated
+                e.g., np.ones((5,5))
 
     Returns:
-            contrast_image, total_contrast
+        contrast_image, total_contrast
 
     Note that the dimensions of the contrast_image will not be the same as for
     the speckle pattern as only valid pixels resulting from the convolution are
@@ -63,15 +63,23 @@ def local_contrast_2D(x, kernel):
     K = np.std(x) / np.mean(x)
 
     # local speckle contrast
-    mu_x = signal.correlate2d(x, kernel, mode='same') / Nk
-    var_x = signal.correlate2d((x - mu_x)**2, kernel, mode='same') / Nk / Nk
+    mu_x = scipy.signal.correlate2d(x, kernel, mode='same') / Nk
+    var_x = scipy.signal.correlate2d((x - mu_x)**2, kernel, mode='same') / Nk / Nk
     C = np.sqrt(var_x) / mu_x
     return C, K
 
 
 def local_contrast_2D_plot(x, kernel):
     """
-    Create a graph showing local and global spatial contrast
+    Create a graph showing local and global spatial contrast.
+
+    Args:
+        x:       speckle pattern for which contrast is to be calculated
+        kernel:  small region over which contrast is to be calculated
+                e.g., np.ones((5,5))
+
+    Returns:
+        a plot with four subplots
     """
 
     C, K = local_contrast_2D(x, kernel)
@@ -110,26 +118,29 @@ def local_contrast_2D_plot(x, kernel):
     return plt
 
 
-def _create_mask(M, x_radius, y_radius, spot='ellipse'):
+def _create_mask(M, x_radius, y_radius, shape='ellipse'):
     """
-    Create an elliptical boolean mask with points inside the ellipse True
+    Create a boolean mask for shapesize.
+
+    The points inside the mask will be set to True.  Three shapes
+    are supported: 'ellipse', 'square', or 'annulus'.
 
     Args:
-    M                dimension of desired image
-    x_radius         half the horizontal width of the ellipse
-    y_radius         half the vertical width of the ellipse
-    spot             'ellipse', 'square', or 'annulus' describing the laser spot
+        M:        dimension of desired image
+        x_radius: half the horizontal width of the ellipse
+        y_radius: half the vertical width of the ellipse
+        shape:     'ellipse', 'square', or 'annulus' describing the laser shape
 
     Returns:
-                     M x M boolean array
+        M x M boolean array
     """
 
     Y, X = np.ogrid[:M, :M]
 
-    if spot == 'square':
+    if shape == 'square':
         dist = np.floor(X / x_radius / 2) + np.floor(Y / y_radius / 2)
         mask = dist < 1
-    elif spot == 'annulus':
+    elif shape == 'annulus':
         rmax = max(x_radius, y_radius)
         rmin = min(x_radius, y_radius)
         dist1 = np.sqrt((X - rmax)**2 + (Y - rmax)**2) / rmax
@@ -146,63 +157,70 @@ def _create_mask(M, x_radius, y_radius, spot='ellipse'):
 
 def create_exp_1D(M, mean, stdev, tau):
     """
-    Generate an array of length M of values with exponential autocorrelation
-    
-    The returned array will the specified mean and standard deviation but
+    Generate an array of length M of values with exponential autocorrelation.
+
+    The returned array will have the specified mean and standard deviation but
     will also have an autocorrelation function given by exp(-1/tau)
 
     see https://www.cmu.edu/biolphys/deserno/pdf/corr_gaussian_random.pdf
 
     Args:
-    M     dimension of desired array
-    mean  average value of signal
-    std   standard deviation of signal
-    tau   exp(-1/tau) is the autocorrelation
+        M:     dimension of desired array
+        mean:  average value of signal
+        std:   standard deviation of signal
+        tau:   exp(-1/tau) is the autocorrelation
 
     Returns:
-            array of length M
+        array of length M
     """
     f = np.exp(-1/tau)
     fsqrt = np.sqrt(1-f*f)
-    
-    g = np.random.normal(size=M)  # gaussian deviates with mean=0 and variance=1
+
+    # gaussian deviates with mean=0 and variance=1
+    g = np.random.normal(size=M)
     r = np.zeros(M)
-    
+
     r[0] = g[0]
-    for i in range(1,M):
+    for i in range(1, M):
         r[i] = f * r[i-1] + fsqrt * g[i]
-        
+
     return mean + stdev * r
 
 
-def create_Exponential(M, pix_per_speckle, alpha=1, spot='ellipse', polarization=1):
+def create_Exponential(M, pix_per_speckle, alpha=1, shape='ellipse', polarization=1):
     """
-    Generate an M x M polarized, fully-developed speckle irradiance pattern
+    Generate an M x M polarized, fully-developed speckle irradiance pattern.
 
     The speckle pattern will have an exponential probability distribution
     function that is spatially bandwidth-limited by the specified pixels per
     speckle.
 
+    The resolution is specified by the parameter `pix_per_speckle` and refers
+    to the smallest speckle size.  Thus `pix_per_speckle=2` means sampling is
+    at the Nyquist limit and `pix_per_speckle=4` will have four pixels across
+    the smallest speckle.
+
+    Non-circular speckle is supported using `alpha`.  This is defined as the
+    ratio of horizontal speckle size to vertical speckle size.  `alpha=1`
+    is circular and `alpha=2` will have speckles that are twice as tall as
+    they are wide.
+
     see Duncan & Kirkpatrick, "Algorithms for simulation of speckle," in SPIE
     Vol. 6855 (2008)
 
     Args:
-    M                dimension of desired square speckle image
-    pix_per_speckle  number of pixels per smallest speckle.
-                     pix_per_speckle=2 means sampling is at Nyquist limit
-                     pix_per_speckle=4 has four pixels per smallest speckle
-    alpha            ratio of horizontal width to vertical width
-                     1 => equal
-                     2 => vertical is twice horizontal
-    spot             'ellipse' or 'square' describing the laser spot
+        M:               dimension of desired square speckle image
+        pix_per_speckle: number of pixels per smallest speckle.
+        alpha:           ratio of horizontal to vertical speckle size
+        shape:           'ellipse', 'square', or 'annulus'
 
     Returns:
                      M x M speckle image
     """
 
     if polarization < 1:
-        y1 = create_Exponential(M, pix_per_speckle, alpha=alpha, spot=spot, polarization=1)
-        y2 = create_Exponential(M, pix_per_speckle, alpha=alpha, spot=spot, polarization=1)
+        y1 = create_Exponential(M, pix_per_speckle, alpha=alpha, shape=shape, polarization=1)
+        y2 = create_Exponential(M, pix_per_speckle, alpha=alpha, shape=shape, polarization=1)
         return 0.5*(1+polarization)*y1 + 0.5*(1-polarization)*y2
 
     x_radius = int(M / 2)
@@ -213,7 +231,7 @@ def create_Exponential(M, pix_per_speckle, alpha=1, spot='ellipse', polarization
     # phases uniformly distributed from 0 to 2*pi
     phase = 2 * np.pi * np.random.rand(L, L)
 
-    mask = _create_mask(L, x_radius, y_radius, spot=spot)
+    mask = _create_mask(L, x_radius, y_radius, shape=shape)
 
     # generate circular fill pattern
     x = np.exp(1j * phase) * mask
@@ -230,7 +248,7 @@ def create_Exponential(M, pix_per_speckle, alpha=1, spot='ellipse', polarization
 
 def statistics_plot(x):
     """
-    Create a plot of the first and second-order statistics of a speckle pattern
+    Plot the first and second-order statistics of a speckle pattern.
 
     This routine calculates and plots the probability density function,
     PDF and the power spectral density, PSD.
@@ -255,7 +273,7 @@ def statistics_plot(x):
     pattern.
     """
 
-    mymap = matplotlib.cm.gray
+    mymap = matplotlib.cm.get_cmap('gray')
     mymap.set_bad('blue')
 
     try:
@@ -266,7 +284,7 @@ def statistics_plot(x):
     ave = np.mean(y)
     std = np.std(y)
 
-    fig, ax = plt.subplots(2, 2, figsize=(14, 12))
+    _, ax = plt.subplots(2, 2, figsize=(14, 12))
 
     # Speckle Realization
     plt.subplot(2, 2, 1)
@@ -310,7 +328,7 @@ def statistics_plot(x):
     return plt
 
 
-def create_Rayleigh(N, pix_per_speckle, alpha=1, spot='ellipse'):
+def create_Rayleigh(N, pix_per_speckle, alpha=1, shape='ellipse'):
     """
     Generate an M x M unpolarized speckle irradiance pattern.
 
@@ -325,17 +343,31 @@ def create_Rayleigh(N, pix_per_speckle, alpha=1, spot='ellipse'):
     alpha            ratio of horizontal width to vertical width
                      1 => equal
                      2 => vertical is twice horizontal
-    spot             'ellipse' or 'square' describing the laser spot
+    shape             'ellipse' or 'square' describing the laser shape
 
     Returns:
                      M x M speckle image
     """
-    y1 = create_Exponential(N, pix_per_speckle, spot=spot, alpha=alpha)
-    y2 = create_Exponential(N, pix_per_speckle, spot=spot, alpha=alpha)
+    y1 = create_Exponential(N, pix_per_speckle, shape=shape, alpha=alpha)
+    y2 = create_Exponential(N, pix_per_speckle, shape=shape, alpha=alpha)
     return (y1 + y2) / 2
 
 
 def box_muller(mu, sigma, N=1):
+    """
+    Generate random pairs of normally distributed numbers.
+
+    Box and Muller generates pairs of independent, standard,
+    normally distributed (zero expectation, unit variance) random numbers,
+    given a source of uniformly distributed random numbers.
+
+    Args:
+        mu: average value
+        sigma: standard deviation of normal distribution
+        N: number of pairs to generate
+    Returns
+        pairs of random numbers
+    """
     x1 = np.random.rand(N)
     x2 = np.random.rand(N)
     tmp = sigma * np.sqrt(-2 * np.log(x1))
@@ -345,6 +377,19 @@ def box_muller(mu, sigma, N=1):
 
 
 def zvalues(r, N=1):
+    """
+    Generate random pairs for the CDF a normal distribution.
+
+    The z-values are from the cumulative distribution function of the
+    normal distribution.
+
+    Args:
+        r: radius of the CDF
+        N: number of pairs to generate
+
+    Returns
+        pairs of random numbers
+    """
     y1, y2 = box_muller(0, 1, N)
     z1 = (np.sqrt(1 + r) * y1 - np.sqrt(1 - r) * y2) / np.sqrt(2)
     z2 = (np.sqrt(1 + r) * y1 + np.sqrt(1 - r) * y2) / np.sqrt(2)
@@ -352,7 +397,17 @@ def zvalues(r, N=1):
 
 
 def tvalues(r, N=1):
+    """
+    Generate random pairs for the student t-distribution.
+
+    Args:
+        r: radius of the CDF
+        N: number of pairs to generate
+
+    Returns
+        pairs of random numbers
+    """
     z1, z2 = zvalues(r, N=N)
-    t1 = norm.cdf(z1)
-    t2 = norm.cdf(z2)
+    t1 = scipy.stats.norm.cdf(z1)
+    t2 = scipy.stats.norm.cdf(z2)
     return t1, t2
