@@ -1,12 +1,12 @@
-recursive-include pypolar *.py
 include CHANGELOG.rst
-exclude Makefile
-include docs/0-One-Dim-Speckle-Basics.ipynb
-include docs/1-Two-Dim-Speckle-Basics.ipynb
 include docs/changelog.rst
-include docs/conf.py
 include docs/index.rst
 include docs/readme.rst
-include docs/requirements.txt
 include LICENSE.txt
 exclude release.txt
+exclude .gitignore
+exclude Makefile
+exclude docs/0-One-Dim-Speckle-Basics.ipynb
+exclude docs/1-Two-Dim-Speckle-Basics.ipynb
+exclude docs/conf.py
+exclude docs/requirements.txt
