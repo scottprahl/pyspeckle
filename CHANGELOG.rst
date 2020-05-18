@@ -4,6 +4,8 @@ Changelog
 v0.3.0
 ------
     use sphinx for documentation
+    implement create_gaussian_1D()
+    improve documentation
 
 v0.2.0
 ------
