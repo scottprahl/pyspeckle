@@ -1,12 +1,10 @@
 """
 ================================================================================
-pyspeckle: Design and Analysis of Speckle
+pyspeckle: Generation and Analysis of Speckle
 ================================================================================
 
-    http://github.com/scottprahl/pyspeckle
+    Source code: https://github.com/scottprahl/pyspeckle
+    
+    Documentation: https://pyspeckle2.readthedocs.io
 """
-
-__author__ = 'Scott Prahl'
-__version__ = '0.2.0'
-
 from .pyspeckle import *
