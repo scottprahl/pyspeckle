@@ -1,12 +1,13 @@
-pyspeckle
-=========
-.. toctree::
-   :maxdepth: 3
+.. include:: ../README.rst
 
-   readme
+.. toctree::
+   :maxdepth: 2
+   :titlesonly:
+
    0-One-Dim-Speckle-Basics.ipynb
    1-Two-Dim-Speckle-Basics.ipynb
-   changelog
 
 .. automodapi:: pyspeckle.pyspeckle
+
+.. include:: ../CHANGELOG.rst
 

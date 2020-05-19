@@ -16,6 +16,8 @@ clean:
 	rm -rf pyspeckle/__pycache__
 	rm -rf docs/_build/*
 	rm -rf docs/api/*
+	rm -rf docs/_build/.buildinfo
+	rm -rf docs/_build/.doctrees
 	rm -rf .tox
 	rm -rf 
 

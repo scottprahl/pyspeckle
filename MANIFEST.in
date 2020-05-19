@@ -1,7 +1,5 @@
 include CHANGELOG.rst
-include docs/changelog.rst
 include docs/index.rst
-include docs/readme.rst
 include LICENSE.txt
 exclude release.txt
 exclude .gitignore
