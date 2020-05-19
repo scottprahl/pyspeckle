@@ -1,6 +1,10 @@
 Changelog
 =================================================
 
+v0.3.1
+------
+* improve api generation using automodapi
+
 v0.3.0
 ------
 * use sphinx for documentation

@@ -18,6 +18,7 @@ import matplotlib.pyplot as plt
 
 __all__ = ('create_exp_1D',
            'create_gaussian_1D',
+           'autocorrelation',
            'local_contrast_2D',
            'local_contrast_2D_plot',
            'create_Exponential',
@@ -29,10 +30,8 @@ def _sqrt_matrix(x):
     """
     Generate the square root of x but scaled as integers from 0-255.
 
-    Args:
-        x numpy array to be scaled
-    Returns:
-        same size array
+    :param x: numpy array to be scaled
+    :returns: scaled array of bytes
     """
     mx = np.max(x)
     if mx == 0:
@@ -49,16 +48,13 @@ def local_contrast_2D(x, kernel):
     contrast should be calculated.  For example, `np.ones((5,5))` would
     represent a 5x5 square.
 
-    Args:
-        x:       speckle pattern for which contrast is to be calculated
-        kernel:  small region over which contrast is to be calculated
-
-    Returns:
-        contrast_image, total_contrast
-
-    Note that the dimensions of the contrast_image will not be the same as for
+    Note that the dimensions of the `2D_contrast_image` will not be the same as for
     the speckle pattern as only valid pixels resulting from the convolution are
     returned.
+
+    :param x: 2D speckle pattern
+    :param kernel: 2D region over which contrast is to be calculated
+    :returns: 2D_contrast_image, total_contrast
     """
     # normalization total for kernel
     Nk = np.sum(kernel)
@@ -80,12 +76,9 @@ def local_contrast_2D_plot(x, kernel):
     contrast should be calculated.  For example, `np.ones((5,5))` would
     represent a 5x5 square.
 
-    Args:
-        x:       speckle pattern for which contrast is to be calculated
-        kernel:  small region over which contrast is to be calculated
-
-    Returns:
-        a plot with four subplots
+    :param x:       speckle pattern for which contrast is to be calculated
+    :param kernel:  small region over which contrast is to be calculated
+    :returns: nothing
     """
     C, K = local_contrast_2D(x, kernel)
 
@@ -120,7 +113,6 @@ def local_contrast_2D_plot(x, kernel):
     plt.title('PDF of Local Speckle Contrast')
     plt.xlabel('Local contrast, C')
     plt.ylabel('PDF')
-    return plt
 
 
 def _create_mask(M, x_radius, y_radius, shape='ellipse'):
@@ -130,14 +122,11 @@ def _create_mask(M, x_radius, y_radius, shape='ellipse'):
     The points inside the mask will be set to True.  Three shapes
     are supported: 'ellipse', 'square', or 'annulus'.
 
-    Args:
-        M:        dimension of desired image
-        x_radius: half the horizontal width of the ellipse
-        y_radius: half the vertical width of the ellipse
-        shape:     'ellipse', 'square', or 'annulus' describing the laser shape
-
-    Returns:
-        M x M boolean array
+    :param M:        dimension of desired image
+    :param x_radius: half the horizontal width of the ellipse
+    :param y_radius: half the vertical width of the ellipse
+    :param shape:    'ellipse', 'square', or 'annulus' describing the laser shape
+    :returns:        M x M boolean array
     """
     Y, X = np.ogrid[:M, :M]
 
@@ -170,14 +159,11 @@ def create_exp_1D(M, mean, stdev, cl):
 
     see https://www.cmu.edu/biolphys/deserno/pdf/corr_gaussian_random.pdf
 
-    Args:
-        M:     dimension of desired array     [-]
-        mean:  average value of signal        [gray levels]
-        std:   standard deviation of signal   [gray levels]
-        cl:    correlation length             [# of pixels]
-
-    Returns:
-        array of length M
+    :param M:     dimension of desired array     [-]
+    :param mean:  average value of signal        [gray levels]
+    :param std:   standard deviation of signal   [gray levels]
+    :param cl:    correlation length             [# of pixels]
+    :returns: array of length M
     """
     f = np.exp(-1/cl)
     fsqrt = np.sqrt(1-f*f)
@@ -210,14 +196,11 @@ def create_gaussian_1D(M, mean, stdev, cl):
 
     see: <http://www.mysimlabs.com/matlab/surfgen/rsgeng1D.m>
 
-    Args:
-        M:     dimension of desired array     [-]
-        mean:  average value of signal        [gray levels]
-        std:   standard deviation of signal   [gray levels]
-        cl:    correlation length             [# of pixels]
-
-    Returns:
-        array with Gaussian autocorrelation
+    :param M:     dimension of desired array     [-]
+    :param mean:  average value of signal        [gray levels]
+    :param std:   standard deviation of signal   [gray levels]
+    :param cl:    correlation length             [# of pixels]
+    :returns:     array of length M
     """
     Z = np.random.normal(0, stdev, M) # zero mean
 
@@ -234,6 +217,29 @@ def create_gaussian_1D(M, mean, stdev, cl):
 
     # shift the correlation
     return mean + f.real
+
+
+def autocorrelation(x):
+    """
+    Find the autocorrelation of the array x
+    
+    This is a little different from the standard autocorrelation because 
+    (1) the mean is subtracted before correlation
+    (2) the autocorrelation is normalized to maximum value
+    (3) only the right hand side of the symmetric function is returned
+
+    :param x:     array
+    :returns:     autocorrelation array of same length
+    """    
+    mean = np.mean(x)
+    x -= mean
+    result = np.correlate(x, x, mode='full')
+# could also use the faster(?)
+#   result = signal.fftconvolve(sig, sig[::-1], mode='full')
+
+    mx = np.max(result)
+    middle = len(result)//2
+    return result[middle:]/mx
 
 
 def create_Exponential(M, pix_per_speckle, alpha=1, shape='ellipse', polarization=1):
@@ -257,15 +263,12 @@ def create_Exponential(M, pix_per_speckle, alpha=1, shape='ellipse', polarizatio
     see Duncan & Kirkpatrick, "Algorithms for simulation of speckle," in SPIE
     Vol. 6855 (2008)
 
-    Args:
-        M:               dimension of desired square speckle image
-        pix_per_speckle: number of pixels per smallest speckle.
-        alpha:           ratio of horizontal to vertical speckle size
-        shape:           'ellipse', 'square', or 'annulus'
-        polarization:    degree of polarization
-
-    Returns:
-                     M x M speckle image
+    :param M:               dimension of desired square speckle image
+    :param pix_per_speckle: number of pixels per smallest speckle.
+    :param alpha:           ratio of horizontal to vertical speckle size
+    :param shape:           'ellipse', 'square', or 'annulus'
+    :param polarization:    degree of polarization
+    :returns: M x M speckle image
     """
     if polarization < 1:
         y1 = create_Exponential(M, pix_per_speckle, alpha=alpha, shape=shape, polarization=1)
@@ -320,6 +323,9 @@ def statistics_plot(x):
     speckle pattern is of such high contrast (theoretically unity) that a
     display of the intensity itself does not reveal the nuance of the
     pattern.
+
+    :param x:       speckle pattern to be analyzed
+    :returns: nothing
     """
     mymap = matplotlib.cm.get_cmap('gray')
     mymap.set_bad('blue')
@@ -373,8 +379,6 @@ def statistics_plot(x):
     plt.xlabel('Irradiance')
     plt.ylabel(r'Probability Distribution Function, $p_I(i)$')
 
-    return plt
-
 
 def create_Rayleigh(N, pix_per_speckle, alpha=1, shape='ellipse'):
     """
@@ -393,14 +397,11 @@ def create_Rayleigh(N, pix_per_speckle, alpha=1, shape='ellipse'):
     is circular and `alpha=2` will have speckles that are twice as tall as
     they are wide.
 
-    Args:
-        M:                dimension of desired square speckle image
-        pix_per_speckle:  number of pixels per smallest speckle.
-        alpha:            ratio of horizontal width to vertical width
-        shape:            'ellipse' or 'square' describing the laser shape
-
-    Returns:
-        M x M speckle image
+    :param M:                dimension of desired square speckle image
+    :param pix_per_speckle:  number of pixels per smallest speckle.
+    :param alpha:            ratio of horizontal width to vertical width
+    :param shape:            'ellipse' or 'square' describing the laser shape
+    :returns:                M x M speckle image
     """
     y1 = create_Exponential(N, pix_per_speckle, shape=shape, alpha=alpha)
     y2 = create_Exponential(N, pix_per_speckle, shape=shape, alpha=alpha)
@@ -415,12 +416,10 @@ def box_muller(mu, sigma, N=1):
     normally distributed (zero expectation, unit variance) random numbers,
     given a source of uniformly distributed random numbers.
 
-    Args:
-        mu: average value
-        sigma: standard deviation of normal distribution
-        N: number of pairs to generate
-    Returns
-        pairs of random numbers
+    :param mu: average value
+    :param sigma: standard deviation of normal distribution
+    :param N: number of pairs to generate
+    :returns: pairs of random numbers
     """
     x1 = np.random.rand(N)
     x2 = np.random.rand(N)
@@ -437,12 +436,9 @@ def zvalues(r, N=1):
     The z-values are from the cumulative distribution function of the
     normal distribution.
 
-    Args:
-        r: radius of the CDF
-        N: number of pairs to generate
-
-    Returns
-        pairs of random numbers
+    :param r: radius of the CDF
+    :param N: number of pairs to generate
+    :returns: pairs of random numbers
     """
     y1, y2 = box_muller(0, 1, N)
     z1 = (np.sqrt(1 + r) * y1 - np.sqrt(1 - r) * y2) / np.sqrt(2)
@@ -454,12 +450,9 @@ def tvalues(r, N=1):
     """
     Generate random pairs for the student t-distribution.
 
-    Args:
-        r: radius of the CDF
-        N: number of pairs to generate
-
-    Returns
-        pairs of random numbers
+    :param r: radius of the CDF
+    :param N: number of pairs to generate
+    :returns: pairs of random numbers
     """
     z1, z2 = zvalues(r, N=N)
     t1 = scipy.stats.norm.cdf(z1)
