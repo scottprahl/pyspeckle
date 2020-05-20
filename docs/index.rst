@@ -7,7 +7,7 @@
    0-One-Dim-Speckle-Basics.ipynb
    1-Two-Dim-Speckle-Basics.ipynb
 
-.. automodapi:: pyspeckle.pyspeckle
+.. automodapi:: pyspeckle
 
 .. include:: ../CHANGELOG.rst
 
