@@ -5,7 +5,9 @@ BUILDDIR      = docs/_build
 
 check:
 	-pylint pyspeckle/pyspeckle.py
-	-pep257 pyspeckle/pyspeckle.py
+	-pydocstyle pyspeckle/pyspeckle.py
+	-pylint pyspeckle/__init__.py
+	-pydocstyle pyspeckle/__init__.py
 
 html:
 	$(SPHINXBUILD) -b html "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS)
@@ -19,7 +21,6 @@ clean:
 	rm -rf docs/_build/.buildinfo
 	rm -rf docs/_build/.doctrees
 	rm -rf .tox
-	rm -rf 
 
 rcheck:
 	make clean

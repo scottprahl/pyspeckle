@@ -4,7 +4,7 @@
   make rcheck
   
 # edit version in setup.cfg
-  git commit -m 'update version' setup.cfg
+  git commit -m 'update version' setup.cfg conf.py
 
 # update CHANGELOG.txt  `git shortlog`
   git commit -m 'update recent changes' CHANGELOG.txt
@@ -17,8 +17,11 @@
 # upload source to pypi
   rm -rf dist/*
   python3 setup.py sdist
-  twine upload dist/*
-
-# test the install
-  pip install pyspeckle
-  pip uninstall pyspeckle
+  python3 -m twine upload dist/*
+  
+# manually update release at
+  https://github.com/scottprahl/pyspeckle
+  
+# check releases at pypi and readthedocs
+  https://pypi.org/project/pyspeckle/
+  https://pyspeckle.readthedocs.io

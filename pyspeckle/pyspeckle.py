@@ -1,13 +1,11 @@
 # pylint: disable=invalid-name
 """
-Useful basic routines for analyzing speckle.
+Generate and analyze speckle patterns.
 
-To do:
-    * Add more routines
-    * Properly document
+A port of the SimSpeckle collection of routines (by Duncan and Kirkpatrick)
+to track and analyze laser speckle. 
 
-Scott Prahl
-May 2020
+Documentation and examples are available at <https://pyspeckle.readthedocs.io>
 """
 
 import scipy.signal
@@ -83,7 +81,7 @@ def local_contrast_2D_plot(x, kernel):
     Args:
         x:       speckle pattern for which contrast is to be calculated
         kernel:  small region over which contrast is to be calculated
-    
+
     Returns:
         nothing
     """
@@ -134,7 +132,7 @@ def _create_mask(M, x_radius, y_radius, shape='ellipse'):
         x_radius: half the horizontal width of the ellipse
         y_radius: half the vertical width of the ellipse
         shape:    'ellipse', 'square', or 'annulus' describing the laser shape
-    
+
     Returns:
         M x M boolean array
     """
@@ -174,7 +172,7 @@ def create_exp_1D(M, mean, stdev, cl):
         mean:  average value of signal        [gray levels]
         std:   standard deviation of signal   [gray levels]
         cl:    correlation length             [# of pixels]
-    
+
     Returns:
         array of length M
     """
@@ -214,7 +212,7 @@ def create_gaussian_1D(M, mean, stdev, cl):
         mean:  average value of signal        [gray levels]
         std:   standard deviation of signal   [gray levels]
         cl:    correlation length             [# of pixels]
-    
+
     Returns:
         array of length M
     """
@@ -237,19 +235,19 @@ def create_gaussian_1D(M, mean, stdev, cl):
 
 def autocorrelation(x):
     """
-    Find the autocorrelation of the array x
-    
-    This is a little different from the standard autocorrelation because 
+    Find the autocorrelation of a 1D array.
+
+    This is a little different from the standard autocorrelation because
     (1) the mean is subtracted before correlation
     (2) the autocorrelation is normalized to maximum value
     (3) only the right hand side of the symmetric function is returned
 
     Args:
-        x:     array
-    
+        x: 1D array
+
     Returns:
         autocorrelation array of same length
-    """    
+    """
     mean = np.mean(x)
     x -= mean
     result = np.correlate(x, x, mode='full')
@@ -288,7 +286,7 @@ def create_Exponential(M, pix_per_speckle, alpha=1, shape='ellipse', polarizatio
         alpha:           ratio of horizontal to vertical speckle size
         shape:           'ellipse', 'square', or 'annulus'
         polarization:    degree of polarization
-    
+
     Returns:
         M x M speckle image
     """
@@ -348,7 +346,7 @@ def statistics_plot(x):
 
     Args:
         x:       speckle pattern to be analyzed
-    
+
     Returns:
         nothing
     """
@@ -427,7 +425,7 @@ def create_Rayleigh(N, pix_per_speckle, alpha=1, shape='ellipse'):
         pix_per_speckle:  number of pixels per smallest speckle.
         alpha:            ratio of horizontal width to vertical width
         shape:            'ellipse' or 'square' describing the laser shape
-    
+
     Returns:
         M x M speckle image
     """
@@ -448,7 +446,7 @@ def box_muller(mu, sigma, N=1):
         mu: average value
         sigma: standard deviation of normal distribution
         N: number of pairs to generate
-    
+
     Returns:
         pairs of random numbers
     """
@@ -470,7 +468,7 @@ def zvalues(r, N=1):
     Args:
         r: radius of the CDF
         N: number of pairs to generate
-    
+
     Returns:
         pairs of random numbers
     """
@@ -487,7 +485,7 @@ def tvalues(r, N=1):
     Args:
         r: radius of the CDF
         N: number of pairs to generate
-    
+
     Returns:
         pairs of random numbers
     """
