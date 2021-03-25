@@ -22,7 +22,7 @@ copyright = '2020, Scott Prahl'
 author = 'Scott Prahl'
 
 # The full version, including alpha/beta/rc tags
-release = '0.3.1'
+release = '0.3.2'
 
 master_doc = 'index'
 
@@ -70,7 +70,7 @@ source_suffix = ['.rst', '.ipynb']
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'sphinx_book_theme'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
