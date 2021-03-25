@@ -5,7 +5,7 @@ Generate and analyze speckle patterns.
 A port of the SimSpeckle collection of routines (by Duncan and Kirkpatrick)
 to track and analyze laser speckle.
 
-Documentation and examples are available at <https://pyspeckle.readthedocs.io>
+Documentation and examples are available at <https://pyspeckle2.readthedocs.io>
 """
 
 import scipy.signal
