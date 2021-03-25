@@ -4,6 +4,9 @@ Changelog
 v0.3.2
 ------
 * add badges for colab and binder
+* sphinx-book-theme for docs
+* cite SPIE paper
+* improve README.rst
 
 v0.3.1
 ------
