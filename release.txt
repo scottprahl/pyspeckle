@@ -1,12 +1,14 @@
 # Releasing a new version
 
+# verify notebooks still work
+
 # sanity check
   make rcheck
   
 # edit version in setup.cfg
   git commit -m 'update version' setup.cfg conf.py
 
-# update CHANGELOG.txt  `git shortlog`
+# update CHANGELOG.txt  `git shortlog v0.3.0..HEAD`
   git commit -m 'update recent changes' CHANGELOG.txt
   git push
 
@@ -15,7 +17,6 @@
   git push origin v1.0.1
 
 # upload source to pypi
-  rm -rf dist/*
   python3 setup.py sdist
   python3 -m twine upload dist/*
   
@@ -24,4 +25,4 @@
   
 # check releases at pypi and readthedocs
   https://pypi.org/project/pyspeckle/
-  https://pyspeckle.readthedocs.io
+  https://pyspeckle2.readthedocs.io
