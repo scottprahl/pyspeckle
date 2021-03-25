@@ -3,7 +3,7 @@
 Generate and analyze speckle patterns.
 
 A port of the SimSpeckle collection of routines (by Duncan and Kirkpatrick)
-to track and analyze laser speckle. 
+to track and analyze laser speckle.
 
 Documentation and examples are available at <https://pyspeckle.readthedocs.io>
 """
