@@ -3,11 +3,18 @@ SPHINXBUILD   ?= sphinx-build
 SOURCEDIR     = docs
 BUILDDIR      = docs/_build
 
-check:
+pycheck:
 	-pylint pyspeckle/pyspeckle.py
 	-pydocstyle pyspeckle/pyspeckle.py
 	-pylint pyspeckle/__init__.py
 	-pydocstyle pyspeckle/__init__.py
+
+rstcheck:
+	-rstcheck README.rst
+	-rstcheck CHANGELOG.rst
+	-rstcheck docs/index.rst
+	-rstcheck docs/changelog.rst
+	-rstcheck --ignore-directives automodule docs/pyspeckle.rst
 
 html:
 	$(SPHINXBUILD) -b html "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS)
@@ -24,6 +31,8 @@ clean:
 
 rcheck:
 	make clean
+	make rstcheck
+	make pycheck
 	touch docs/*ipynb
 	touch docs/*rst
 	make html
