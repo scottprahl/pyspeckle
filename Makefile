@@ -3,10 +3,15 @@ SPHINXBUILD   ?= sphinx-build
 SOURCEDIR     = docs
 BUILDDIR      = docs/_build
 
-pycheck:
+html:
+	$(SPHINXBUILD) -b html "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS)
+
+lintcheck:
 	-pylint pyspeckle/pyspeckle.py
-	-pydocstyle pyspeckle/pyspeckle.py
 	-pylint pyspeckle/__init__.py
+
+doccheck:
+	-pydocstyle pyspeckle/pyspeckle.py
 	-pydocstyle pyspeckle/__init__.py
 
 rstcheck:
@@ -16,28 +21,28 @@ rstcheck:
 	-rstcheck docs/changelog.rst
 	-rstcheck --ignore-directives automodule docs/pyspeckle.rst
 
-html:
-	$(SPHINXBUILD) -b html "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS)
-
-clean:
-	rm -rf dist
-	rm -rf pyspeckle.egg-info
-	rm -rf pyspeckle/__pycache__
-	rm -rf docs/_build/*
-	rm -rf docs/api/*
-	rm -rf docs/_build/.buildinfo
-	rm -rf docs/_build/.doctrees
-	rm -rf .tox
+notecheck:
+	make clean
+	pytest --verbose -n 2 test_all_notebooks.py
+	rm -rf __pycache__
 
 rcheck:
-	make clean
+	make notecheck
 	make rstcheck
-	make pycheck
-	touch docs/*ipynb
-	touch docs/*rst
+	make lintcheck
+	make doccheck
 	make html
 	check-manifest
 	pyroma -d .
 #	tox
 
-.PHONY: clean check rcheck html
+clean:
+	rm -rf dist
+	rm -rf pyspeckle.egg-info
+	rm -rf pyspeckle/__pycache__
+	rm -rf docs/_build
+	rm -rf docs/api
+	rm -rf .tox
+	rm -rf __pycache__
+
+.PHONY: clean check rcheck html doccheck lintcheck rstcheck
