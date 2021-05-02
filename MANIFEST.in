@@ -6,3 +6,4 @@ exclude docs/*
 exclude Makefile
 exclude release.txt
 exclude requirements.txt
+exclude test_all_notebooks.py
