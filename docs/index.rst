@@ -17,6 +17,12 @@
    1-Two-Dim-Speckle-Basics.ipynb
 
 .. toctree::
+   :caption: 3D Speckle
+   :hidden:
+
+   2-Three-Dim-Speckle.ipynb
+
+.. toctree::
    :caption: API
    :hidden:
 

@@ -19,5 +19,10 @@ Two dimensional functions::
     pyspeckle.create_Exponential(M, pix_per_speckle)
     pyspeckle.create_Rayleigh(M, pix_per_speckle)
     pyspeckle.statistics_plot(x)
+
+Three dimensional functions::
+
+    pyspeckle.create_Exponential_3D(M, pix_per_speckle)
+    pyspeckle.create_Rayleigh_3D(M, pix_per_speckle)
 """
 from .pyspeckle import *
