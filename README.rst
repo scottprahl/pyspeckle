@@ -1,6 +1,9 @@
 pyspeckle
 =========
 
+.. image:: https://img.shields.io/pypi/v/pyspeckle.svg
+   :target: https://pypi.org/project/pyspeckle/
+
 .. image:: https://colab.research.google.com/assets/colab-badge.svg
    :target: https://colab.research.google.com/github/scottprahl/pyspeckle/blob/master
 
