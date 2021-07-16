@@ -156,8 +156,8 @@ def _create_mask(M, x_radius, y_radius, shape='ellipse'):
         mask2 = dist2 > 1
         mask = np.logical_and(mask2, mask1)
     else:
-        dist = np.sqrt((X - x_radius)**2 / x_radius**2 +
-                       (Y - y_radius)**2 / y_radius**2)
+        dist = np.sqrt((X - x_radius)**2 / x_radius**2
+                       + (Y - y_radius)**2 / y_radius**2)
         mask = dist < 1
     return mask
 
@@ -182,8 +182,8 @@ def create_exp_1D(M, mean, stdev, cl):
     Returns:
         array of length M
     """
-    f = np.exp(-1/cl)
-    fsqrt = np.sqrt(1-f*f)
+    f = np.exp(-1 / cl)
+    fsqrt = np.sqrt(1 - f * f)
 
     # gaussian deviates with mean=0 and variance=1
     g = np.random.normal(size=M)
@@ -191,7 +191,7 @@ def create_exp_1D(M, mean, stdev, cl):
 
     r[0] = g[0]
     for i in range(1, M):
-        r[i] = f * r[i-1] + fsqrt * g[i]
+        r[i] = f * r[i - 1] + fsqrt * g[i]
 
     return mean + stdev * r
 
@@ -222,18 +222,18 @@ def create_gaussian_1D(M, mean, stdev, cl):
     Returns:
         array of length M
     """
-    Z = np.random.normal(0, stdev, M) # zero mean
+    Z = np.random.normal(0, stdev, M)  # zero mean
 
     # Gaussian filter
-    x = np.linspace(-M/2, M/2, M)/cl
-    F = np.exp(-2*x**2)
+    x = np.linspace(-M / 2, M / 2, M) / cl
+    F = np.exp(-2 * x**2)
 
     # Fourier transform the signal and filter
     fZ = np.fft.fft(Z)
     fF = np.fft.fft(F)
 
     # correlation is the scaled inverse Fourier transform of the product
-    f = np.sqrt(2/cl/np.sqrt(np.pi)) * np.fft.ifft(fZ * fF)
+    f = np.sqrt(2 / cl / np.sqrt(np.pi)) * np.fft.ifft(fZ * fF)
 
     # shift the correlation
     return mean + f.real
@@ -261,8 +261,8 @@ def autocorrelation(x):
 #   result = signal.fftconvolve(sig, sig[::-1], mode='full')
 
     mx = np.max(result)
-    middle = len(result)//2
-    return result[middle:]/mx
+    middle = len(result) // 2
+    return result[middle:] / mx
 
 
 def create_Exponential(M, pix_per_speckle, alpha=1, shape='ellipse', polarization=1):
@@ -299,7 +299,7 @@ def create_Exponential(M, pix_per_speckle, alpha=1, shape='ellipse', polarizatio
     if polarization < 1:
         y1 = create_Exponential(M, pix_per_speckle, alpha=alpha, shape=shape, polarization=1)
         y2 = create_Exponential(M, pix_per_speckle, alpha=alpha, shape=shape, polarization=1)
-        return 0.5*(1+polarization)*y1 + 0.5*(1-polarization)*y2
+        return 0.5 * (1 + polarization) * y1 + 0.5 * (1 - polarization) * y2
 
     x_radius = int(M / 2)
     y_radius = int(alpha * M / 2)
@@ -401,7 +401,7 @@ def statistics_plot(x):
     # Probability Distribution Function on Log Scale
     plt.subplot(2, 2, 4)
     ax[1, 1].set_aspect('equal')
- #    pdf = hist / (np.sum(hist) * (bins[1] - bins[0]))
+#    pdf = hist / (np.sum(hist) * (bins[1] - bins[0]))
 
     plt.semilogy(center, hist, 'r.')
     plt.title('Speckle Contrast, K=%.3f' % (std / ave))
@@ -438,6 +438,135 @@ def create_Rayleigh(N, pix_per_speckle, alpha=1, shape='ellipse'):
     y1 = create_Exponential(N, pix_per_speckle, shape=shape, alpha=alpha)
     y2 = create_Exponential(N, pix_per_speckle, shape=shape, alpha=alpha)
     return (y1 + y2) / 2
+
+
+def _create_mask_3D(M, x_radius, y_radius, z_radius, shape='ellipsoid'):
+    """
+    Create 3D boolean mask for designated shape.
+
+    The points inside the mask will be set to True.  Three shapes
+    are supported: 'cube', 'shell', or 'ellipsoid'.
+
+    Args:
+        M:        dimension of desired image
+        x_radius: half the horizontal width of the ellipse
+        y_radius: half the vertical width of the ellipse
+        z_radius: half the vertical width of the ellipse
+        shape:    'ellipse', 'square', or 'annulus' describing the laser shape
+
+    Returns:
+        M x M boolean array
+    """
+    X, Y, Z = np.ogrid[:M, :M, :M]
+
+    if shape == 'cube':
+        dist = np.floor(X / x_radius / 2) + np.floor(Y / y_radius / 2) + np.floor(Z / z_radius / 2)
+        mask = dist < 1
+    elif shape == 'shell':
+        rmax = max(x_radius, y_radius, z_radius)
+        rmin = min(x_radius, y_radius, z_radius)
+        dist1 = np.sqrt((X - rmax)**2 + (Y - rmax)**2 + (Z - rmax)**2) / rmax
+        mask1 = dist1 < 1
+        dist2 = np.sqrt((X - rmax)**2 + (Y - rmax)**2 + (Z - rmax)**2) / rmin
+        mask2 = dist2 > 1
+        mask = np.logical_and(mask2, mask1)
+    else:
+        dist = np.sqrt((X - x_radius)**2 / x_radius**2
+                       + (Y - y_radius)**2 / y_radius**2
+                       + (Z - z_radius)**2 / z_radius**2)
+        mask = dist <= 1
+    return mask
+
+
+def create_Exponential_3D(M, pix_per_speckle, alpha=1, beta=1, shape='ellipsoid', polarization=1):
+    """
+    Generate an M x M x M polarized, fully-developed speckle irradiance pattern.
+
+    The speckle pattern will have an exponential probability distribution
+    function that is spatially bandwidth-limited by the specified pixels per
+    speckle.
+
+    The resolution is specified by the parameter `pix_per_speckle` and refers
+    to the smallest speckle size.  Thus `pix_per_speckle=2` means sampling is
+    at the Nyquist limit and `pix_per_speckle=4` will have four pixels across
+    the smallest speckle.
+
+    Non-circular speckle is supported using `alpha` and `beta`.  This is defined
+    as the ratio of x-speckle size to y-speckle size (or x to z).  `alpha=1`
+    is circular and `alpha=2` will have speckles that with y-dimensions that
+    are twice the x-dimension.
+
+    see Duncan & Kirkpatrick, "Algorithms for simulation of speckle," in SPIE
+    Vol. 6855 (2008)
+
+    Args:
+        M:               dimension of desired square speckle image
+        pix_per_speckle: number of pixels per smallest speckle.
+        alpha:           ratio of x to y speckle size
+        beta:            ratio of x to z speckle size
+        shape:           'cube', 'shell', or 'ellipsoid'
+        polarization:    degree of polarization (0-1)
+
+    Returns:
+        M x M X M speckle image
+    """
+    if polarization < 1:
+        y1 = create_Exponential_3D(M, pix_per_speckle, alpha=alpha, shape=shape, polarization=1)
+        y2 = create_Exponential_3D(M, pix_per_speckle, alpha=alpha, shape=shape, polarization=1)
+        return 0.5 * (1 + polarization) * y1 + 0.5 * (1 - polarization) * y2
+
+    x_radius = int(M / 2)
+    y_radius = int(alpha * M / 2)
+    z_radius = int(beta * M / 2)
+
+    L = pix_per_speckle * 2 * max(x_radius, y_radius, z_radius)
+
+    # phases uniformly distributed from 0 to 2*pi
+    phase = 2 * np.pi * np.random.rand(L, L, L)
+
+    mask = _create_mask_3D(L, x_radius, y_radius, z_radius, shape=shape)
+
+    # generate circular fill pattern
+    x = np.exp(1j * phase) * mask
+
+    # take the FFT and square it
+    x = np.fft.fftshift(np.fft.fftn(x))
+    x = abs(x)**2
+
+    # extract the M x M matrix and normalize
+    y = x[:M, :M, :M]
+    ymax = np.max(y)
+    return y / ymax
+
+
+def create_Rayleigh_3D(M, pix_per_speckle, alpha=1, beta=1, shape='ellipsoid'):
+    """
+    Generate an M x M x M unpolarized speckle irradiance pattern.
+
+    The speckle pattern will have a Rayleigh distribution and results from
+    the incoherent sum of two speckle patterns.
+
+    The resolution is specified by the parameter `pix_per_speckle` and refers
+    to the smallest speckle size.  Thus `pix_per_speckle=2` means sampling is
+    at the Nyquist limit and `pix_per_speckle=4` will have four pixels across
+    the smallest speckle.
+
+    Non-circular speckle is supported using `alpha`.  This is defined as the
+    ratio of horizontal speckle size to vertical speckle size.  `alpha=1`
+    is circular and `alpha=2` will have speckles that are twice as tall as
+    they are wide.
+
+    Args:
+        M:                dimension of desired square speckle image
+        pix_per_speckle:  number of pixels per smallest speckle.
+        alpha:            ratio of x to y speckle size
+        beta:             ratio of x to z speckle size
+        shape:           'cube', 'shell', or 'ellipsoid'
+
+    Returns:
+        M x M X M speckle image
+    """
+    return create_Exponential_3D(M, pix_per_speckle, alpha, beta, shape, 0)
 
 
 def box_muller(mu, sigma, N=1):
@@ -499,129 +628,3 @@ def tvalues(r, N=1):
     t1 = scipy.stats.norm.cdf(z1)
     t2 = scipy.stats.norm.cdf(z2)
     return t1, t2
-
-def _create_mask_3D(M, x_radius, y_radius, z_radius, shape='ellipsoid'):
-    """
-    Create 3D boolean mask for designated shape.
-
-    The points inside the mask will be set to True.  Three shapes
-    are supported: 'ellipse', 'square', or 'annulus'.
-
-    Args:
-        M:        dimension of desired image
-        x_radius: half the horizontal width of the ellipse
-        y_radius: half the vertical width of the ellipse
-        z_radius: half the vertical width of the ellipse
-        shape:    'ellipse', 'square', or 'annulus' describing the laser shape
-
-    Returns:
-        M x M boolean array
-    """
-    X, Y, Z = np.ogrid[:M, :M, :M]
-
-    if shape == 'cube':
-        dist = np.floor(X / x_radius / 2) + np.floor(Y / y_radius / 2) + np.floor(Z / z_radius / 2)
-        mask = dist < 1
-    elif shape == 'shell':
-        rmax = max(x_radius, y_radius, z_radius)
-        rmin = min(x_radius, y_radius, z_radius)
-        dist1 = np.sqrt((X - rmax)**2 + (Y - rmax)**2 + (Z - rmax)**2) / rmax
-        mask1 = dist1 < 1
-        dist2 = np.sqrt((X - rmax)**2 + (Y - rmax)**2 + (Z - rmax)**2) / rmin
-        mask2 = dist2 > 1
-        mask = np.logical_and(mask2, mask1)
-    else:
-        dist = np.sqrt((X - x_radius)**2 / x_radius**2 +
-                       (Y - y_radius)**2 / y_radius**2 +
-                       (Z - z_radius)**2 / z_radius**2)
-        mask = dist <= 1
-    return mask
-
-def create_Exponential_3D(M, pix_per_speckle, alpha=1, beta=1, shape='ellipsoid', polarization=1):
-    """
-    Generate an M x M X M polarized, fully-developed speckle irradiance pattern.
-
-    The speckle pattern will have an exponential probability distribution
-    function that is spatially bandwidth-limited by the specified pixels per
-    speckle.
-
-    The resolution is specified by the parameter `pix_per_speckle` and refers
-    to the smallest speckle size.  Thus `pix_per_speckle=2` means sampling is
-    at the Nyquist limit and `pix_per_speckle=4` will have four pixels across
-    the smallest speckle.
-
-    Non-circular speckle is supported using `alpha` and `beta`.  This is defined
-    as the ratio of x-speckle size to y-speckle size (or x to z).  `alpha=1`
-    is circular and `alpha=2` will have speckles that with y-dimensions that
-    are twice the x-dimension.
-
-    see Duncan & Kirkpatrick, "Algorithms for simulation of speckle," in SPIE
-    Vol. 6855 (2008)
-
-    Args:
-        M:               dimension of desired square speckle image
-        pix_per_speckle: number of pixels per smallest speckle.
-        alpha:           ratio of x to y speckle size
-        beta:            ratio of x to z speckle size
-        shape:           'ellipse', 'square', or 'annulus'
-        polarization:    degree of polarization
-
-    Returns:
-        M x M X M speckle image
-    """
-    if polarization < 1:
-        y1 = create_Exponential_3D(M, pix_per_speckle, alpha=alpha, shape=shape, polarization=1)
-        y2 = create_Exponential_3D(M, pix_per_speckle, alpha=alpha, shape=shape, polarization=1)
-        return 0.5*(1+polarization)*y1 + 0.5*(1-polarization)*y2
-
-    x_radius = int(M / 2)
-    y_radius = int(alpha * M / 2)
-    z_radius = int(beta * M / 2)
-
-    L = pix_per_speckle * 2 * max(x_radius, y_radius, z_radius)
-
-    # phases uniformly distributed from 0 to 2*pi
-    phase = 2 * np.pi * np.random.rand(L, L, L)
-
-    mask = _create_mask_3D(L, x_radius, y_radius, z_radius, shape=shape)
-
-    # generate circular fill pattern
-    x = np.exp(1j * phase) * mask
-
-    # take the FFT and square it
-    x = np.fft.fftshift(np.fft.fftn(x))
-    x = abs(x)**2
-
-    # extract the M x M matrix and normalize
-    y = x[:M, :M, :M]
-    ymax = np.max(y)
-    return y / ymax
-
-def create_Rayleigh_3D(M, pix_per_speckle, alpha=1, beta=1, shape='ellipsoid'):
-    """
-    Generate an M x M X M unpolarized speckle irradiance pattern.
-
-    The speckle pattern will have a Rayleigh distribution and results from
-    the incoherent sum of two speckle patterns.
-
-    The resolution is specified by the parameter `pix_per_speckle` and refers
-    to the smallest speckle size.  Thus `pix_per_speckle=2` means sampling is
-    at the Nyquist limit and `pix_per_speckle=4` will have four pixels across
-    the smallest speckle.
-
-    Non-circular speckle is supported using `alpha`.  This is defined as the
-    ratio of horizontal speckle size to vertical speckle size.  `alpha=1`
-    is circular and `alpha=2` will have speckles that are twice as tall as
-    they are wide.
-
-    Args:
-        M:                dimension of desired square speckle image
-        pix_per_speckle:  number of pixels per smallest speckle.
-        alpha:            ratio of x to y speckle size
-        beta:             ratio of x to z speckle size
-        shape:            'ellipsoid', 'shell', 'box' or 'square' laser shape
-
-    Returns:
-        M x M X M speckle image
-    """
-    return create_Exponential_3D(M, pix_per_speckle, alpha, beta, shape, 0)

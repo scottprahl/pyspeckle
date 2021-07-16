@@ -33,6 +33,7 @@ rcheck:
 	make lintcheck
 	make doccheck
 	make html
+	flake8 .
 	check-manifest
 	pyroma -d .
 #	tox
