@@ -1,6 +1,13 @@
 Changelog
 =========
 
+v0.4.0
+------
+* 3D speckle generation
+* flake8 testing
+* add pypi badge
+* automate notebook testing
+
 v0.3.2
 ------
 * add badges for colab and binder
