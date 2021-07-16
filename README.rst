@@ -29,6 +29,7 @@ This implementation contains code for
 
     * 1D exponential and gaussian speckle 
     * 2D speckle algorithms
+    * 3D speckle generation
 
 Using pyspeckle
 -------------------
