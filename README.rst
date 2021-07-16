@@ -16,7 +16,7 @@ pyspeckle
 .. image:: https://img.shields.io/badge/github-code-green.svg
    :target: https://github.com/scottprahl/pyspeckle
 
-.. image:: https://img.shields.io/badge/MIT-license-yellow.svg
+.. image:: https://img.shields.io/badge/License-MIT-yellow.svg
    :target: https://github.com/scottprahl/pyspeckle/blob/master/LICENSE.txt
 
 __________
