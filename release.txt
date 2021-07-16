@@ -1,20 +1,18 @@
 # Releasing a new version
 
-# verify notebooks still work
-
 # sanity check
   make rcheck
   
-# edit version in setup.cfg
-  git commit -m 'update version' setup.cfg conf.py
+# edit version in setup.cfg and docs/conf.py
+  git commit -m 'update version' setup.cfg docs/conf.py
 
-# update CHANGELOG.txt  `git shortlog v0.3.0..HEAD`
+# update CHANGELOG.txt  `git shortlog v0.4.0..HEAD`
   git commit -m 'update recent changes' CHANGELOG.txt
   git push
 
 # create release tag on github
-  git tag v1.0.1
-  git push origin v1.0.1
+  git tag v0.4.0
+  git push origin v0.4.0
 
 # upload source to pypi
   python3 setup.py sdist
