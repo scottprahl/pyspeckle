@@ -18,11 +18,11 @@ sys.path.insert(0, os.path.abspath('..'))
 # -- Project information -----------------------------------------------------
 
 project = 'pyspeckle'
-copyright = '2020, Scott Prahl'
+copyright = '2020-21, Scott Prahl'
 author = 'Scott Prahl'
 
 # The full version, including alpha/beta/rc tags
-release = '0.3.2'
+release = '0.4.0'
 
 master_doc = 'index'
 
