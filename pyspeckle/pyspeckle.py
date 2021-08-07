@@ -26,6 +26,7 @@ __all__ = ('create_exp_1D',
            'create_Exponential',
            'create_Rayleigh',
            'statistics_plot',
+           'slice_plot',
            'create_Exponential_3D',
            'create_Rayleigh_3D')
 
@@ -324,7 +325,7 @@ def create_Exponential(M, pix_per_speckle, alpha=1, shape='ellipse', polarizatio
     return y / ymax
 
 
-def statistics_plot(x):
+def statistics_plot(x, initialize=True):
     """
     Plot the first and second-order statistics of a speckle pattern.
 
@@ -367,7 +368,8 @@ def statistics_plot(x):
     ave = np.mean(y)
     std = np.std(y)
 
-    _, ax = plt.subplots(2, 2, figsize=(14, 12))
+    if initialize:
+        plt.subplots(2, 2, figsize=(14, 12))
 
     # Speckle Realization
     plt.subplot(2, 2, 1)
@@ -379,7 +381,7 @@ def statistics_plot(x):
     # Histogram of Probability Distribution Function
     plt.subplot(2, 2, 2)
     num_bins = 30
-    ax[0, 1].set_aspect('equal')
+#    plt.gca().set_aspect('equal')
     hist, bins = np.histogram(y, bins=num_bins)
     width = 0.7 * (bins[1] - bins[0])
     center = (bins[:-1] + bins[1:]) / 2
@@ -390,7 +392,7 @@ def statistics_plot(x):
 
     # Power Spectral Density
     plt.subplot(2, 2, 3)
-    ax[1, 0].set_aspect('equal')
+    plt.gca().set_aspect('equal')
     psd = np.fft.fftshift(np.fft.fft2(x))
     psd = 2 * np.log(abs(psd))
     plt.imshow(psd, cmap=mymap, extent=[-0.5, 0.5, -0.5, 0.5])
@@ -400,7 +402,7 @@ def statistics_plot(x):
 
     # Probability Distribution Function on Log Scale
     plt.subplot(2, 2, 4)
-    ax[1, 1].set_aspect('equal')
+#    plt.gca().set_aspect('equal')
 #    pdf = hist / (np.sum(hist) * (bins[1] - bins[0]))
 
     plt.semilogy(center, hist, 'r.')
@@ -567,6 +569,59 @@ def create_Rayleigh_3D(M, pix_per_speckle, alpha=1, beta=1, shape='ellipsoid'):
         M x M X M speckle image
     """
     return create_Exponential_3D(M, pix_per_speckle, alpha, beta, shape, 0)
+
+
+def slice_plot(data, x, y, z, initialize=True, show_sqrt=True):
+    """
+    Plot the x, y, and z slices of 3D data cube.
+
+    Args:
+        data:       3D speckle pattern to be plotted
+        x: constant x slice
+        y: constant y slice
+        z: constant z slice
+
+    Returns:
+        nothing
+    """
+    mymap = copy.copy(matplotlib.cm.get_cmap("gray"))
+    mymap.set_bad('blue')
+
+    if initialize:
+        plt.subplots(2, 2, figsize=(14, 12))
+
+    plt.subplot(2, 2, 1)
+    plt.gca().set_aspect('equal')
+    zz = data[:, :, z]
+    if show_sqrt:
+        zz = _sqrt_matrix(zz)
+    plt.imshow(zz, cmap=mymap)
+    plt.title('Constant Z=%d values' % z)
+    plt.xlabel('X Position (pixels)')
+    plt.ylabel('Y Position (pixels)')
+
+    plt.subplot(2, 2, 2)
+    plt.gca().set_aspect('equal')
+    yy = data[:, y, :]
+    if show_sqrt:
+        yy = _sqrt_matrix(yy)
+    plt.imshow(yy, cmap=mymap)
+    plt.title('Constant Y=%d values' % y)
+    plt.xlabel('X Position (pixels)')
+    plt.ylabel('Z Position (pixels)')
+
+    plt.subplot(2, 2, 3)
+    plt.gca().set_aspect('equal')
+    xx = data[x, :, :]
+    if show_sqrt:
+        xx = _sqrt_matrix(xx)
+    plt.imshow(xx, cmap=mymap)
+    plt.title('Constant X=%d values' % x)
+    plt.xlabel('Y Position (pixels)')
+    plt.ylabel('Z Position (pixels)')
+
+    plt.subplot(2, 2, 4)
+    plt.gca().axis('off')
 
 
 def box_muller(mu, sigma, N=1):
