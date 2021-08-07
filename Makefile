@@ -46,5 +46,6 @@ clean:
 	rm -rf docs/api
 	rm -rf .tox
 	rm -rf __pycache__
+	rm -rf build
 
 .PHONY: clean check rcheck html doccheck lintcheck rstcheck

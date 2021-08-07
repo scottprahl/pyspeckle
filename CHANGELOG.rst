@@ -1,6 +1,13 @@
 Changelog
 =========
 
+v0.4.1
+------
+* add slice_plot() for 3D speckle
+* create pure python packaging
+* include wheel file
+* package as python3 only
+
 v0.4.0
 ------
 * 3D speckle generation

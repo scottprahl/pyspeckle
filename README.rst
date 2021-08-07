@@ -2,13 +2,13 @@ pyspeckle
 =========
 
 .. image:: https://img.shields.io/pypi/v/pyspeckle
-    :target: https://pypi.org/project/pyspeckle/
-    :alt: Latest PyPI version
+   :target: https://pypi.org/project/pyspeckle/
+   :alt: Latest PyPI version
 
 .. image:: https://img.shields.io/pypi/dm/pyspeckle
-    :target: https://pypi.org/project/pyspeckle/
-    :alt: Number of PyPI downloads
-    
+   :target: https://pypi.org/project/pyspeckle/
+   :alt: Number of PyPI downloads
+
 .. image:: https://colab.research.google.com/assets/colab-badge.svg
    :target: https://colab.research.google.com/github/scottprahl/pyspeckle/blob/master
    :alt: Google Collaboratory
