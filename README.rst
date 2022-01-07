@@ -1,6 +1,8 @@
 pyspeckle
 =========
 
+by Scott Prahl
+
 .. image:: https://img.shields.io/pypi/v/pyspeckle
    :target: https://pypi.org/project/pyspeckle/
    :alt: Latest PyPI version
