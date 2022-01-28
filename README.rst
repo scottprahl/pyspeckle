@@ -39,12 +39,14 @@ This implementation contains code for
     * 2D speckle algorithms
     * 3D speckle generation
 
+Documentation and examples are available at <https://pyspeckle2.readthedocs.io>
+
 Using pyspeckle
 -------------------
 
 1. Install with ``pip``::
     
-    pip install --user pyspeckle
+    pip install pyspeckle
 
 2. or `run this code in the cloud using Google Collaboratory <https://colab.research.google.com/github/scottprahl/pyspeckle/blob/master>`_ by selecting the Jupyter notebook that interests you.
 
