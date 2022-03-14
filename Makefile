@@ -39,14 +39,15 @@ rcheck:
 #	tox
 
 clean:
-	rm -rf dist
-	rm -rf pyspeckle.egg-info
-	rm -rf pyspeckle/__pycache__
-	rm -rf pyspeckle/__init__.pyc
-	rm -rf docs/_build
-	rm -rf docs/api
 	rm -rf .tox
 	rm -rf __pycache__
+	rm -rf .ipynb_checkpoints
 	rm -rf build
+	rm -rf dist
+	rm -rf docs/_build
+	rm -rf docs/api
+	rm -rf pyspeckle.egg-info
+	rm -rf pyspeckle/__pycache__
+	rm -rf pyspeckle/*.pyc
 
 .PHONY: clean check rcheck html doccheck lintcheck rstcheck
