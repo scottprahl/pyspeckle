@@ -20,7 +20,7 @@ rstcheck:
 	-rstcheck CHANGELOG.rst
 	-rstcheck docs/index.rst
 	-rstcheck docs/changelog.rst
-	-rstcheck --ignore-directives automodule docs/pyspeckle.rst
+	-rstcheck --ignore-directives automodapi docs/pyspeckle.rst
 
 notecheck:
 	make clean
