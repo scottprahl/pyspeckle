@@ -42,6 +42,7 @@ clean:
 	rm -rf dist
 	rm -rf pyspeckle.egg-info
 	rm -rf pyspeckle/__pycache__
+	rm -rf pyspeckle/__init__.pyc
 	rm -rf docs/_build
 	rm -rf docs/api
 	rm -rf .tox

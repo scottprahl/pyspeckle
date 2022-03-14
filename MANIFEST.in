@@ -2,6 +2,7 @@ include CHANGELOG.rst
 include LICENSE.txt
 
 exclude .gitignore
+exclude .readthedocs.yaml
 exclude docs/*
 exclude Makefile
 exclude release.txt
