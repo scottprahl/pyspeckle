@@ -45,18 +45,20 @@ extensions = [
 numpydoc_show_class_members = False
 napoleon_use_param = False
 napoleon_use_rtype = False
+napoleon_custom_sections = [('Returns', 'params_style')]
 
-# List of file patterns, relative to source directory, to exclude
-exclude_patterns = ['_build', '.tox', '**.ipynb_checkpoints']
+# List of patterns, relative to source directory, of files to ignore
+exclude_patterns = ['_build',
+                    '.tox',
+                    '**.ipynb_checkpoints',
+                    ]
 
 # I execute the notebooks manually in advance. 
 nbsphinx_execute = 'never'
 nbsphinx_allow_errors = True
 
-# Add type of source files
-source_suffix = ['.rst', '.ipynb']
-
 # -- Options for HTML output -------------------------------------------------
+
 html_theme = 'sphinx_rtd_theme'
 html_scaled_image_link = False
 html_sourcelink_suffix = ''
