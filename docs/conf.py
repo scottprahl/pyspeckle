@@ -36,6 +36,7 @@ master_doc = 'index'
 
 # Sphinx extension modules
 extensions = [
+#    'jupyterlite_sphinx',
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
     'sphinx.ext.mathjax',
@@ -52,6 +53,10 @@ exclude_patterns = ['_build',
                     '.tox',
                     '**.ipynb_checkpoints',
                     ]
+
+jupyterlite_contents = ['0-One-Dim-Speckle-Basics.ipynb',
+                        '1-Two-Dim-Speckle-Basics.ipynb',
+                        ]
 
 # I execute the notebooks manually in advance. 
 nbsphinx_execute = 'never'

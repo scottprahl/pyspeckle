@@ -1,6 +1,7 @@
 # pylint: disable=invalid-name
 # pylint: disable=too-many-arguments
 # pylint: disable=too-many-locals
+# pylint: disable=consider-using-f-string
 
 """
 Generate and analyze speckle patterns.
@@ -37,11 +38,10 @@ def _sqrt_matrix(x):
 
     Args:
         x: numpy array to be scaled
-    nscaled array of bytes
+    Returns:
+        scaled array of integers
     """
-    mx = np.max(x)
-    if mx == 0:
-        mx = 1
+    mx = np.max(x) or 1
     y = 255 * np.sqrt(x / mx)
     return y.astype(int)
 
@@ -129,37 +129,67 @@ def local_contrast_2D_plot(x, kernel):
 
 def _create_mask(M, x_radius, y_radius, shape='ellipse'):
     """
-    Create a boolean mask for shapesize.
+    Create a MxM boolean mask for a particular beam shape.
+    
+    The resulting shape is in the top left corner of the the returned array.
 
     The points inside the mask will be set to True.  Three shapes
-    are supported: 'ellipse', 'square', or 'annulus'.
+    are supported: 'ellipse', 'rectangle', or 'annulus'.
+    
+    For example `._create_mask(10,3,4,'ellipse').astype(int)` yields
+
+    [[0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+    [0, 0, 1, 1, 1, 0, 0, 0, 0, 0],
+    [0, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+    [0, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+    [1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
+    [0, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+    [0, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+    [0, 0, 1, 1, 1, 0, 0, 0, 0, 0],
+    [0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+       
+    When shape is 'annulus' then the outer circle radius is the max(x_radius, y_radius)
+    and then inner radius is the other.
 
     Args:
         M:        dimension of desired image
-        x_radius: half the horizontal width of the ellipse
-        y_radius: half the vertical width of the ellipse
-        shape:    'ellipse', 'square', or 'annulus' describing the laser shape
+        x_radius: half the horizontal width of the ellipse (in pixels)
+        y_radius: half the vertical width of the ellipse (in pixels)
+        shape:    'ellipse', 'rectangle', or 'annulus' describing the laser shape
 
     Returns:
         M x M boolean array
     """
+    if M < 2 * max(x_radius, y_radius):
+        raise ValueError("Array size M must be at least twice the radius.")
+
     Y, X = np.ogrid[:M, :M]
 
-    if shape == 'square':
-        dist = np.floor(X / x_radius / 2) + np.floor(Y / y_radius / 2)
-        mask = dist < 1
-    elif shape == 'annulus':
+    lshape = shape.lower()
+
+    if lshape == 'rectangle' or lshape == 'square':
+        mask1 = X < 2 * x_radius
+        mask2 = Y < 2 * y_radius
+        mask = np.logical_and(mask2, mask1)
+
+    elif lshape == 'annulus':
         rmax = max(x_radius, y_radius)
         rmin = min(x_radius, y_radius)
         dist1 = np.sqrt((X - rmax)**2 + (Y - rmax)**2) / rmax
-        mask1 = dist1 < 1
+        mask1 = dist1 <= 1
         dist2 = np.sqrt((X - rmax)**2 + (Y - rmax)**2) / rmin
         mask2 = dist2 > 1
         mask = np.logical_and(mask2, mask1)
-    else:
+
+    elif lshape == 'ellipse':
         dist = np.sqrt((X - x_radius)**2 / x_radius**2
                        + (Y - y_radius)**2 / y_radius**2)
-        mask = dist < 1
+        mask = dist <= 1
+
+    else:
+        raise ValueError("shape must be 'ellipse', 'rectangle', or 'annulus'")
+
     return mask
 
 
@@ -177,12 +207,22 @@ def create_exp_1D(M, mean, stdev, cl):
     Args:
         M:     dimension of desired array     [-]
         mean:  average value of signal        [gray levels]
-        std:   standard deviation of signal   [gray levels]
+        stdev:   standard deviation of signal [gray levels]
         cl:    correlation length             [# of pixels]
 
     Returns:
         array of length M
     """
+    if cl <= 0:
+        raise ValueError("Correlation length cl must be positive.")
+
+    if M <= 2 * cl:
+        raise ValueError("Array size M must be at least twice the correlation length cl.")
+
+    if stdev < 0:
+        raise ValueError("Standard deviation std must be non-negative.")
+
+
     f = np.exp(-1 / cl)
     fsqrt = np.sqrt(1 - f * f)
 
@@ -223,6 +263,15 @@ def create_gaussian_1D(M, mean, stdev, cl):
     Returns:
         array of length M
     """
+    if cl <= 0:
+        raise ValueError("Correlation length cl must be positive.")
+
+    if M <= 2 * cl:
+        raise ValueError("Array size M must be at least twice the correlation length cl.")
+
+    if stdev < 0:
+        raise ValueError("Standard deviation std must be non-negative.")
+
     Z = np.random.normal(0, stdev, M)  # zero mean
 
     # Gaussian filter
@@ -255,13 +304,14 @@ def autocorrelation(x):
     Returns:
         autocorrelation array of same length
     """
+    xx = x.astype(float)
     mean = np.mean(x)
-    x -= mean
-    result = np.correlate(x, x, mode='full')
+    xx -= mean
+    result = np.correlate(xx, xx, mode='full')
 # could also use the faster(?)
 #   result = signal.fftconvolve(sig, sig[::-1], mode='full')
 
-    mx = np.max(result)
+    mx = np.max(result) or 1
     middle = len(result) // 2
     return result[middle:] / mx
 
@@ -291,12 +341,15 @@ def create_Exponential(M, pix_per_speckle, alpha=1, shape='ellipse', polarizatio
         M:               dimension of desired square speckle image
         pix_per_speckle: number of pixels per smallest speckle.
         alpha:           ratio of horizontal to vertical speckle size
-        shape:           'ellipse', 'square', or 'annulus'
+        shape:           'ellipse', 'rectangle', or 'annulus'
         polarization:    degree of polarization
 
     Returns:
         M x M speckle image
     """
+    if polarization < 0 or polarization > 1:
+        raise ValueError("bad polarization. It must be 0 <= polarization <= 1.")
+
     if polarization < 1:
         y1 = create_Exponential(M, pix_per_speckle, alpha=alpha, shape=shape, polarization=1)
         y2 = create_Exponential(M, pix_per_speckle, alpha=alpha, shape=shape, polarization=1)
@@ -321,7 +374,7 @@ def create_Exponential(M, pix_per_speckle, alpha=1, shape='ellipse', polarizatio
 
     # extract the M x M matrix and normalize
     y = x[:M, :M]
-    ymax = np.max(y)
+    ymax = np.max(y) or 1
     return y / ymax
 
 
@@ -432,7 +485,7 @@ def create_Rayleigh(N, pix_per_speckle, alpha=1, shape='ellipse'):
         M:                dimension of desired square speckle image
         pix_per_speckle:  number of pixels per smallest speckle.
         alpha:            ratio of horizontal width to vertical width
-        shape:            'ellipse' or 'square' describing the laser shape
+        shape:            'ellipse' or 'rectangle' describing the laser shape
 
     Returns:
         M x M speckle image
@@ -454,7 +507,7 @@ def _create_mask_3D(M, x_radius, y_radius, z_radius, shape='ellipsoid'):
         x_radius: half the horizontal width of the ellipse
         y_radius: half the vertical width of the ellipse
         z_radius: half the vertical width of the ellipse
-        shape:    'ellipse', 'square', or 'annulus' describing the laser shape
+        shape:    'ellipse', 'rectangle', or 'annulus' describing the laser shape
 
     Returns:
         M x M boolean array
@@ -537,7 +590,7 @@ def create_Exponential_3D(M, pix_per_speckle, alpha=1, beta=1, shape='ellipsoid'
 
     # extract the M x M matrix and normalize
     y = x[:M, :M, :M]
-    ymax = np.max(y)
+    ymax = np.max(y) or 1
     return y / ymax
 
 
