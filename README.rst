@@ -4,7 +4,7 @@ pyspeckle
 by Scott Prahl
 
 .. image:: https://img.shields.io/pypi/v/pyspeckle
-   :target: https://pypi.org/project/pyspeckle/
+   :target: https://pypi.org/project/pyspeckle2/
    :alt: PyPI
 
 .. image:: https://img.shields.io/conda/v/conda-forge/pyspeckle.svg
@@ -26,7 +26,7 @@ by Scott Prahl
    :target: https://github.com/scottprahl/miepython/actions/workflows/test.yml
    :alt: Testing
 
-s.. image:: https://img.shields.io/pypi/dm/pyspeckle
+.. image:: https://img.shields.io/pypi/dm/pyspeckle
    :target: https://pypi.org/project/pyspeckle/
    :alt: Number of PyPI downloads
 
