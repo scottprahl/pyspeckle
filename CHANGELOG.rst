@@ -1,6 +1,16 @@
 Changelog
 =========
 
+0.5.0
+------
+* drop 'v' from version tags
+* add testing
+* reject bad values to some routines
+* add conda support
+* add github automated testing
+* improve CITATION
+* add github automated version updates
+
 v0.4.1
 ------
 * add slice_plot() for 3D speckle
