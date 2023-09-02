@@ -51,11 +51,11 @@ Using pyspeckle
     
     pip install pyspeckle
 
-of with ``conda''::
-   
+or install using ``conda``::
+    
     conda install -c conda-forge pyspeckle
 
 License
 -------
 
-``pyspeckle'' is licensed under the terms of the MIT license.
+``pyspeckle`` is licensed under the terms of the MIT license.
