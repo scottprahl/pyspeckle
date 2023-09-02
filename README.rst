@@ -4,7 +4,7 @@ pyspeckle
 by Scott Prahl
 
 .. image:: https://img.shields.io/pypi/v/pyspeckle
-   :target: https://pypi.org/project/pyspeckle2/
+   :target: https://pypi.org/project/pyspeckle/
    :alt: PyPI
 
 .. image:: https://img.shields.io/conda/v/conda-forge/pyspeckle.svg
@@ -15,13 +15,15 @@ by Scott Prahl
    :target: https://pyspeckle2.readthedocs.io
    :alt: Read the Docs
 
+.. image:: https://zenodo.org/badge/131667397.svg
+   :target: https://zenodo.org/badge/latestdoi/131667397
+      
+|
+
 .. image:: https://img.shields.io/github/license/scottprahl/pyspeckle
    :target: https://github.com/scottprahl/pyspeckle/blob/master/LICENSE.txt
    :alt: MIT License
 
-.. image:: https://zenodo.org/badge/131667397.svg
-   :target: https://zenodo.org/badge/latestdoi/131667397
-      
 .. image:: https://github.com/scottprahl/miepython/actions/workflows/test.yml/badge.svg
    :target: https://github.com/scottprahl/miepython/actions/workflows/test.yml
    :alt: Testing
@@ -38,21 +40,11 @@ port of SimSpeckle Matlab routines described in
 
 1D speckle
 ----------
-.. image:: https://github.com/scottprahl/pyspeckle/blob/master/docs/oneD_example.png?raw=true
-   :alt: 1D speckle plot
-
-usercontent
------------
 .. image:: https://raw.githubusercontent.com/scottprahl/pyspeckle/master/docs/oneD_example.png
    :alt: 1D speckle plot
 
 2D speckle
 ----------
-.. image:: https://github.com/scottprahl/pyspeckle/blob/master/docs/twoD_speckle.png?raw=true
-   :alt: 2D speckle plot
-
-usercontent
------------
 .. image:: https://raw.githubusercontent.com/scottprahl/pyspeckle/master/docs/twoD_speckle.png
    :alt: 2D speckle plot
 
