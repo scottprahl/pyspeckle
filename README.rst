@@ -35,11 +35,11 @@ by Scott Prahl
 ________
 
 A collection of routines to track and analyze laser speckle.  This is a python
-port of SimSpeckle Matlab routines described in::
+port of SimSpeckle Matlab routines described in:
 
 .. note:: Duncan & Kirkpatrick, "Algorithms for simulation of speckle (laser and otherwise)," in SPIE Vol. 6855 (2008). <https://www.researchgate.net/profile/Sean-Kirkpatrick-2/publication/233783056_Algorithms_for_simulation_of_speckle_laser_and_otherwise/links/09e4150b78c4e8fe5f000000/Algorithms-for-simulation-of-speckle-laser-and-otherwise.pdf>`_
 
-To cite the code, then use::
+To cite the code, then use:
 
 .. note:: Prahl, S. (2023). pyspeckle: a python module for creation and analysis of laser speckle. (Version 0.5.1) https://doi.org/10.5281/zenodo.8311678
 
