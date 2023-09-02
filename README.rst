@@ -38,14 +38,14 @@ port of SimSpeckle Matlab routines described in
 
 1D speckle
 ----------
-.. image:: https://raw.githubusercontent.com/scottprahl/pyspeckle/master/docs/oneD_example.png
+.. image:: https://github.com/scottprahl/pyspeckle/blob/master/docs/oneD_example.png?raw=true
    :alt: 1D speckle plot
 
 docs/twoD_speckle.png
 
 2D speckle
 ----------
-.. image:: https://raw.githubusercontent.com/scottprahl/pyspeckle/master/docs/twoD_speckle.png
+.. image:: https://github.com/scottprahl/pyspeckle/blob/master/docs/twoD_speckle.png?raw=true
    :alt: 2D speckle plot
 
 Documentation and examples for 1D, 2D, and 3D speckle are available at <https://pyspeckle2.readthedocs.io>
