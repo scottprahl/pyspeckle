@@ -44,14 +44,14 @@ This implementation contains code for
 
 Documentation and examples are available at <https://pyspeckle2.readthedocs.io>
 
-Using pyspeckle
--------------------
+Installation
+-------------
 
-1. Install with ``pip``::
+Use ``pip``::
     
     pip install pyspeckle
 
-or install using ``conda``::
+or use ``conda``::
     
     conda install -c conda-forge pyspeckle
 
