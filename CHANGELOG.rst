@@ -1,6 +1,10 @@
 Changelog
 =========
 
+0.5.1
+------
+* attempt to fix images on pypi.org
+
 0.5.0
 ------
 * drop 'v' from version tags

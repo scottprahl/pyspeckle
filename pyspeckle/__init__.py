@@ -25,10 +25,10 @@ Three dimensional functions::
     pyspeckle.create_Exponential_3D(M, pix_per_speckle)
     pyspeckle.create_Rayleigh_3D(M, pix_per_speckle)
 """
-__version__ = '0.5.0'
+__version__ = '0.5.1'
 __author__ = 'Scott Prahl'
 __email__ = 'scott.prahl@oit.edu'
-__copyright__ = 'Copyright 2020-23, Scott Prahl'
+__copyright__ = 'Copyright 2018-23, Scott Prahl'
 __license__ = 'MIT'
 __url__ = 'https://github.com/scottprahl/pyspeckle.git'
 

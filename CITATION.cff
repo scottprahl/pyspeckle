@@ -6,6 +6,6 @@ cff-version: 1.2.0
 date-released: '2023-09-02'
 doi: 10.5281/zenodo.8311678
 message: If you use this software, please cite it as below.
-title: 'pyspeckle: Creation and Analysis of Laser Speckle'
+title: 'pyspeckle: python code for creation and analysis of laser speckle'
 url: https://zenodo.org/badge/latestdoi/131667397
 version: 0.5.0
