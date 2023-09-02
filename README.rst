@@ -44,7 +44,7 @@ port of SimSpeckle Matlab routines described in
 
 2D speckle
 ----------
-.. image:: https://github.com/scottprahl/pyspeckle/blob/master/docs/twoD_example.png
+.. image:: https://github.com/scottprahl/pyspeckle/blob/master/docs/twoD_speckle.png
    :alt: 2D speckle plot
    :width: 600px
 
