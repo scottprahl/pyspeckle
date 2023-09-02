@@ -11,10 +11,6 @@ by Scott Prahl
    :target: https://anaconda.org/conda-forge/pyspeckle
    :alt: Conda
 
-.. image:: https://readthedocs.org/projects/pyspeckle2/badge
-   :target: https://pyspeckle2.readthedocs.io
-   :alt: Read the Docs
-
 .. image:: https://zenodo.org/badge/131667397.svg
    :target: https://zenodo.org/badge/latestdoi/131667397
       
@@ -27,6 +23,10 @@ by Scott Prahl
 .. image:: https://github.com/scottprahl/miepython/actions/workflows/test.yml/badge.svg
    :target: https://github.com/scottprahl/miepython/actions/workflows/test.yml
    :alt: Testing
+
+.. image:: https://readthedocs.org/projects/pyspeckle2/badge
+   :target: https://pyspeckle2.readthedocs.io
+   :alt: Read the Docs
 
 .. image:: https://img.shields.io/pypi/dm/pyspeckle
    :target: https://pypi.org/project/pyspeckle/
