@@ -42,7 +42,7 @@ port of SimSpeckle Matlab routines described in
    :alt: 1D speckle plot
 
 usercontent
-----------_
+-----------
 .. image:: https://raw.githubusercontent.com/scottprahl/pyspeckle/master/docs/oneD_example.png
    :alt: 1D speckle plot
 
@@ -52,7 +52,7 @@ usercontent
    :alt: 2D speckle plot
 
 usercontent
-----------_
+-----------
 .. image:: https://raw.githubusercontent.com/scottprahl/pyspeckle/master/docs/twoD_speckle.png
    :alt: 2D speckle plot
 
