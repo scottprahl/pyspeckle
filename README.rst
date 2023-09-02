@@ -4,7 +4,7 @@ pyspeckle
 by Scott Prahl
 
 .. image:: https://img.shields.io/pypi/v/pyspeckle
-   :target: https://pypi.org/project/pyspeckle/
+   :target: https://pypi.org/project/pyspeckle2/
    :alt: PyPI
 
 .. image:: https://img.shields.io/conda/v/conda-forge/pyspeckle.svg
@@ -41,11 +41,19 @@ port of SimSpeckle Matlab routines described in
 .. image:: https://github.com/scottprahl/pyspeckle/blob/master/docs/oneD_example.png?raw=true
    :alt: 1D speckle plot
 
-docs/twoD_speckle.png
+usercontent
+----------_
+.. image:: https://raw.githubusercontent.com/scottprahl/pyspeckle/master/docs/oneD_example.png
+   :alt: 1D speckle plot
 
 2D speckle
 ----------
 .. image:: https://github.com/scottprahl/pyspeckle/blob/master/docs/twoD_speckle.png?raw=true
+   :alt: 2D speckle plot
+
+usercontent
+----------_
+.. image:: https://raw.githubusercontent.com/scottprahl/pyspeckle/master/docs/twoD_speckle.png
    :alt: 2D speckle plot
 
 Documentation and examples for 1D, 2D, and 3D speckle are available at <https://pyspeckle2.readthedocs.io>
