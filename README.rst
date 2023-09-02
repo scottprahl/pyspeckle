@@ -51,14 +51,11 @@ Using pyspeckle
     
     pip install pyspeckle
 
-2. or `run this code in the cloud using Google Collaboratory <https://colab.research.google.com/github/scottprahl/pyspeckle/blob/master>`_ by selecting the Jupyter notebook that interests you.
-
-3. use `binder <https://mybinder.org/v2/gh/scottprahl/pyspeckle/master?filepath=docs>`_ which will create a new environment that allows you to run Jupyter notebooks.  This takes a bit longer to start, but it automatically installs ``pyspeckle``.
-
-4. clone the `pyspeckle github repository <https://github.com/scottprahl/pyspeckle>`_ and then add the repository to your ``PYTHONPATH`` environment variable
-
+of with ``conda''::
+   
+    conda install -c conda-forge pyspeckle
 
 License
 -------
 
-pyspeckle is licensed under the terms of the MIT license.
+``pyspeckle'' is licensed under the terms of the MIT license.
