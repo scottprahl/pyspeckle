@@ -19,9 +19,9 @@ by Scott Prahl
    :target: https://github.com/scottprahl/pyspeckle/blob/master/LICENSE.txt
    :alt: MIT License
 
-.. image:: https://zenodo.org/badge/99259684.svg
-   :target: https://zenodo.org/badge/latestdoi/99259684
-
+.. image:: https://zenodo.org/badge/131667397.svg
+   :target: https://zenodo.org/badge/latestdoi/131667397
+      
 .. image:: https://github.com/scottprahl/miepython/actions/workflows/test.yml/badge.svg
    :target: https://github.com/scottprahl/miepython/actions/workflows/test.yml
    :alt: Testing
