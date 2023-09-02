@@ -36,7 +36,11 @@ A collection of routines to track and analyze laser speckle.  This is a python
 port of SimSpeckle Matlab routines described in
 `Duncan & Kirkpatrick, "Algorithms for simulation of speckle (laser and otherwise)," in SPIE Vol. 6855 (2008) <https://www.researchgate.net/profile/Sean-Kirkpatrick-2/publication/233783056_Algorithms_for_simulation_of_speckle_laser_and_otherwise/links/09e4150b78c4e8fe5f000000/Algorithms-for-simulation-of-speckle-laser-and-otherwise.pdf>`_
 
-This implementation contains code for
+1D speckle
+----------
+.. image:: docs/oneD_speckle.png
+   :alt: 1D speckle plot
+   :width: 500px  # Optional: you can set width, height, etc.
 
     * 1D exponential and gaussian speckle 
     * 2D speckle algorithms
