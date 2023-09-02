@@ -47,6 +47,7 @@ clean:
 	rm -rf .ipynb_checkpoints
 	rm -rf .jupyterlite.doit.db
 	rm -rf .pytest_cache
+	rm -rf .virtual_documents
 	rm -rf build
 	rm -rf dist
 	rm -rf docs/_build
