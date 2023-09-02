@@ -130,12 +130,12 @@ def local_contrast_2D_plot(x, kernel):
 def _create_mask(M, x_radius, y_radius, shape='ellipse'):
     """
     Create a MxM boolean mask for a particular beam shape.
-    
+
     The resulting shape is in the top left corner of the the returned array.
 
     The points inside the mask will be set to True.  Three shapes
     are supported: 'ellipse', 'rectangle', or 'annulus'.
-    
+
     For example `._create_mask(10,3,4,'ellipse').astype(int)` yields
 
     [[0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
@@ -148,7 +148,7 @@ def _create_mask(M, x_radius, y_radius, shape='ellipse'):
     [0, 0, 1, 1, 1, 0, 0, 0, 0, 0],
     [0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
-       
+
     When shape is 'annulus' then the outer circle radius is the max(x_radius, y_radius)
     and then inner radius is the other.
 
@@ -168,7 +168,7 @@ def _create_mask(M, x_radius, y_radius, shape='ellipse'):
 
     lshape = shape.lower()
 
-    if lshape == 'rectangle' or lshape == 'square':
+    if lshape in ('rectangle', 'square'):
         mask1 = X < 2 * x_radius
         mask2 = Y < 2 * y_radius
         mask = np.logical_and(mask2, mask1)
@@ -221,7 +221,6 @@ def create_exp_1D(M, mean, stdev, cl):
 
     if stdev < 0:
         raise ValueError("Standard deviation std must be non-negative.")
-
 
     f = np.exp(-1 / cl)
     fsqrt = np.sqrt(1 - f * f)
@@ -641,7 +640,7 @@ def slice_plot(data, x, y, z, initialize=True, show_sqrt=True):
     mymap.set_bad('blue')
 
     if initialize:
-        plt.subplots(2, 2, figsize=(14, 12))
+        plt.subplots(2, 2, figsize=(9, 9))
 
     plt.subplot(2, 2, 1)
     plt.gca().set_aspect('equal')
