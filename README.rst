@@ -38,9 +38,9 @@ port of SimSpeckle Matlab routines described in
 
 1D speckle
 ----------
-.. image:: docs/oneD_speckle.png
+.. image:: https://github.com/scottprahl/pyspeckle/raw/main/docs/oneD_speckle.png
    :alt: 1D speckle plot
-   :width: 500px  # Optional: you can set width, height, etc.
+   :width: 500px
 
     * 1D exponential and gaussian speckle 
     * 2D speckle algorithms
