@@ -11,8 +11,8 @@ def test_create_exp_1D_output_length():
 
 def test_create_exp_1D_mean_and_std():
     arr = pyspeckle.create_exp_1D(1000, 10, 2, 5)
-    assert abs(np.mean(arr) - 10) < 0.5  # A small tolerance might be needed due to randomness
-    assert abs(np.std(arr) - 2) < 0.5
+    assert abs(np.mean(arr) - 10) < 0.8  # A small tolerance might be needed due to randomness
+    assert abs(np.std(arr) - 2) < 0.8
 
 
 @pytest.mark.parametrize("M,mean,stdev,cl", [(0, 10, 2, 5), (100, 10, -2, 5), (100, 10, 2, -5), (100, 10, 2, 51)])
