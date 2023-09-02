@@ -30,7 +30,6 @@ by Scott Prahl
    :target: https://pypi.org/project/pyspeckle/
    :alt: Number of PyPI downloads
 
-
 ________
 
 A collection of routines to track and analyze laser speckle.  This is a python

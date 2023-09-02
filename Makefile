@@ -25,13 +25,8 @@ rstcheck:
 	-rstcheck docs/changelog.rst
 	-rstcheck --ignore-directives automodapi docs/pyspeckle.rst
 
-notecheck:
-	make clean
-	pytest --verbose test_all_notebooks.py
-	rm -rf __pycache__
-
 rcheck:
-	make notecheck
+	make test
 	make rstcheck
 	make lintcheck
 	make doccheck
@@ -41,6 +36,7 @@ rcheck:
 	pyroma -d .
 
 test:
+	make clean
 	pytest tests/test_basics.py
 	pytest tests/test_all_notebooks.py
 
@@ -59,6 +55,7 @@ clean:
 	rm -rf docs/api
 	rm -rf docs/.ipynb_checkpoints
 	rm -rf docs/.jupyterlite.doit.db
+	rm -rf tests/__pycache__
 	rm -rf pyspeckle.egg-info
 	rm -rf pyspeckle/__pycache__
 	rm -rf pyspeckle/*.pyc

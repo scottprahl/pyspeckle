@@ -5,10 +5,10 @@ Changelog
 ------
 * drop 'v' from version tags
 * add testing
-* reject bad values to some routines
 * add conda support
 * add github automated testing
-* improve CITATION
+* improve CITATION.cff
+* create zenodo DOI
 * add github automated version updates
 
 v0.4.1
