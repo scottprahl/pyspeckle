@@ -5,32 +5,33 @@ by Scott Prahl
 
 .. image:: https://img.shields.io/pypi/v/pyspeckle
    :target: https://pypi.org/project/pyspeckle/
-   :alt: PyPI
+   :alt: pypi
 
 .. image:: https://img.shields.io/conda/v/conda-forge/pyspeckle.svg
    :target: https://anaconda.org/conda-forge/pyspeckle
-   :alt: Conda
+   :alt: conda-forge
 
 .. image:: https://zenodo.org/badge/131667397.svg
    :target: https://zenodo.org/badge/latestdoi/131667397
-      
+   :alt: doi
+
 |
 
 .. image:: https://img.shields.io/github/license/scottprahl/pyspeckle
    :target: https://github.com/scottprahl/pyspeckle/blob/master/LICENSE.txt
-   :alt: MIT License
+   :alt: License
 
-.. image:: https://github.com/scottprahl/miepython/actions/workflows/test.yml/badge.svg
-   :target: https://github.com/scottprahl/miepython/actions/workflows/test.yml
+.. image:: https://github.com/scottprahl/pyspeckle/actions/workflows/test.yml/badge.svg
+   :target: https://github.com/scottprahl/pyspeckle/actions/workflows/test.yml
    :alt: Testing
 
 .. image:: https://readthedocs.org/projects/pyspeckle2/badge
    :target: https://pyspeckle2.readthedocs.io
-   :alt: Read the Docs
+   :alt: Docs
 
 .. image:: https://img.shields.io/pypi/dm/pyspeckle
    :target: https://pypi.org/project/pyspeckle/
-   :alt: Number of PyPI downloads
+   :alt: Downloads
 
 ________
 
