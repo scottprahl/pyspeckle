@@ -4,7 +4,7 @@ pyspeckle
 by Scott Prahl
 
 .. image:: https://img.shields.io/pypi/v/pyspeckle
-   :target: https://pypi.org/project/pyspeckle2/
+   :target: https://pypi.org/project/pyspeckle/
    :alt: PyPI
 
 .. image:: https://img.shields.io/conda/v/conda-forge/pyspeckle.svg
