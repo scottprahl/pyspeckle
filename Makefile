@@ -14,6 +14,11 @@ lintcheck:
 	-pylint pyspeckle/pyspeckle.py
 	-pylint pyspeckle/__init__.py
 
+yamlcheck:
+	-yamllint .github/workflows/pypi.yaml
+	-yamllint .github/workflows/test.yaml
+	-yamllint .github/workflows/citation.yaml
+
 doccheck:
 	-pydocstyle pyspeckle/pyspeckle.py
 	-pydocstyle pyspeckle/__init__.py
