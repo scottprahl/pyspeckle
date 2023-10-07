@@ -3,11 +3,15 @@ pyspeckle
 
 by Scott Prahl
 
-.. image:: https://img.shields.io/pypi/v/pyspeckle
+.. image:: https://img.shields.io/pypi/v/pyspeckle?color=68CA66
    :target: https://pypi.org/project/pyspeckle/
    :alt: pypi
 
-.. image:: https://img.shields.io/conda/v/conda-forge/pyspeckle.svg
+.. image:: https://img.shields.io/github/v/tag/scottprahl/pyspeckle?label=github&color=68CA66
+   :target: https://github.com/scottprahl/pyspeckle
+   :alt: github
+
+.. image:: https://img.shields.io/conda/v/conda-forge/pyspeckle?label=conda&color=68CA66
    :target: https://anaconda.org/conda-forge/pyspeckle
    :alt: conda-forge
 
@@ -17,7 +21,7 @@ by Scott Prahl
 
 |
 
-.. image:: https://img.shields.io/github/license/scottprahl/pyspeckle
+.. image:: https://img.shields.io/github/license/scottprahl/pyspeckle?color=68CA66
    :target: https://github.com/scottprahl/pyspeckle/blob/master/LICENSE.txt
    :alt: License
 
@@ -25,11 +29,11 @@ by Scott Prahl
    :target: https://github.com/scottprahl/pyspeckle/actions/workflows/test.yml
    :alt: Testing
 
-.. image:: https://readthedocs.org/projects/pyspeckle2/badge
+.. image:: https://readthedocs.org/projects/pyspeckle2/badge?color=68CA66
    :target: https://pyspeckle2.readthedocs.io
    :alt: Docs
 
-.. image:: https://img.shields.io/pypi/dm/pyspeckle
+.. image:: https://img.shields.io/pypi/dm/pyspeckle?color=68CA66
    :target: https://pypi.org/project/pyspeckle/
    :alt: Downloads
 
