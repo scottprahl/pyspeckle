@@ -1,3 +1,4 @@
+"""Setup for pyspeckle module."""
 import re
 import os.path
 from setuptools import setup

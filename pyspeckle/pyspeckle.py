@@ -256,7 +256,7 @@ def create_gaussian_1D(M, mean, stdev, cl):
     Args:
         M:     dimension of desired array     [-]
         mean:  average value of signal        [gray levels]
-        std:   standard deviation of signal   [gray levels]
+        stdev:   standard deviation of signal [gray levels]
         cl:    correlation length             [# of pixels]
 
     Returns:
@@ -405,6 +405,7 @@ def statistics_plot(x, initialize=True):
 
     Args:
         x:       speckle pattern to be analyzed
+        initialize: boolean to initialize the plot
 
     Returns:
         nothing
@@ -465,7 +466,7 @@ def statistics_plot(x, initialize=True):
 
 def create_Rayleigh(N, pix_per_speckle, alpha=1, shape='ellipse'):
     """
-    Generate an M x M unpolarized speckle irradiance pattern.
+    Generate an N x N unpolarized speckle irradiance pattern.
 
     The speckle pattern will have a Rayleigh distribution and results from
     the incoherent sum of two speckle patterns.
@@ -481,13 +482,13 @@ def create_Rayleigh(N, pix_per_speckle, alpha=1, shape='ellipse'):
     they are wide.
 
     Args:
-        M:                dimension of desired square speckle image
+        N:                dimension of desired square speckle image
         pix_per_speckle:  number of pixels per smallest speckle.
         alpha:            ratio of horizontal width to vertical width
         shape:            'ellipse' or 'rectangle' describing the laser shape
 
     Returns:
-        M x M speckle image
+        N x N speckle image
     """
     y1 = create_Exponential(N, pix_per_speckle, shape=shape, alpha=alpha)
     y2 = create_Exponential(N, pix_per_speckle, shape=shape, alpha=alpha)
@@ -632,6 +633,8 @@ def slice_plot(data, x, y, z, initialize=True, show_sqrt=True):
         x: constant x slice
         y: constant y slice
         z: constant z slice
+        initialize: boolean to initialize plot
+        show_sqrt: take sqrt() of image for better visualization
 
     Returns:
         nothing
