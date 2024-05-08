@@ -1,3 +1,4 @@
+"""Update version and date in citation."""
 import json
 import requests
 import yaml
