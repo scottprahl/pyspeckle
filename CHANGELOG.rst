@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.6.0
+------
+* modernize packaging
+* modernize github actions
+* improve docstrings
+* use ruff for linting
+
 0.5.1
 ------
 * attempt to fix images on pypi.org
