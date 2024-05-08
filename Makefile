@@ -10,7 +10,7 @@ html:
 lite:
 	jupyter lite build --XeusPythonEnv.packages=numpy,matplotlib,scipy,pyspeckle
 
-lintcheck:
+lint:
 	-pylint pyspeckle/pyspeckle.py
 	-pylint pyspeckle/__init__.py
 
@@ -18,10 +18,6 @@ yamlcheck:
 	-yamllint .github/workflows/pypi.yaml
 	-yamllint .github/workflows/test.yaml
 	-yamllint .github/workflows/citation.yaml
-
-doccheck:
-	-pydocstyle pyspeckle/pyspeckle.py
-	-pydocstyle pyspeckle/__init__.py
 
 rstcheck:
 	-rstcheck README.rst
@@ -31,12 +27,11 @@ rstcheck:
 	-rstcheck --ignore-directives automodapi docs/pyspeckle.rst
 
 rcheck:
+	make clean
+	ruff check
 	make test
 	make rstcheck
-	make lintcheck
-	make doccheck
 	make html
-	flake8 .
 	check-manifest
 	pyroma -d .
 
