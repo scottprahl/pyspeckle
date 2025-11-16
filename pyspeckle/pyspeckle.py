@@ -19,17 +19,19 @@ import numpy as np
 import matplotlib.cm
 import matplotlib.pyplot as plt
 
-__all__ = ('create_exp_1D',
-           'create_gaussian_1D',
-           'autocorrelation',
-           'local_contrast_2D',
-           'local_contrast_2D_plot',
-           'create_Exponential',
-           'create_Rayleigh',
-           'statistics_plot',
-           'slice_plot',
-           'create_Exponential_3D',
-           'create_Rayleigh_3D')
+__all__ = (
+    "create_exp_1D",
+    "create_gaussian_1D",
+    "autocorrelation",
+    "local_contrast_2D",
+    "local_contrast_2D_plot",
+    "create_Exponential",
+    "create_Rayleigh",
+    "statistics_plot",
+    "slice_plot",
+    "create_Exponential_3D",
+    "create_Rayleigh_3D",
+)
 
 
 def _sqrt_matrix(x):
@@ -71,8 +73,8 @@ def local_contrast_2D(x, kernel):
     K = np.std(x) / np.mean(x)
 
     # local speckle contrast
-    mu_x = scipy.signal.correlate2d(x, kernel, mode='same') / Nk
-    var_x = scipy.signal.correlate2d((x - mu_x)**2, kernel, mode='same') / Nk / Nk
+    mu_x = scipy.signal.correlate2d(x, kernel, mode="same") / Nk
+    var_x = scipy.signal.correlate2d((x - mu_x) ** 2, kernel, mode="same") / Nk / Nk
     C = np.sqrt(var_x) / mu_x
     return C, K
 
@@ -97,37 +99,37 @@ def local_contrast_2D_plot(x, kernel):
     plt.subplots(2, 2, figsize=(14, 12))
     plt.subplot(221)
 
-    plt.imshow(_sqrt_matrix(x), cmap='gray')
-    plt.xlabel('Position (pixels)')
-    plt.ylabel('Position (pixels)')
-    plt.title('Speckle Realization, Overall Contrast=%0.2f' % K)
+    plt.imshow(_sqrt_matrix(x), cmap="gray")
+    plt.xlabel("Position (pixels)")
+    plt.ylabel("Position (pixels)")
+    plt.title("Speckle Realization, Overall Contrast=%0.2f" % K)
 
     plt.subplot(222)
     hist, bins = np.histogram(x, bins=30)
     width = 0.7 * (bins[1] - bins[0])
     center = (bins[:-1] + bins[1:]) / 2
-    plt.bar(center, hist, align='center', width=width)
-    plt.title('PDF of Speckle Realization')
-    plt.xlabel('Gray level, g')
-    plt.ylabel('PDF')
+    plt.bar(center, hist, align="center", width=width)
+    plt.title("PDF of Speckle Realization")
+    plt.xlabel("Gray level, g")
+    plt.ylabel("PDF")
 
     plt.subplot(223)
-    plt.imshow(_sqrt_matrix(C), cmap='gray')
-    plt.xlabel('Position (pixels)')
-    plt.ylabel('Position (pixels)')
-    plt.title('Local speckle contrast')
+    plt.imshow(_sqrt_matrix(C), cmap="gray")
+    plt.xlabel("Position (pixels)")
+    plt.ylabel("Position (pixels)")
+    plt.title("Local speckle contrast")
 
     plt.subplot(224)
     hist, bins = np.histogram(C, bins=20)
     width = 0.7 * (bins[1] - bins[0])
     center = (bins[:-1] + bins[1:]) / 2
-    plt.bar(center, hist, align='center', width=width)
-    plt.title('PDF of Local Speckle Contrast')
-    plt.xlabel('Local contrast, C')
-    plt.ylabel('PDF')
+    plt.bar(center, hist, align="center", width=width)
+    plt.title("PDF of Local Speckle Contrast")
+    plt.xlabel("Local contrast, C")
+    plt.ylabel("PDF")
 
 
-def _create_mask(M, x_radius, y_radius, shape='ellipse'):
+def _create_mask(M, x_radius, y_radius, shape="ellipse"):
     """
     Create a MxM boolean mask for a particular beam shape.
 
@@ -168,23 +170,22 @@ def _create_mask(M, x_radius, y_radius, shape='ellipse'):
 
     lshape = shape.lower()
 
-    if lshape in ('rectangle', 'square'):
+    if lshape in ("rectangle", "square"):
         mask1 = X < 2 * x_radius
         mask2 = Y < 2 * y_radius
         mask = np.logical_and(mask2, mask1)
 
-    elif lshape == 'annulus':
+    elif lshape == "annulus":
         rmax = max(x_radius, y_radius)
         rmin = min(x_radius, y_radius)
-        dist1 = np.sqrt((X - rmax)**2 + (Y - rmax)**2) / rmax
+        dist1 = np.sqrt((X - rmax) ** 2 + (Y - rmax) ** 2) / rmax
         mask1 = dist1 <= 1
-        dist2 = np.sqrt((X - rmax)**2 + (Y - rmax)**2) / rmin
+        dist2 = np.sqrt((X - rmax) ** 2 + (Y - rmax) ** 2) / rmin
         mask2 = dist2 > 1
         mask = np.logical_and(mask2, mask1)
 
-    elif lshape == 'ellipse':
-        dist = np.sqrt((X - x_radius)**2 / x_radius**2
-                       + (Y - y_radius)**2 / y_radius**2)
+    elif lshape == "ellipse":
+        dist = np.sqrt((X - x_radius) ** 2 / x_radius**2 + (Y - y_radius) ** 2 / y_radius**2)
         mask = dist <= 1
 
     else:
@@ -306,16 +307,16 @@ def autocorrelation(x):
     xx = x.astype(float)
     mean = np.mean(x)
     xx -= mean
-    result = np.correlate(xx, xx, mode='full')
-# could also use the faster(?)
-#   result = signal.fftconvolve(sig, sig[::-1], mode='full')
+    result = np.correlate(xx, xx, mode="full")
+    # could also use the faster(?)
+    #   result = signal.fftconvolve(sig, sig[::-1], mode='full')
 
     mx = np.max(result) or 1
     middle = len(result) // 2
     return result[middle:] / mx
 
 
-def create_Exponential(M, pix_per_speckle, alpha=1, shape='ellipse', polarization=1):
+def create_Exponential(M, pix_per_speckle, alpha=1, shape="ellipse", polarization=1):
     """
     Generate an M x M polarized, fully-developed speckle irradiance pattern.
 
@@ -369,7 +370,7 @@ def create_Exponential(M, pix_per_speckle, alpha=1, shape='ellipse', polarizatio
 
     # take the FFT and square it
     x = np.fft.fftshift(np.fft.fft2(x))
-    x = abs(x)**2
+    x = abs(x) ** 2
 
     # extract the M x M matrix and normalize
     y = x[:M, :M]
@@ -411,12 +412,12 @@ def statistics_plot(x, initialize=True):
         nothing
     """
     mymap = copy.copy(matplotlib.cm.get_cmap("gray"))
-    mymap.set_bad('blue')
+    mymap.set_bad("blue")
 
     try:
         y = x.compressed()  # if masked array
     except AttributeError:
-        y = x               # not a masked array
+        y = x  # not a masked array
 
     ave = np.mean(y)
     std = np.std(y)
@@ -427,44 +428,44 @@ def statistics_plot(x, initialize=True):
     # Speckle Realization
     plt.subplot(2, 2, 1)
     plt.imshow(_sqrt_matrix(x), cmap=mymap)
-    plt.title('Sqrt() of Speckle Irradiance')
-    plt.xlabel('Position (pixels)')
-    plt.ylabel('Position (pixels)')
+    plt.title("Sqrt() of Speckle Irradiance")
+    plt.xlabel("Position (pixels)")
+    plt.ylabel("Position (pixels)")
 
     # Histogram of Probability Distribution Function
     plt.subplot(2, 2, 2)
     num_bins = 30
-#    plt.gca().set_aspect('equal')
+    #    plt.gca().set_aspect('equal')
     hist, bins = np.histogram(y, bins=num_bins)
     width = 0.7 * (bins[1] - bins[0])
     center = (bins[:-1] + bins[1:]) / 2
-    plt.bar(center, hist, align='center', width=width, color='gray')
-    plt.xlabel('Irradiance (gray level/pixel)')
-    plt.ylabel(r'Probability Distribution Function, $p_I(i)$')
-    plt.title('Average = %.2f, Standard Deviation = %.2f' % (ave, std))
+    plt.bar(center, hist, align="center", width=width, color="gray")
+    plt.xlabel("Irradiance (gray level/pixel)")
+    plt.ylabel(r"Probability Distribution Function, $p_I(i)$")
+    plt.title("Average = %.2f, Standard Deviation = %.2f" % (ave, std))
 
     # Power Spectral Density
     plt.subplot(2, 2, 3)
-    plt.gca().set_aspect('equal')
+    plt.gca().set_aspect("equal")
     psd = np.fft.fftshift(np.fft.fft2(x))
     psd = 2 * np.log(abs(psd))
     plt.imshow(psd, cmap=mymap, extent=[-0.5, 0.5, -0.5, 0.5])
-    plt.title('Log() of Power Spectral Density')
-    plt.xlabel('Spatial Frequency (1/pixels)')
-    plt.ylabel('Spatial Frequency (1/pixels)')
+    plt.title("Log() of Power Spectral Density")
+    plt.xlabel("Spatial Frequency (1/pixels)")
+    plt.ylabel("Spatial Frequency (1/pixels)")
 
     # Probability Distribution Function on Log Scale
     plt.subplot(2, 2, 4)
-#    plt.gca().set_aspect('equal')
-#    pdf = hist / (np.sum(hist) * (bins[1] - bins[0]))
+    #    plt.gca().set_aspect('equal')
+    #    pdf = hist / (np.sum(hist) * (bins[1] - bins[0]))
 
-    plt.semilogy(center, hist, 'r.')
-    plt.title('Speckle Contrast, K=%.3f' % (std / ave))
-    plt.xlabel('Irradiance')
-    plt.ylabel(r'Probability Distribution Function, $p_I(i)$')
+    plt.semilogy(center, hist, "r.")
+    plt.title("Speckle Contrast, K=%.3f" % (std / ave))
+    plt.xlabel("Irradiance")
+    plt.ylabel(r"Probability Distribution Function, $p_I(i)$")
 
 
-def create_Rayleigh(N, pix_per_speckle, alpha=1, shape='ellipse'):
+def create_Rayleigh(N, pix_per_speckle, alpha=1, shape="ellipse"):
     """
     Generate an N x N unpolarized speckle irradiance pattern.
 
@@ -495,7 +496,7 @@ def create_Rayleigh(N, pix_per_speckle, alpha=1, shape='ellipse'):
     return (y1 + y2) / 2
 
 
-def _create_mask_3D(M, x_radius, y_radius, z_radius, shape='ellipsoid'):
+def _create_mask_3D(M, x_radius, y_radius, z_radius, shape="ellipsoid"):
     """
     Create 3D boolean mask for designated shape.
 
@@ -514,26 +515,26 @@ def _create_mask_3D(M, x_radius, y_radius, z_radius, shape='ellipsoid'):
     """
     X, Y, Z = np.ogrid[:M, :M, :M]
 
-    if shape == 'cube':
+    if shape == "cube":
         dist = np.floor(X / x_radius / 2) + np.floor(Y / y_radius / 2) + np.floor(Z / z_radius / 2)
         mask = dist < 1
-    elif shape == 'shell':
+    elif shape == "shell":
         rmax = max(x_radius, y_radius, z_radius)
         rmin = min(x_radius, y_radius, z_radius)
-        dist1 = np.sqrt((X - rmax)**2 + (Y - rmax)**2 + (Z - rmax)**2) / rmax
+        dist1 = np.sqrt((X - rmax) ** 2 + (Y - rmax) ** 2 + (Z - rmax) ** 2) / rmax
         mask1 = dist1 < 1
-        dist2 = np.sqrt((X - rmax)**2 + (Y - rmax)**2 + (Z - rmax)**2) / rmin
+        dist2 = np.sqrt((X - rmax) ** 2 + (Y - rmax) ** 2 + (Z - rmax) ** 2) / rmin
         mask2 = dist2 > 1
         mask = np.logical_and(mask2, mask1)
     else:
-        dist = np.sqrt((X - x_radius)**2 / x_radius**2
-                       + (Y - y_radius)**2 / y_radius**2
-                       + (Z - z_radius)**2 / z_radius**2)
+        dist = np.sqrt(
+            (X - x_radius) ** 2 / x_radius**2 + (Y - y_radius) ** 2 / y_radius**2 + (Z - z_radius) ** 2 / z_radius**2
+        )
         mask = dist <= 1
     return mask
 
 
-def create_Exponential_3D(M, pix_per_speckle, alpha=1, beta=1, shape='ellipsoid', polarization=1):
+def create_Exponential_3D(M, pix_per_speckle, alpha=1, beta=1, shape="ellipsoid", polarization=1):
     """
     Generate an M x M x M polarized, fully-developed speckle irradiance pattern.
 
@@ -586,7 +587,7 @@ def create_Exponential_3D(M, pix_per_speckle, alpha=1, beta=1, shape='ellipsoid'
 
     # take the FFT and square it
     x = np.fft.fftshift(np.fft.fftn(x))
-    x = abs(x)**2
+    x = abs(x) ** 2
 
     # extract the M x M matrix and normalize
     y = x[:M, :M, :M]
@@ -594,7 +595,7 @@ def create_Exponential_3D(M, pix_per_speckle, alpha=1, beta=1, shape='ellipsoid'
     return y / ymax
 
 
-def create_Rayleigh_3D(M, pix_per_speckle, alpha=1, beta=1, shape='ellipsoid'):
+def create_Rayleigh_3D(M, pix_per_speckle, alpha=1, beta=1, shape="ellipsoid"):
     """
     Generate an M x M x M unpolarized speckle irradiance pattern.
 
@@ -640,43 +641,43 @@ def slice_plot(data, x, y, z, initialize=True, show_sqrt=True):
         nothing
     """
     mymap = copy.copy(matplotlib.cm.get_cmap("gray"))
-    mymap.set_bad('blue')
+    mymap.set_bad("blue")
 
     if initialize:
         plt.subplots(2, 2, figsize=(9, 9))
 
     plt.subplot(2, 2, 1)
-    plt.gca().set_aspect('equal')
+    plt.gca().set_aspect("equal")
     zz = data[:, :, z]
     if show_sqrt:
         zz = _sqrt_matrix(zz)
     plt.imshow(zz, cmap=mymap)
-    plt.title('Constant Z=%d values' % z)
-    plt.xlabel('X Position (pixels)')
-    plt.ylabel('Y Position (pixels)')
+    plt.title("Constant Z=%d values" % z)
+    plt.xlabel("X Position (pixels)")
+    plt.ylabel("Y Position (pixels)")
 
     plt.subplot(2, 2, 2)
-    plt.gca().set_aspect('equal')
+    plt.gca().set_aspect("equal")
     yy = data[:, y, :]
     if show_sqrt:
         yy = _sqrt_matrix(yy)
     plt.imshow(yy, cmap=mymap)
-    plt.title('Constant Y=%d values' % y)
-    plt.xlabel('X Position (pixels)')
-    plt.ylabel('Z Position (pixels)')
+    plt.title("Constant Y=%d values" % y)
+    plt.xlabel("X Position (pixels)")
+    plt.ylabel("Z Position (pixels)")
 
     plt.subplot(2, 2, 3)
-    plt.gca().set_aspect('equal')
+    plt.gca().set_aspect("equal")
     xx = data[x, :, :]
     if show_sqrt:
         xx = _sqrt_matrix(xx)
     plt.imshow(xx, cmap=mymap)
-    plt.title('Constant X=%d values' % x)
-    plt.xlabel('Y Position (pixels)')
-    plt.ylabel('Z Position (pixels)')
+    plt.title("Constant X=%d values" % x)
+    plt.xlabel("Y Position (pixels)")
+    plt.ylabel("Z Position (pixels)")
 
     plt.subplot(2, 2, 4)
-    plt.gca().axis('off')
+    plt.gca().axis("off")
 
 
 def box_muller(mu, sigma, N=1):
