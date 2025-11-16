@@ -27,7 +27,8 @@ jobs:
       - name: Build
         run: |
           pip install setuptools wheel twine build
-          pip install -r requirements.txt
+          pip install numpy
+          pip install pytest
           python -m build
 
       - name: Publish package to PyPI
