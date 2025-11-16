@@ -19,7 +19,7 @@ yamllint
 rstcheck
 pylint
 pyroma
-black
+black[jupyter]
 
 # Release
 check-manifest
