@@ -1,28 +1,28 @@
-# Releasing a new version
+Releasing a new version
 
-# sanity check
+# make sure things are not broken and that files match up
   make rcheck
-  
-# edit version in pyspeckle/__init__.py
-  git commit -m 'update version' pyspeckle/__init__.py
 
-# update CHANGELOG.txt  `git shortlog v0.4.0..HEAD`
+# deploy new version to github
+  make lite-deploy
+
+# update the version in __init__.py and pyproject.toml
+  git commit pyspeckle/__init__.py pyproject.toml -m 'update version'
+
+# update CHANGELOG.txt  `git shortlog v0.5.0..HEAD`
   git commit -m 'update recent changes' CHANGELOG.txt
   git push
 
 # create release tag on github
-  git tag 0.5.1
-  git push origin 0.5.1
+  git tag 0.6.0
+  git push origin 0.6.0
 
-# upload source to pypi
-  python -m build
-  python -m twine upload dist/*
-
-# update/check releases
+# manually publish release at
   open https://github.com/scottprahl/pyspeckle
+  
+# verify action success
   open https://pypi.org/project/pyspeckle/
   open https://pyspeckle2.readthedocs.io
-
-# merge pull request for conda when the email arrives
+  
+# wait for feedstock update
   open https://github.com/conda-forge/pyspeckle-feedstock
-

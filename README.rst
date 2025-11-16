@@ -30,48 +30,107 @@
    :target: https://pypi.org/project/pyspeckle/
    :alt: Downloads
 
+.. |lite| image:: https://img.shields.io/badge/try-JupyterLite-68CA66.svg
+   :target: https://scottprahl.github.io/pyspeckle/
+   :alt: Try Online
+
+
 pyspeckle
 =========
 
-by Scott Prahl
+|pypi-badge| |github-badge| |conda-badge| |doi-badge|  
+|license| |test-badge| |docs-badge| |downloads-badge|  
+|lite|
 
-|pypi-badge| |github-badge| |conda-badge| |doi-badge| 
+**pyspeckle** is a research-grade Python library for generating and analyzing laser speckle fields.  
+It provides reproducible numerical implementations of physically motivated speckle models used in optical metrology, coherent imaging, and biomedical photonics.
 
-|license| |test-badge| |docs-badge| |downloads-badge|
+The methods implemented in this package are derived from the algorithms of Duncan & Kirkpatrick  
+(**"Algorithms for simulation of speckle (laser and otherwise)"**, Proc. SPIE 6855, 2008). :contentReference[oaicite:1]{index=1}  
+These algorithms unify a variety of simulation approaches across:
 
-A collection of routines to track and analyze laser speckle.  This is a python
-port of SimSpeckle Matlab routines described in:
+- **objective speckle** (non-imaged fields),
+- **subjective speckle** (imaged fields),
+- **static speckle**, and
+- **dynamic speckle** including translation, strain, boiling, and decorrelation.
 
-    Duncan & Kirkpatrick, "Algorithms for simulation of speckle (laser and otherwise)," in SPIE Vol. 6855 (2008). <https://www.researchgate.net/profile/Sean-Kirkpatrick-2/publication/233783056_Algorithms_for_simulation_of_speckle_laser_and_otherwise/links/09e4150b78c4e8fe5f000000/Algorithms-for-simulation-of-speckle-laser-and-otherwise.pdf>`_
+The goal of this project is to provide the research community with a reliable, transparent, and extensible computational reference for speckle simulation studies and validation of analytical models.
 
-To cite this code, use:
+Scientific Context
+------------------
 
-     Prahl, S. (2023). pyspeckle: a python module for creation and analysis of laser speckle. (Version 0.5.1) https://doi.org/10.5281/zenodo.8311678
+Coherent imaging systems—including SAR, OCT, ultrasound, ESPI, and laser speckle contrast imaging—produce granular interference patterns defined by the random phase relationships of scattered waves.
+
+The statistical properties of these patterns depend on:
+
+- the nature of the scatterers,
+- the system geometry (objective vs. subjective speckle),
+- sampling in the optical transfer function domain,
+- polarization state,
+- mechanical motion (coordinated or uncoordinated),
+- temporal evolution of scatterer phase correlations.
+
+Using the FFT-based band-limited generation approach described by Duncan & Kirkpatrick, this library supports:
+
+- fully developed speckle following exponential intensity statistics,
+- partially polarized speckle fields parameterized by polarization degree,
+- correlation-controlled temporal sequences via Gaussian copulas,
+- controlled motion using the Fourier shift theorem,
+- simulation of decorrelation consistent with analytical expectation (e.g., Airy-law decay in defocus imaging).
+
+The resulting fields are suitable for testing theory, validating algorithms, benchmarking imaging systems, and training machine-learning models under controlled statistical conditions.
+
+Representative Outputs
+----------------------
 
 1D speckle
-----------
+~~~~~~~~~~
+
 .. image:: https://raw.githubusercontent.com/scottprahl/pyspeckle/main/docs/oneD_example.png
-   :alt: 1D speckle plot
+   :alt: synthetic 1D speckle intensity profile
 
 2D speckle
-----------
+~~~~~~~~~~
+
 .. image:: https://raw.githubusercontent.com/scottprahl/pyspeckle/main/docs/twoD_speckle.png
-   :alt: 2D speckle plot
+   :alt: simulated 2D speckle field
 
-Documentation and examples for 1D, 2D, and 3D speckle are available at <https://pyspeckle2.readthedocs.io>
-
-Installation
+Documentation
 -------------
 
-Use ``pip``::
-    
+Full documentation and algorithm demonstrations are available at:
+
+   https://pyspeckle2.readthedocs.io
+
+A browser-run JupyterLite environment requires no installation:
+
+   https://scottprahl.github.io/pyspeckle/
+
+Installation
+------------
+
+``pip``::
+
     pip install pyspeckle
 
-or use ``conda``::
-    
+or ``conda``::
+
     conda install -c conda-forge pyspeckle
+
+
+Citation
+--------
+
+If you use ``pyspeckle`` in research or publication, please cite:
+
+::
+
+   Prahl, S. (2023). *pyspeckle: A Python module for creation and analysis of laser speckle.*
+   Version 0.5.1. https://doi.org/10.5281/zenodo.8311678
+
 
 License
 -------
 
-``pyspeckle`` is licensed under the terms of the MIT license.
+``pyspeckle`` is released under the MIT License. Contributions are welcome.
+
