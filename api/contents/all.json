@@ -1,0 +1,57 @@
+{
+  "content": [
+    {
+      "content": null,
+      "created": "2025-11-16T20:57:34.105481Z",
+      "format": null,
+      "hash": null,
+      "hash_algorithm": null,
+      "last_modified": "2025-11-16T20:57:32.375876Z",
+      "mimetype": null,
+      "name": "2-Three-Dim-Speckle.ipynb",
+      "path": "2-Three-Dim-Speckle.ipynb",
+      "size": 4801,
+      "type": "notebook",
+      "writable": true
+    },
+    {
+      "content": null,
+      "created": "2025-11-16T20:57:34.105239Z",
+      "format": null,
+      "hash": null,
+      "hash_algorithm": null,
+      "last_modified": "2025-11-16T20:57:32.257938Z",
+      "mimetype": null,
+      "name": "1-Two-Dim-Speckle-Basics.ipynb",
+      "path": "1-Two-Dim-Speckle-Basics.ipynb",
+      "size": 8731,
+      "type": "notebook",
+      "writable": true
+    },
+    {
+      "content": null,
+      "created": "2025-11-16T20:57:34.104975Z",
+      "format": null,
+      "hash": null,
+      "hash_algorithm": null,
+      "last_modified": "2025-11-16T20:57:32.148341Z",
+      "mimetype": null,
+      "name": "0-One-Dim-Speckle-Basics.ipynb",
+      "path": "0-One-Dim-Speckle-Basics.ipynb",
+      "size": 11163,
+      "type": "notebook",
+      "writable": true
+    }
+  ],
+  "created": "2025-11-16T20:57:34.105367Z",
+  "format": "json",
+  "hash": null,
+  "hash_algorithm": null,
+  "last_modified": "2025-11-16T20:57:34.105367Z",
+  "mimetype": null,
+  "name": "",
+  "path": "",
+  "size": null,
+  "type": "directory",
+  "writable": true
+}

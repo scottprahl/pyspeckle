@@ -1,0 +1,28 @@
+{
+  "pyspeckle": {
+    "releases": {
+      "0.6.0": [
+        {
+          "comment_text": "",
+          "digests": {
+            "md5": "96f405acdf9ecb395e0aa82540320608",
+            "sha256": "bf6d55693fced47de1926f900aa77eb3a42a1e82ced284d9f60e856e54e54fd1"
+          },
+          "downloads": -1,
+          "filename": "pyspeckle-0.6.0-py3-none-any.whl",
+          "has_sig": false,
+          "md5_digest": "96f405acdf9ecb395e0aa82540320608",
+          "packagetype": "bdist_wheel",
+          "python_version": "py3",
+          "requires_python": ">=3.9",
+          "size": 9806,
+          "upload_time": "2025-11-16T20:57:31.097757Z",
+          "upload_time_iso_8601": "2025-11-16T20:57:31.097757Z",
+          "url": "./pyspeckle-0.6.0-py3-none-any.whl",
+          "yanked": false,
+          "yanked_reason": null
+        }
+      ]
+    }
+  }
+}
