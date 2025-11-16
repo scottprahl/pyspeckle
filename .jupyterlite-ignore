@@ -1,0 +1,28 @@
+# JupyterLite ignore patterns (gitignore-style)
+# Ignore git directories and worktrees
+.gh-pages/
+.git/
+
+# Ignore build outputs
+_site/
+dist/
+build/
+*.egg-info/
+
+# Ignore Python cache
+__pycache__/
+.pytest_cache/
+.venv/
+.ruff_cache/
+
+# Ignore Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Ignore documentation builds
+docs/_build/
+
+# Ignore tests
+tests/
+
+# Ignore CI/CD
+.github/
