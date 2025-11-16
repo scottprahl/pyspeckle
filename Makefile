@@ -205,6 +205,7 @@ lite: $(VENV)/.ready
 	else \
 		echo "⚠️  No notebooks found in docs/"; \
 	fi
+	@/bin/cp docs/speckle.png "$(STAGE_DIR)"
 
 	@echo "==> Building JupyterLite"
 	@"$(PYTHON)" -m jupyter lite build \
