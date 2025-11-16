@@ -10,8 +10,8 @@
    :target: https://anaconda.org/conda-forge/pyspeckle
    :alt: conda-forge
 
-.. |doi-badge| image:: https://zenodo.org/badge/8311677.svg
-   :target: https://zenodo.org/badge/latestdoi/8311677
+.. |doi-badge| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.8312075.svg
+   :target: https://doi.org/10.5281/zenodo.8312075
    :alt: doi
 
 .. |license| image:: https://img.shields.io/github/license/scottprahl/pyspeckle?color=68CA66
@@ -132,7 +132,7 @@ If you use ``pyspeckle`` in research or publication, please cite:
 ::
 
    Prahl, S. (2025). *pyspeckle: A Python module for creation and analysis of laser speckle.*
-   Version 0.6.0. https://doi.org/10.5281/zenodo.8311677
+   Version 0.6.0. https://doi.org/10.5281/zenodo.8312075
 
 ::
 
