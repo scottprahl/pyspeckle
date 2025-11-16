@@ -43,10 +43,11 @@ pyspeckle
 |lite|
 
 **pyspeckle** is a research-grade Python library for generating and analyzing laser speckle fields.  
-It provides reproducible numerical implementations of physically motivated speckle models used in optical metrology, coherent imaging, and biomedical photonics.
+It provides reproducible numerical implementations of physically motivated speckle models used in 
+optical metrology, coherent imaging, and biomedical photonics.
 
 The methods implemented in this package are derived from the algorithms of Duncan & Kirkpatrick  
-(**"Algorithms for simulation of speckle (laser and otherwise)"**, Proc. SPIE 6855, 2008). :contentReference[oaicite:1]{index=1}  
+(**"Algorithms for simulation of speckle (laser and otherwise)"**, Proc. SPIE 6855, 2008).
 These algorithms unify a variety of simulation approaches across:
 
 - **objective speckle** (non-imaged fields),
@@ -54,12 +55,14 @@ These algorithms unify a variety of simulation approaches across:
 - **static speckle**, and
 - **dynamic speckle** including translation, strain, boiling, and decorrelation.
 
-The goal of this project is to provide the research community with a reliable, transparent, and extensible computational reference for speckle simulation studies and validation of analytical models.
+The goal of this project is to provide the research community with a reliable, transparent, 
+and extensible computational reference for speckle simulation studies and validation of analytical models.
 
 Scientific Context
 ------------------
 
-Coherent imaging systems—including SAR, OCT, ultrasound, ESPI, and laser speckle contrast imaging—produce granular interference patterns defined by the random phase relationships of scattered waves.
+Coherent imaging systems—including SAR, OCT, ultrasound, ESPI, and laser speckle contrast 
+imaging—produce granular interference patterns defined by the random phase relationships of scattered waves.
 
 The statistical properties of these patterns depend on:
 
@@ -78,7 +81,8 @@ Using the FFT-based band-limited generation approach described by Duncan & Kirkp
 - controlled motion using the Fourier shift theorem,
 - simulation of decorrelation consistent with analytical expectation (e.g., Airy-law decay in defocus imaging).
 
-The resulting fields are suitable for testing theory, validating algorithms, benchmarking imaging systems, and training machine-learning models under controlled statistical conditions.
+The resulting fields are suitable for testing theory, validating algorithms, benchmarking imaging systems, 
+and training machine-learning models under controlled statistical conditions.
 
 Representative Outputs
 ----------------------
@@ -128,7 +132,11 @@ If you use ``pyspeckle`` in research or publication, please cite:
    Prahl, S. (2023). *pyspeckle: A Python module for creation and analysis of laser speckle.*
    Version 0.5.1. https://doi.org/10.5281/zenodo.8311678
 
+as well as
 
+    Duncan & Kirkpatrick (2008) "Algorithms for simulation of speckle (laser and otherwise)",
+    Proc. of SPIE Vol. 6855, 685505.
+    
 License
 -------
 
