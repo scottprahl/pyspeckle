@@ -4,6 +4,7 @@
 pytest
 setuptools
 libarchive-c
+imageio
 
 # Testing notebooks
 numpy
