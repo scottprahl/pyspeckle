@@ -30,6 +30,7 @@ lite/
 # Documentation
 docs/_build/
 docs/api/
+docs/*pdf
 
 # Testing
 .pytest_cache/
