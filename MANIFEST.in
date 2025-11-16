@@ -1,10 +1,7 @@
-include CHANGELOG.rst
+# Core package files
 include LICENSE.txt
+include README.rst
+include CHANGELOG.rst
+include CITATION.cff
 
-exclude .gitignore
-exclude .readthedocs.yaml
-exclude docs/*
-exclude Makefile
-exclude release.txt
-exclude requirements.txt
-exclude test_all_notebooks.py
+recursive-include tests *.py
