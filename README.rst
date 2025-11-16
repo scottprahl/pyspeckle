@@ -10,8 +10,8 @@
    :target: https://anaconda.org/conda-forge/pyspeckle
    :alt: conda-forge
 
-.. |doi-badge| image:: https://zenodo.org/badge/131667397.svg
-   :target: https://zenodo.org/badge/latestdoi/131667397
+.. |doi-badge| image:: https://zenodo.org/badge/8311677.svg
+   :target: https://zenodo.org/badge/latestdoi/8311677
    :alt: doi
 
 .. |license| image:: https://img.shields.io/github/license/scottprahl/pyspeckle?color=68CA66
@@ -39,7 +39,9 @@ pyspeckle
 =========
 
 |pypi-badge| |github-badge| |conda-badge| |doi-badge|  
+
 |license| |test-badge| |docs-badge| |downloads-badge|  
+
 |lite|
 
 **pyspeckle** is a research-grade Python library for generating and analyzing laser speckle fields.  
@@ -129,10 +131,10 @@ If you use ``pyspeckle`` in research or publication, please cite:
 
 ::
 
-   Prahl, S. (2023). *pyspeckle: A Python module for creation and analysis of laser speckle.*
-   Version 0.5.1. https://doi.org/10.5281/zenodo.8311678
+   Prahl, S. (2025). *pyspeckle: A Python module for creation and analysis of laser speckle.*
+   Version 0.6.0. https://doi.org/10.5281/zenodo.8311677
 
-as well as
+::
 
     Duncan & Kirkpatrick (2008) "Algorithms for simulation of speckle (laser and otherwise)",
     Proc. of SPIE Vol. 6855, 685505.
