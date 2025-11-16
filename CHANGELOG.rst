@@ -3,10 +3,14 @@ Changelog
 
 0.6.0
 ------
+* jupyterlite support
 * modernize packaging
 * modernize github actions
+* use pyproject.toml only
 * improve docstrings
 * use ruff for linting
+* add requirements-dev.txt
+* use venv for reproducibility
 
 0.5.1
 ------
