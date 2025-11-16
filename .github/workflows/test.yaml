@@ -27,8 +27,8 @@ jobs:
 
       - name: Install package and dependencies
         run: |
-          pip install -r numpy
-          pip install -r pytest
+          pip install numpy
+          pip install pytest
           pip install -e .  # current package in editable mode
 
       - name: Test with pytest
