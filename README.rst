@@ -44,7 +44,7 @@ pyspeckle
 
 |lite|
 
-**pyspeckle** is a research-grade Python library for generating and analyzing laser speckle fields.  
+**pyspeckle** is a Python library for generating and analyzing laser speckle fields.  
 It provides reproducible numerical implementations of physically motivated speckle models used in 
 optical metrology, coherent imaging, and biomedical photonics.
 
