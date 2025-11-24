@@ -16,8 +16,7 @@ abstract: 'pyspeckle is a Python library for analyzing laser speckle patterns, w
   support for contrast-based image metrics, histogram statistics, autocorrelation
   (ACF), and probability distribution functions (PDF) for both objective and subjective
   speckle fields. It is designed for research, education, and engineering applications
-  involving coherent imaging, scattering, and speckle metrology.
-
+  involving coherent imaging, scattering, and speckle metrology.'
 keywords:
 - speckle
 - objective speckle
@@ -27,7 +26,6 @@ keywords:
 - laser imaging
 - scattering
 - metrology
-
 preferred-citation:
   type: software
   title: 'pyspeckle: Tools for objective and subjective laser speckle analysis'
