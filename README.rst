@@ -38,18 +38,16 @@
 pyspeckle
 =========
 
-|pypi-badge| |github-badge| |conda-badge| |doi-badge|  
-
-|license| |test-badge| |docs-badge| |downloads-badge|  
-
+|pypi-badge| |github-badge| |conda-badge| |doi-badge|
+|license| |test-badge| |docs-badge| |downloads-badge|
 |lite|
 
-**pyspeckle** is a Python library for generating and analyzing laser speckle fields.  
-It provides reproducible numerical implementations of physically motivated speckle models used in 
+**pyspeckle** is a Python library for generating and analyzing laser speckle fields.
+It provides reproducible numerical implementations of physically motivated speckle models used in
 optical metrology, coherent imaging, and biomedical photonics.
 
-The methods implemented in this package are derived from the algorithms of Duncan & Kirkpatrick  
-(**"Algorithms for simulation of speckle (laser and otherwise)"**, Proc. SPIE 6855, 2008).
+The methods implemented in this package are derived from Duncan & Kirkpatrick  
+(*Algorithms for simulation of speckle (laser and otherwise)*, Proc. SPIE 6855, 2008).
 These algorithms unify a variety of simulation approaches across:
 
 - **objective speckle** (non-imaged fields),
@@ -57,34 +55,11 @@ These algorithms unify a variety of simulation approaches across:
 - **static speckle**, and
 - **dynamic speckle** including translation, strain, boiling, and decorrelation.
 
-The goal of this project is to provide the research community with a reliable, transparent, 
-and extensible computational reference for speckle simulation studies and validation of analytical models.
-
 Scientific Context
 ------------------
 
-Coherent imaging systems—including SAR, OCT, ultrasound, ESPI, and laser speckle contrast 
+Coherent imaging systems—including SAR, OCT, ultrasound, ESPI, and laser speckle contrast
 imaging—produce granular interference patterns defined by the random phase relationships of scattered waves.
-
-The statistical properties of these patterns depend on:
-
-- the nature of the scatterers,
-- the system geometry (objective vs. subjective speckle),
-- sampling in the optical transfer function domain,
-- polarization state,
-- mechanical motion (coordinated or uncoordinated),
-- temporal evolution of scatterer phase correlations.
-
-Using the FFT-based band-limited generation approach described by Duncan & Kirkpatrick, this library supports:
-
-- fully developed speckle following exponential intensity statistics,
-- partially polarized speckle fields parameterized by polarization degree,
-- correlation-controlled temporal sequences via Gaussian copulas,
-- controlled motion using the Fourier shift theorem,
-- simulation of decorrelation consistent with analytical expectation (e.g., Airy-law decay in defocus imaging).
-
-The resulting fields are suitable for testing theory, validating algorithms, benchmarking imaging systems, 
-and training machine-learning models under controlled statistical conditions.
 
 Representative Outputs
 ----------------------
@@ -106,22 +81,23 @@ Documentation
 
 Full documentation and algorithm demonstrations are available at:
 
-   https://pyspeckle2.readthedocs.io
+https://pyspeckle2.readthedocs.io
 
-You can test ``pyspeckle`` in a JupyterLite browser window that requires no installation:
+Try in JupyterLite (no install required):
 
-   https://scottprahl.github.io/pyspeckle/
+https://scottprahl.github.io/pyspeckle/
+
 
 Installation
 ------------
 
 ``pip``::
 
-    pip install pyspeckle
+   pip install pyspeckle
 
-or ``conda``::
+``conda``::
 
-    conda install -c conda-forge pyspeckle
+   conda install -c conda-forge pyspeckle
 
 
 Citation
@@ -134,7 +110,7 @@ Prahl, S. (2025). *pyspeckle: Tools for objective and subjective laser speckle a
 
 
 BibTeX
-^^^^^^
+~~~~~~
 
 .. code-block:: bibtex
 
@@ -152,4 +128,3 @@ License
 -------
 
 ``pyspeckle`` is released under the MIT License. Contributions are welcome.
-
