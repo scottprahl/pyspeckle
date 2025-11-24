@@ -1,44 +1,41 @@
 cff-version: 1.2.0
 type: software
 message: If you use this software, please cite it as below.
-title: "pyspeckle: Tools for objective and subjective laser speckle analysis"
-version: "0.6.0"
+title: 'pyspeckle: Tools for objective and subjective laser speckle analysis'
+version: 0.6.0
 doi: 10.5281/zenodo.8311677
-date-released: "2025-11-23"
+date-released: '2023-09-02'
 url: https://doi.org/10.5281/zenodo.8311677
 repository-code: https://github.com/scottprahl/pyspeckle
 license: BSD-3-Clause
 authors:
-  - family-names: Prahl
-    given-names: Scott
-    orcid: https://orcid.org/0000-0003-1468-6851
+- family-names: Prahl
+  given-names: Scott
+  orcid: https://orcid.org/0000-0003-1468-6851
+abstract: 'pyspeckle is a Python library for analyzing laser speckle patterns, with
+  support for contrast-based image metrics, histogram statistics, autocorrelation
+  (ACF), and probability distribution functions (PDF) for both objective and subjective
+  speckle fields. It is designed for research, education, and engineering applications
+  involving coherent imaging, scattering, and speckle metrology.
 
-abstract: >
-  pyspeckle is a Python library for analyzing laser speckle patterns,
-  with support for contrast-based image metrics, histogram statistics,
-  autocorrelation (ACF), and probability distribution functions (PDF)
-  for both objective and subjective speckle fields. It is designed for
-  research, education, and engineering applications involving coherent
-  imaging, scattering, and speckle metrology.
-
+  '
 keywords:
-  - speckle
-  - objective speckle
-  - subjective speckle
-  - contrast
-  - correlation
-  - laser imaging
-  - scattering
-  - metrology
-
+- speckle
+- objective speckle
+- subjective speckle
+- contrast
+- correlation
+- laser imaging
+- scattering
+- metrology
 preferred-citation:
   type: software
-  title: "pyspeckle: Tools for objective and subjective laser speckle analysis"
-  year: 2025
-  version: "0.6.0"
+  title: 'pyspeckle: Tools for objective and subjective laser speckle analysis'
+  year: 2023
+  version: 0.6.0
   doi: 10.5281/zenodo.XXXXXXX
   url: https://doi.org/10.5281/zenodo.8311677
   authors:
-    - family-names: Prahl
-      given-names: Scott
-      orcid: https://orcid.org/0000-0003-1468-6851
+  - family-names: Prahl
+    given-names: Scott
+    orcid: https://orcid.org/0000-0003-1468-6851
