@@ -39,7 +39,9 @@ pyspeckle
 =========
 
 |pypi-badge| |github-badge| |conda-badge| |doi-badge|
+
 |license| |test-badge| |docs-badge| |downloads-badge|
+
 |lite|
 
 **pyspeckle** is a Python library for generating and analyzing laser speckle fields.
