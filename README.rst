@@ -10,8 +10,8 @@
    :target: https://anaconda.org/conda-forge/pyspeckle
    :alt: conda-forge
 
-.. |doi-badge| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.8312075.svg
-   :target: https://doi.org/10.5281/zenodo.8312075
+.. |doi-badge| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.8311677.svg
+   :target: https://doi.org/10.5281/zenodo.8311677
    :alt: doi
 
 .. |license| image:: https://img.shields.io/github/license/scottprahl/pyspeckle?color=68CA66
@@ -108,7 +108,7 @@ Full documentation and algorithm demonstrations are available at:
 
    https://pyspeckle2.readthedocs.io
 
-A browser-run JupyterLite environment requires no installation:
+You can test ``pyspeckle`` in a JupyterLite browser window that requires no installation:
 
    https://scottprahl.github.io/pyspeckle/
 
@@ -127,18 +127,27 @@ or ``conda``::
 Citation
 --------
 
-If you use ``pyspeckle`` in research or publication, please cite:
+If you use ``pyspeckle`` in academic, instructional, or applied technical work, please cite:
 
-::
+Prahl, S. (2025). *pyspeckle: Tools for objective and subjective laser speckle analysis*
+(Version 0.6.0) [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.8311677
 
-   Prahl, S. (2025). *pyspeckle: A Python module for creation and analysis of laser speckle.*
-   Version 0.6.0. https://doi.org/10.5281/zenodo.8312075
 
-::
+BibTeX
+^^^^^^
 
-    Duncan & Kirkpatrick (2008) "Algorithms for simulation of speckle (laser and otherwise)",
-    Proc. of SPIE Vol. 6855, 685505.
-    
+.. code-block:: bibtex
+
+   @software{pyspeckle_prahl_2025,
+     author    = {Scott Prahl},
+     title     = {pyspeckle: Tools for objective and subjective laser speckle analysis},
+     year      = {2025},
+     version   = {0.6.0},
+     doi       = {10.5281/zenodo.8311677},
+     url       = {https://github.com/scottprahl/pyspeckle},
+     publisher = {Zenodo}
+   }
+
 License
 -------
 

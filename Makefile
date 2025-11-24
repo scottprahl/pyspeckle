@@ -279,6 +279,7 @@ clean:
 	rm -rf docs/_build
 	rm -rf tests/charts
 	rm -rf dist
+	rm -rf .cache
 
 .PHONY: lite-clean
 lite-clean:
