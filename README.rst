@@ -69,13 +69,13 @@ Representative Outputs
 1D speckle
 ~~~~~~~~~~
 
-.. image:: https://raw.githubusercontent.com/scottprahl/pyspeckle/main/docs/oneD_example.png
+.. image:: https://raw.githubusercontent.com/scottprahl/pyspeckle/main/docs/images/oneD_example.png
    :alt: synthetic 1D speckle intensity profile
 
 2D speckle
 ~~~~~~~~~~
 
-.. image:: https://raw.githubusercontent.com/scottprahl/pyspeckle/main/docs/twoD_speckle.png
+.. image:: https://raw.githubusercontent.com/scottprahl/pyspeckle/main/docs/images/twoD_speckle.png
    :alt: simulated 2D speckle field
 
 Documentation

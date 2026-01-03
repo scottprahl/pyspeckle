@@ -1,7 +1,0 @@
-numpy
-matplotlib
-scipy
-nbsphinx
-sphinx-automodapi
-sphinx-rtd-theme
-pyspeckle
