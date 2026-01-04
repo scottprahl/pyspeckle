@@ -274,6 +274,7 @@ clean:
 	rm -rf $(PACKAGE).egg-info
 	rm -rf docs/api
 	rm -rf docs/_build
+	rm -rf docs/_static
 	rm -rf tests/charts
 	rm -rf dist
 	rm -rf .cache

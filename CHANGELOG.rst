@@ -12,6 +12,9 @@ Changelog
 * move jupyter_lite_config.json to pyspeckle folder
 * update github actions
 * use a single source for versioning
+* only test ipynb files in first level of docs/
+* fix zenodo
+* fix badges
 
 0.6.0
 ------
