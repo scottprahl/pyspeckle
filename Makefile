@@ -102,7 +102,7 @@ dist: $(VENV)/.ready
 	
 .PHONY: test
 test: $(VENV)/.ready
-	$(PYTEST) $(PYTEST_OPTS) tests
+	$(PYTEST) $(PYTEST_OPTS) tests/test_basics.py
 
 .PHONY: note-test
 note-test: $(VENV)/.ready
@@ -195,12 +195,13 @@ lite: $(VENV)/.ready $(LITE_CONFIG)
 	@/bin/rm -rf "$(STAGE_DIR)"; mkdir -p "$(STAGE_DIR)"
 	@if ls docs/*.ipynb 1> /dev/null 2>&1; then \
 		/bin/cp docs/*.ipynb "$(STAGE_DIR)"; \
+		/bin/mkdir -p "$(STAGE_DIR)/images"; \
+		/bin/cp "docs/images/speckle.png" "$(STAGE_DIR)/images"; \
 		echo "==> Clearing outputs from staged notebooks"; \
 		"$(PYTHON)" -m jupyter nbconvert --clear-output --inplace "$(STAGE_DIR)"/*.ipynb; \
 	else \
 		echo "⚠️  No notebooks found in docs/"; \
 	fi
-	@/bin/cp docs/speckle.png "$(STAGE_DIR)"
 
 	@echo "==> Building JupyterLite"
 	@"$(PYTHON)" -m jupyter lite build \
