@@ -14,7 +14,7 @@ import pytest
 from nbconvert.preprocessors import ExecutePreprocessor
 
 # Default search path is the current directory
-searchpath = pathlib.Path(".")
+searchpath = pathlib.Path("docs/")  # all notebooks are in here
 
 # Read patterns from .testignore file
 ignores = ""
@@ -26,7 +26,7 @@ if os.path.exists(".testignore"):
 # Ignore hidden folders (startswith('.')) and files matching ignore patterns
 notebooks = [
     notebook
-    for notebook in searchpath.glob("**/*.ipynb")
+    for notebook in searchpath.glob("*.ipynb")
     if not (
         any(parent.startswith(".") for parent in notebook.parent.parts)
         or any(notebook.match(pattern) for pattern in ignores)

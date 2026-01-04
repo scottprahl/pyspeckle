@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 packages = ["pyspeckle"]
 
 [tool.setuptools.dynamic]
-version = {attr = "miepython.__version__"}
+version = {attr = "pyspeckle.__version__"}
 
 [project]
 name = "pyspeckle"
