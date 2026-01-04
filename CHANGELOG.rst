@@ -1,6 +1,18 @@
 Changelog
 =========
 
+0.7.0
+------
+* move pngs to docs/images
+* create make_readme_images.py
+* move requirements into pyproject.toml
+* fix importing of speckle.png
+* update .readthedocs.yaml
+* update docs/conf.py
+* move jupyter_lite_config.json to pyspeckle folder
+* update github actions
+* use a single source for versioning
+
 0.6.0
 ------
 * jupyterlite support
