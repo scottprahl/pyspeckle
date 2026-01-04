@@ -5,13 +5,13 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools]
 packages = ["pyspeckle"]
 
+[tool.setuptools.dynamic]
+version = {attr = "miepython.__version__"}
+
 [project]
 name = "pyspeckle"
-version = "0.6.0"
-authors = [
-    { name = "Scott Prahl", email = "scott.prahl@oit.edu" }
-]
 description = "Routines for creating and analyzing laser speckle"
+authors = [{ name = "Scott Prahl", email = "scott.prahl@oit.edu" }]
 keywords = [
   "speckle",
   "objective",
@@ -25,11 +25,6 @@ keywords = [
 ]
 readme = "README.rst"
 license = "BSD-3-Clause"
-dependencies = [
-    "matplotlib",
-    "numpy",
-    "scipy"
-]
 requires-python = ">=3.9"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
@@ -41,6 +36,12 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+]
+dynamic = ["version"]
+dependencies = [
+    "numpy",
+    "matplotlib",
+    "scipy",
 ]
 
 [project.optional-dependencies]
@@ -89,6 +90,7 @@ Documentation = "https://pyspeckle.readthedocs.io"
 Source = "https://github.com/scottprahl/pyspeckle"
 Tracker = "https://github.com/scottprahl/pyspeckle/issues"
 Changelog = "https://github.com/scottprahl/pyspeckle/blob/main/docs/CHANGELOG.rst"
+
 
 [tool.black]
 line-length = 120
