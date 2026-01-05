@@ -1,0 +1,29 @@
+{
+  "content": [
+    {
+      "content": null,
+      "created": "2026-01-05T16:13:38.407245Z",
+      "format": null,
+      "hash": null,
+      "hash_algorithm": null,
+      "last_modified": "2026-01-05T16:13:34.911263Z",
+      "mimetype": "image/png",
+      "name": "speckle.png",
+      "path": "images/speckle.png",
+      "size": 541013,
+      "type": "file",
+      "writable": true
+    }
+  ],
+  "created": "2026-01-05T16:13:38.407014Z",
+  "format": "json",
+  "hash": null,
+  "hash_algorithm": null,
+  "last_modified": "2026-01-05T16:13:38.407014Z",
+  "mimetype": null,
+  "name": "images",
+  "path": "images",
+  "size": null,
+  "type": "directory",
+  "writable": true
+}
