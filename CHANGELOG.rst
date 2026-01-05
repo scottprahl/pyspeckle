@@ -1,11 +1,12 @@
 Changelog
 =========
 
-0.7.0
+0.6.1
 ------
+* __init__.py is only source of version
+* pyproject.toml is only source of package requirements
 * move pngs to docs/images
 * create make_readme_images.py
-* move requirements into pyproject.toml
 * fix importing of speckle.png
 * update .readthedocs.yaml
 * update docs/conf.py
@@ -15,6 +16,7 @@ Changelog
 * only test ipynb files in first level of docs/
 * fix zenodo
 * fix badges
+* release to pypi upon publishing
 
 0.6.0
 ------

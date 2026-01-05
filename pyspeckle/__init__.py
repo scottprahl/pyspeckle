@@ -26,7 +26,7 @@ Three dimensional functions::
     pyspeckle.create_Rayleigh_3D(M, pix_per_speckle)
 """
 
-__version__ = "0.6.0"
+__version__ = "0.6.1"
 __author__ = "Scott Prahl"
 __email__ = "scott.prahl@oit.edu"
 __copyright__ = "2018-26, Scott Prahl"
