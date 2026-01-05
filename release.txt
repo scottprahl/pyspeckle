@@ -6,10 +6,10 @@ Releasing a new version
 # deploy new version to github
   make lite-deploy
 
-# update the version in __init__.py and pyproject.toml
-  git commit pyspeckle/__init__.py pyproject.toml -m 'update version'
+# update the version in __init__.py
+  git commit pyspeckle/__init__.py -m 'update version'
 
-# update CHANGELOG.txt  `git shortlog v0.5.0..HEAD`
+# update CHANGELOG.txt  `git shortlog 0.6.1..HEAD`
   git commit -m 'update recent changes' CHANGELOG.txt
   git push
 
