@@ -2,9 +2,9 @@ cff-version: 1.2.0
 type: software
 message: If you use this software, please cite it as below.
 title: 'pyspeckle: Tools for objective and subjective laser speckle analysis'
-version: 0.6.0
+version: 0.6.1
 doi: 10.5281/zenodo.8311677
-date-released: '2025-11-16'
+date-released: '2026-01-05'
 url: https://doi.org/10.5281/zenodo.8311677
 repository-code: https://github.com/scottprahl/pyspeckle
 license: BSD-3-Clause
@@ -29,8 +29,8 @@ keywords:
 preferred-citation:
   type: software
   title: 'pyspeckle: Tools for objective and subjective laser speckle analysis'
-  year: 2025
-  version: 0.6.0
+  year: 2026
+  version: 0.6.1
   doi: 10.5281/zenodo.8311677
   url: https://doi.org/10.5281/zenodo.8311677
   authors:

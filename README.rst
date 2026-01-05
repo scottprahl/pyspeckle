@@ -107,8 +107,8 @@ Citation
 
 If you use ``pyspeckle`` in academic, instructional, or applied technical work, please cite:
 
-Prahl, S. (2025). *pyspeckle: Tools for objective and subjective laser speckle analysis*
-(Version 0.6.0) [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.8311677
+Prahl, S. (2026). *pyspeckle: Tools for objective and subjective laser speckle analysis*
+(Version 0.6.1) [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.8311677
 
 
 BibTeX
@@ -116,11 +116,11 @@ BibTeX
 
 .. code-block:: bibtex
 
-   @software{pyspeckle_prahl_2025,
+   @software{pyspeckle_prahl_2026,
      author    = {Scott Prahl},
      title     = {pyspeckle: Tools for objective and subjective laser speckle analysis},
-     year      = {2025},
-     version   = {0.6.0},
+     year      = {2026},
+     version   = {0.6.1},
      doi       = {10.5281/zenodo.8311677},
      url       = {https://github.com/scottprahl/pyspeckle},
      publisher = {Zenodo}
