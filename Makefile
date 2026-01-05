@@ -87,8 +87,8 @@ $(VENV)/.ready: Makefile $(PYPROJECT)
 		"$(PY)" -m venv "$(VENV)"; \
 	fi
 	@$(PYTHON) -m pip -q install --upgrade pip wheel
-	@echo "==> Installing miepython + dev extras"
-	@$(PYTHON) -m pip install -e ".[dev,docs,lite]"
+	@echo "==> Installing $(PACKAGE) + dev extras"
+	@$(PYTHON) -m pip install -q -e ".[dev,docs,lite]"
 	@touch "$(VENV)/.ready"
 	@echo "✅ venv ready"
 
