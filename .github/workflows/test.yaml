@@ -1,7 +1,8 @@
+# yamllint disable rule:truthy
 ---
 name: Test
 
-on:    # yamllint disable-line rule:truthy
+on:
   push:
     branches: [main]
   pull_request:
