@@ -2,11 +2,11 @@
   "content": [
     {
       "content": null,
-      "created": "2026-01-05T16:13:38.407245Z",
+      "created": "2026-02-22T15:58:22.167160Z",
       "format": null,
       "hash": null,
       "hash_algorithm": null,
-      "last_modified": "2026-01-05T16:13:34.911263Z",
+      "last_modified": "2026-02-22T15:58:18.100726Z",
       "mimetype": "image/png",
       "name": "speckle.png",
       "path": "images/speckle.png",
@@ -15,11 +15,11 @@
       "writable": true
     }
   ],
-  "created": "2026-01-05T16:13:38.407014Z",
+  "created": "2026-02-22T15:58:22.166930Z",
   "format": "json",
   "hash": null,
   "hash_algorithm": null,
-  "last_modified": "2026-01-05T16:13:38.407014Z",
+  "last_modified": "2026-02-22T15:58:22.166930Z",
   "mimetype": null,
   "name": "images",
   "path": "images",

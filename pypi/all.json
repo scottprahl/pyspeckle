@@ -5,19 +5,19 @@
         {
           "comment_text": "",
           "digests": {
-            "md5": "fad6a2477ada79173624fc9d7291f304",
-            "sha256": "68f177b4f9eea8d22f72f21e3f1b4dcab950c3b8685ca6e3f3cd35ef69b8c9f8"
+            "md5": "37f4cfe9f90b1d9580e50754dd02b626",
+            "sha256": "be5b4b1724230c9c222503a439f03b23d8dbe157a4a75163a10308cdedd1681f"
           },
           "downloads": -1,
           "filename": "pyspeckle-0.6.1-py3-none-any.whl",
           "has_sig": false,
-          "md5_digest": "fad6a2477ada79173624fc9d7291f304",
+          "md5_digest": "37f4cfe9f90b1d9580e50754dd02b626",
           "packagetype": "bdist_wheel",
           "python_version": "py3",
-          "requires_python": ">=3.9",
-          "size": 10419,
-          "upload_time": "2026-01-05T16:13:34.804842Z",
-          "upload_time_iso_8601": "2026-01-05T16:13:34.804842Z",
+          "requires_python": ">=3.10",
+          "size": 10436,
+          "upload_time": "2026-02-22T15:58:17.913638Z",
+          "upload_time_iso_8601": "2026-02-22T15:58:17.913638Z",
           "url": "./pyspeckle-0.6.1-py3-none-any.whl",
           "yanked": false,
           "yanked_reason": null
