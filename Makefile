@@ -5,6 +5,8 @@ UV              ?= uv
 RUN             := $(UV) run --extra dev
 RUN_DOCS        := $(UV) run --extra docs
 RUN_LITE        := $(UV) run --extra lite
+RM              ?= rm -f
+RMR             ?= rm -rf
 
 BUILD_APPS      := lab
 DOCS_DIR        := docs
@@ -30,7 +32,7 @@ PYTEST_OPTS     := -q
 SPHINX_OPTS     := -T -E -b html -d $(DOCS_DIR)/_build/doctrees -D language=en
 PYTEST_TARGETS  := tests/test_basics.py
 NOTEBOOK_TESTS  := tests/test_all_notebooks.py
-PYLINT_TARGETS  := pyspeckle/*.py tests/*.py .github/scripts/update_citation.py
+PYLINT_TARGETS  := $(PACKAGE)/*.py tests/*.py .github/scripts/update_citation.py
 YAML_TARGETS    := .github/workflows/citation.yaml .github/workflows/pypi.yaml .github/workflows/test.yaml
 RST_TARGETS     := README.rst CHANGELOG.rst $(DOCS_DIR)/index.rst $(DOCS_DIR)/changelog.rst
 RST_AUTOMODAPI  := $(DOCS_DIR)/$(PACKAGE).rst
@@ -146,21 +148,19 @@ lite: $(LITE_CONFIG)
 		echo "    Found .gh-pages worktree, removing..."; \
 		git worktree remove "$(WORKTREE)" --force 2>/dev/null || true; \
 		git worktree prune; \
-		rm -rf "$(WORKTREE)"; \
+		$(RMR) "$(WORKTREE)"; \
 		echo "    ✓ Removed"; \
 	else \
 		echo "    No .gh-pages worktree found"; \
 	fi
 
 	@echo "==> Cleaning previous builds"
-	@/bin/rm -rf "$(OUT_ROOT)"
-	@/bin/rm -rf "$(DOIT_DB)"
-	@/bin/rm -rf ".doit.db"
-	@/bin/rm -rf ".jupyterlite.doit.db.db"
+	@$(RMR) "$(OUT_ROOT)"
+	@$(RMR) "$(DOIT_DB)"
 	@echo "    ✓ Cleaned"
 
 	@echo "==> Staging notebooks from docs -> $(STAGE_DIR)"
-	@/bin/rm -rf "$(STAGE_DIR)"; mkdir -p "$(STAGE_DIR)"
+	@$(RMR) "$(STAGE_DIR)"; mkdir -p "$(STAGE_DIR)"
 	@if ls docs/*.ipynb 1> /dev/null 2>&1; then \
 		/bin/cp docs/*.ipynb "$(STAGE_DIR)"; \
 		/bin/mkdir -p "$(STAGE_DIR)/images"; \
@@ -206,7 +206,7 @@ lite-deploy:
 	@echo "==> Setup deployment worktree"
 	@git worktree remove "$(WORKTREE)" --force 2>/dev/null || true
 	@git worktree prune || true
-	@rm -rf "$(WORKTREE)"
+	@$(RMR) "$(WORKTREE)"
 	@git worktree add "$(WORKTREE)" "$(PAGES_BRANCH)"
 	@git -C "$(WORKTREE)" pull "$(REMOTE)" "$(PAGES_BRANCH)" 2>/dev/null || true
 
@@ -234,32 +234,31 @@ lab:
 .PHONY: clean
 clean:
 	@echo "==> Cleaning build artifacts"	
-	@find . -name '__pycache__' -type d -exec rm -rf {} +
-	@find . -name '.DS_Store' -type f -delete
-	@find . -name '.ipynb_checkpoints' -type d -prune -exec rm -rf {} +
-	@find . -name '.pytest_cache' -type d -prune -exec rm -rf {} +
-	rm -rf .ruff_cache
-	rm -rf $(PACKAGE).egg-info
-	rm -rf docs/api
-	rm -rf docs/_build
-	rm -rf tests/charts
-	rm -rf dist
+	@find . -name '__pycache__' -type d -exec $(RMR) {} +
+	@find . -name '.DS_Store' -type f -exec $(RM) {} +
+	@find . -name '.ipynb_checkpoints' -type d -prune -exec $(RMR) {} +
+	@find . -name '.pytest_cache' -type d -prune -exec $(RMR) {} +
+	$(RMR) .ruff_cache
+	$(RMR) $(PACKAGE).egg-info
+	$(RMR) docs/api
+	$(RMR) docs/_build
+	$(RMR) dist
 
 .PHONY: lite-clean
 lite-clean:
 	@echo "==> Cleaning JupyterLite build artifacts"
-	@/bin/rm -rf "$(STAGE_DIR)"
-	@/bin/rm -rf "$(OUT_ROOT)"
-	@/bin/rm -rf ".lite_root"
-	@/bin/rm -rf "$(DOIT_DB)"
-	rm -rf .cache
-	rm -rf $(PACKAGE).egg-info
-	rm -rf dist
+	$(RMR) "$(STAGE_DIR)"
+	$(RMR) "$(OUT_ROOT)"
+	$(RMR) ".lite_root"
+	$(RMR) "$(DOIT_DB)"
+	$(RMR) .cache
+	$(RMR) $(PACKAGE).egg-info
+	$(RMR) dist
 
 .PHONY: realclean
 realclean: lite-clean clean
 	@echo "==> Deep cleaning: removing .venv and deployment worktree"
 	@git worktree remove "$(WORKTREE)" --force 2>/dev/null || true
-	@/bin/rm -rf "$(WORKTREE)"
-	@/bin/rm -rf .venv
-	@/bin/rm -f uv.lock
+	$(RMR) "$(WORKTREE)"
+	$(RMR) .venv
+	$(RM) uv.lock
