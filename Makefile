@@ -1,6 +1,7 @@
 PACKAGE         := pyspeckle
 GITHUB_USER     := scottprahl
 
+PY_VERSION      ?= 3.14
 UV              ?= uv
 RUN             := $(UV) run --extra dev
 RUN_DOCS        := $(UV) run --extra docs
@@ -8,16 +9,13 @@ RUN_LITE        := $(UV) run --extra lite
 RM              ?= rm -f
 RMR             ?= rm -rf
 
-BUILD_APPS      := lab
 DOCS_DIR        := docs
 HTML_DIR        := $(DOCS_DIR)/_build/html
-
-ROOT            := $(abspath .)
-OUT_ROOT        := $(ROOT)/_site
+OUT_ROOT        := _site
 OUT_DIR         := $(OUT_ROOT)/$(PACKAGE)
-STAGE_DIR       := $(ROOT)/.lite_src
-DOIT_DB         := $(ROOT)/.jupyterlite.doit.db
-LITE_CONFIG     := $(ROOT)/$(PACKAGE)/jupyter_lite_config.json
+STAGE_DIR       := .lite_src
+DOIT_DB         := .jupyterlite.doit.db
+LITE_CONFIG     := $(PACKAGE)/jupyter_lite_config.json
 
 # --- GitHub Pages deploy config ---
 PAGES_BRANCH    := gh-pages
@@ -30,8 +28,7 @@ PORT            := 8000
 
 PYTEST_OPTS     := -q
 SPHINX_OPTS     := -T -E -b html -d $(DOCS_DIR)/_build/doctrees -D language=en
-PYTEST_TARGETS  := tests/test_basics.py
-NOTEBOOK_TESTS  := tests/test_all_notebooks.py
+
 PYLINT_TARGETS  := $(PACKAGE)/*.py tests/*.py .github/scripts/update_citation.py
 YAML_TARGETS    := .github/workflows/citation.yaml .github/workflows/pypi.yaml .github/workflows/test.yaml
 RST_TARGETS     := README.rst CHANGELOG.rst $(DOCS_DIR)/index.rst $(DOCS_DIR)/changelog.rst
@@ -71,16 +68,15 @@ help:
 
 .PHONY: venv
 venv:
-	$(UV) sync --all-extras
+	@$(UV) sync --python $(PY_VERSION) --extra dev --extra docs --extra lite
 
 .PHONY: test
 test:
-	$(RUN) pytest $(PYTEST_OPTS) $(PYTEST_TARGETS)
+	-$(RUN) pytest $(PYTEST_OPTS) tests --ignore=tests/test_all_notebooks.py
 
 .PHONY: note-test
 note-test:
-	$(RUN) pytest --verbose $(NOTEBOOK_TESTS)
-	@echo "✅ Notebook check complete"
+	$(RUN) pytest --verbose tests/test_all_notebooks.py
 
 .PHONY: dist
 dist:
@@ -139,48 +135,20 @@ rcheck:
 	@echo "✅ Release checks complete"
 	
 .PHONY: lite
-lite: $(LITE_CONFIG)
-	@echo "==> Building package wheel for PyOdide"
-	@$(RUN) python -m build
-
-	@echo "==> Checking for .gh-pages worktree"
-	@if [ -d "$(WORKTREE)" ]; then \
-		echo "    Found .gh-pages worktree, removing..."; \
-		git worktree remove "$(WORKTREE)" --force 2>/dev/null || true; \
-		git worktree prune; \
-		$(RMR) "$(WORKTREE)"; \
-		echo "    ✓ Removed"; \
-	else \
-		echo "    No .gh-pages worktree found"; \
-	fi
-
-	@echo "==> Cleaning previous builds"
-	@$(RMR) "$(OUT_ROOT)"
-	@$(RMR) "$(DOIT_DB)"
-	@echo "    ✓ Cleaned"
-
+lite: lite-clean $(LITE_CONFIG) dist
 	@echo "==> Staging notebooks from docs -> $(STAGE_DIR)"
-	@$(RMR) "$(STAGE_DIR)"; mkdir -p "$(STAGE_DIR)"
-	@if ls docs/*.ipynb 1> /dev/null 2>&1; then \
-		/bin/cp docs/*.ipynb "$(STAGE_DIR)"; \
-		/bin/mkdir -p "$(STAGE_DIR)/images"; \
-		/bin/cp "docs/images/speckle.png" "$(STAGE_DIR)/images"; \
-		echo "==> Clearing outputs from staged notebooks"; \
-		$(RUN) jupyter nbconvert --clear-output --inplace "$(STAGE_DIR)"/*.ipynb; \
-	else \
-		echo "⚠️  No notebooks found in docs/"; \
-	fi
+	mkdir -p "$(STAGE_DIR)"
+	/bin/cp docs/*.ipynb "$(STAGE_DIR)"
+	$(RUN) jupyter nbconvert --clear-output --inplace "$(STAGE_DIR)"/*.ipynb
+	/bin/mkdir -p "$(STAGE_DIR)/images"
+	/bin/cp "docs/images/speckle.png" "$(STAGE_DIR)/images"; \
 
 	@echo "==> Building JupyterLite"
 	@$(RUN_LITE) jupyter lite build \
 		--config="$(LITE_CONFIG)" \
 		--contents="$(STAGE_DIR)" \
 		--output-dir="$(OUT_DIR)"
-
-	@echo "==> Adding .nojekyll for GitHub Pages"
-	@touch "$(OUT_DIR)/.nojekyll"
-	
-	@echo "✅ Build complete -> $(OUT_DIR)"
+	@touch "$(OUT_DIR)/.nojekyll"  # for github
 
 .PHONY: lite-serve
 lite-serve:
@@ -231,34 +199,30 @@ lab:
 	@echo "==> Launching JupyterLab"
 	$(RUN) jupyter lab --ServerApp.root_dir="$(CURDIR)"
 
+.PHONY: lite-clean
+lite-clean:
+	@echo "==> Cleaning JupyterLite build artifacts"
+	@$(RMR) "$(STAGE_DIR)"
+	@$(RMR) "$(OUT_ROOT)"
+	@$(RMR) "$(DOIT_DB)"
+	@$(RMR) .cache dist $(PACKAGE).egg-info
+
 .PHONY: clean
-clean:
+clean: lite-clean
 	@echo "==> Cleaning build artifacts"	
 	@find . -name '__pycache__' -type d -exec $(RMR) {} +
 	@find . -name '.DS_Store' -type f -exec $(RM) {} +
 	@find . -name '.ipynb_checkpoints' -type d -prune -exec $(RMR) {} +
 	@find . -name '.pytest_cache' -type d -prune -exec $(RMR) {} +
 	$(RMR) .ruff_cache
-	$(RMR) $(PACKAGE).egg-info
 	$(RMR) docs/api
 	$(RMR) docs/_build
-	$(RMR) dist
-
-.PHONY: lite-clean
-lite-clean:
-	@echo "==> Cleaning JupyterLite build artifacts"
-	$(RMR) "$(STAGE_DIR)"
-	$(RMR) "$(OUT_ROOT)"
-	$(RMR) ".lite_root"
-	$(RMR) "$(DOIT_DB)"
-	$(RMR) .cache
-	$(RMR) $(PACKAGE).egg-info
-	$(RMR) dist
 
 .PHONY: realclean
-realclean: lite-clean clean
-	@echo "==> Deep cleaning: removing .venv and deployment worktree"
+realclean: clean
+	@echo "==> Deep cleaning: removing venv and deployment worktree"
 	@git worktree remove "$(WORKTREE)" --force 2>/dev/null || true
+	@git worktree prune || true
 	$(RMR) "$(WORKTREE)"
 	$(RMR) .venv
-	$(RM) uv.lock
+	@$(RM) uv.lock
