@@ -43,3 +43,7 @@ docs/*pdf
 *.tmp
 todo
 todo.txt
+
+CLAUDE.md
+uv.lock
+meta.yaml
