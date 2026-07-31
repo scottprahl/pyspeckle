@@ -326,8 +326,8 @@ def create_Exponential(M, pix_per_speckle, alpha=1, shape="ellipse", polarizatio
 
     Non-circular speckle is supported using `alpha`.  This is defined as the
     ratio of horizontal speckle size to vertical speckle size.  `alpha=1`
-    is circular and `alpha=2` will have speckles that are twice as tall as
-    they are wide.
+    is circular and `alpha=2` will have speckles that are twice as wide as
+    they are tall.
 
     see Duncan & Kirkpatrick, "Algorithms for simulation of speckle," in SPIE
     Vol. 6855 (2008)
@@ -474,13 +474,13 @@ def create_Rayleigh(N, pix_per_speckle, alpha=1, shape="ellipse"):
 
     Non-circular speckle is supported using `alpha`.  This is defined as the
     ratio of horizontal speckle size to vertical speckle size.  `alpha=1`
-    is circular and `alpha=2` will have speckles that are twice as tall as
-    they are wide.
+    is circular and `alpha=2` will have speckles that are twice as wide as
+    they are tall.
 
     Args:
         N:                dimension of desired square speckle image
         pix_per_speckle:  number of pixels per smallest speckle.
-        alpha:            ratio of horizontal width to vertical width
+        alpha:            ratio of horizontal to vertical speckle size
         shape:            'ellipse' or 'rectangle' describing the laser shape
 
     Returns:
@@ -544,8 +544,8 @@ def create_Exponential_3D(M, pix_per_speckle, alpha=1, beta=1, shape="ellipsoid"
 
     Non-circular speckle is supported using `alpha` and `beta`.  This is defined
     as the ratio of x-speckle size to y-speckle size (or x to z).  `alpha=1`
-    is circular and `alpha=2` will have speckles that with y-dimensions that
-    are twice the x-dimension.
+    and `beta=1` is spherical; `alpha=2` will have speckles whose x-dimension
+    is twice the y-dimension, and `beta=2` twice the z-dimension.
 
     see Duncan & Kirkpatrick, "Algorithms for simulation of speckle," in SPIE
     Vol. 6855 (2008)
@@ -602,10 +602,10 @@ def create_Rayleigh_3D(M, pix_per_speckle, alpha=1, beta=1, shape="ellipsoid"):
     at the Nyquist limit and `pix_per_speckle=4` will have four pixels across
     the smallest speckle.
 
-    Non-circular speckle is supported using `alpha`.  This is defined as the
-    ratio of horizontal speckle size to vertical speckle size.  `alpha=1`
-    is circular and `alpha=2` will have speckles that are twice as tall as
-    they are wide.
+    Non-spherical speckle is supported using `alpha` and `beta`.  This is
+    defined as the ratio of x-speckle size to y-speckle size (or x to z).
+    `alpha=1` and `beta=1` is spherical; `alpha=2` will have speckles whose
+    x-dimension is twice the y-dimension, and `beta=2` twice the z-dimension.
 
     Args:
         M:                dimension of desired square speckle image

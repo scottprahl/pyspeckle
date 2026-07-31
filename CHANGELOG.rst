@@ -5,6 +5,7 @@ Unreleased ()
 -------------
 * fix local_contrast_2D variance normalization (contrast was low by sqrt(kernel sum))
 * fix create_Rayleigh_3D silently ignoring beta
+* correct the alpha/beta docstrings, which described the anisotropy backwards
 * seed numpy in each notebook so re-execution reproduces identical figures
 * add update-notebooks target to reformat and re-execute notebooks in place
 * add coverage target with a terminal-only report
