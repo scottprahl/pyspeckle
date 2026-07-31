@@ -562,8 +562,8 @@ def create_Exponential_3D(M, pix_per_speckle, alpha=1, beta=1, shape="ellipsoid"
         M x M X M speckle image
     """
     if polarization < 1:
-        y1 = create_Exponential_3D(M, pix_per_speckle, alpha=alpha, shape=shape, polarization=1)
-        y2 = create_Exponential_3D(M, pix_per_speckle, alpha=alpha, shape=shape, polarization=1)
+        y1 = create_Exponential_3D(M, pix_per_speckle, alpha=alpha, beta=beta, shape=shape, polarization=1)
+        y2 = create_Exponential_3D(M, pix_per_speckle, alpha=alpha, beta=beta, shape=shape, polarization=1)
         return 0.5 * (1 + polarization) * y1 + 0.5 * (1 - polarization) * y2
 
     x_radius = int(M / 2)

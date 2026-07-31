@@ -134,6 +134,24 @@ def test_local_contrast_2D_matches_global():
     assert abs(interior - 1) < 0.2
 
 
+# Tests for create_Rayleigh_3D
+def test_create_Rayleigh_3D_uses_beta():
+    """Verify beta reaches the mask; the unpolarized recursion used to drop it."""
+    M = 24
+    speckle = pyspeckle.create_Rayleigh_3D(M, 2, beta=3)
+    assert speckle.shape == (M, M, M)
+
+    def half_width(line):
+        """Lag at which the autocorrelation first falls below one half."""
+        return np.argmax(pyspeckle.autocorrelation(line.astype(float)) < 0.5)
+
+    x_width = np.mean([half_width(speckle[:, j, k]) for j in range(0, M, 4) for k in range(0, M, 4)])
+    z_width = np.mean([half_width(speckle[i, j, :]) for i in range(0, M, 4) for j in range(0, M, 4)])
+
+    # beta>1 stretches the speckle along x; dropping beta leaves it isotropic
+    assert x_width / z_width > 1.4
+
+
 def test_ellipse_mask():
     """Basic functionality for ellipse mask."""
     mask = pyspeckle.pyspeckle._create_mask(10, 3, 4)  # pylint: disable=protected-access
