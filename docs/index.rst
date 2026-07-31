@@ -14,19 +14,19 @@
    :caption: 1D Speckle
    :hidden:
 
-   0-One-Dim-Speckle-Basics.ipynb
+   1D-Speckle.ipynb
 
 .. toctree::
    :caption: 2D Speckle
    :hidden:
 
-   1-Two-Dim-Speckle-Basics.ipynb
+   2D-Speckle.ipynb
 
 .. toctree::
    :caption: 3D Speckle
    :hidden:
 
-   2-Three-Dim-Speckle.ipynb
+   3D-Speckle.ipynb
 
 .. toctree::
    :caption: API
