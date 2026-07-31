@@ -32,4 +32,4 @@ jobs:
           pip install -e .  # current package in editable mode
 
       - name: Test with pytest
-        run: pytest tests/test_basics.py
+        run: pytest tests --ignore=tests/test_all_notebooks.py

@@ -19,23 +19,23 @@ def seed_rng():
 
 
 def test_create_exp_1D_output_length():
-    """Test length of create_exp_1D."""
-    arr = pyspeckle.create_exp_1D(100, 10, 2, 5)
+    """Test length of create_exp_corr_1D."""
+    arr = pyspeckle.create_exp_corr_1D(100, 10, 2, 5)
     assert len(arr) == 100
 
 
 def test_create_exp_1D_mean_and_std():
-    """Test mean and stdev of create_exp_1D."""
-    arr = pyspeckle.create_exp_1D(1000, 10, 2, 5)
+    """Test mean and stdev of create_exp_corr_1D."""
+    arr = pyspeckle.create_exp_corr_1D(1000, 10, 2, 5)
     assert abs(np.mean(arr) - 10) < 0.8  # A small tolerance might be needed due to randomness
     assert abs(np.std(arr) - 2) < 0.8
 
 
 @pytest.mark.parametrize("M,mean,stdev,cl", [(0, 10, 2, 5), (100, 10, -2, 5), (100, 10, 2, -5), (100, 10, 2, 51)])
 def test_create_exp_1D_invalid_args(M, mean, stdev, cl):
-    """Test bad inputs to create_exp_1D."""
+    """Test bad inputs to create_exp_corr_1D."""
     with pytest.raises(ValueError):
-        pyspeckle.create_exp_1D(M, mean, stdev, cl)
+        pyspeckle.create_exp_corr_1D(M, mean, stdev, cl)
 
 
 def test_create_gaussian_1D_output_length():
@@ -81,50 +81,50 @@ def test_autocorrelation_value2():
     assert autocorr[0] == 0  # It's normalized to have a max of 1
 
 
-# Test for create_Exponential
-def test_Exponential_shape_of_output():
-    """Test shape of create_Exponential."""
-    result = pyspeckle.create_Exponential(10, 2)
+# Test for create_exponential_2D
+def test_exponential_2D_shape_of_output():
+    """Test shape of create_exponential_2D."""
+    result = pyspeckle.create_exponential_2D(10, 2)
     assert result.shape == (10, 10)
 
 
-def test_create_Exponential_shape():
-    """Test shape of create_Exponential with params."""
-    speckle = pyspeckle.create_Exponential(50, 2, alpha=1, shape="ellipse", polarization=1)
+def test_create_exponential_2D_shape():
+    """Test shape of create_exponential_2D with params."""
+    speckle = pyspeckle.create_exponential_2D(50, 2, alpha=1, shape="ellipse", polarization=1)
     assert speckle.shape == (50, 50)
 
 
-def test_Exponential_maximum_value():
-    """Test max value of create_Exponential."""
-    result = pyspeckle.create_Exponential(10, 2)
+def test_exponential_2D_maximum_value():
+    """Test max value of create_exponential_2D."""
+    result = pyspeckle.create_exponential_2D(10, 2)
     assert np.max(result) <= 1.0
 
 
-def test_Exponential_non_circular_shapes():
-    """Verify that other shapes work with create_Exponential."""
+def test_exponential_2D_non_circular_shapes():
+    """Verify that other shapes work with create_exponential_2D."""
     shapes = ["ellipse", "rectangle", "annulus", "ELLIPSE", "Rectangle", "ANNULus"]
     for shape in shapes:
-        result = pyspeckle.create_Exponential(10, 2, shape=shape)
+        result = pyspeckle.create_exponential_2D(10, 2, shape=shape)
         assert result.shape == (10, 10)
         assert np.max(result) <= 1.0
 
 
-def test_create_Exponential_invalid_pol1():
+def test_create_exponential_2D_invalid_pol1():
     """Test invalid polarization."""
     with pytest.raises(ValueError):
-        pyspeckle.create_Exponential(10, 2, polarization=-1)
+        pyspeckle.create_exponential_2D(10, 2, polarization=-1)
 
 
-def test_create_Exponential_invalid_pol2():
+def test_create_exponential_2D_invalid_pol2():
     """Test2 invalid polarization."""
     with pytest.raises(ValueError):
-        pyspeckle.create_Exponential(10, 2, polarization=2)
+        pyspeckle.create_exponential_2D(10, 2, polarization=2)
 
 
-def test_Exponential_polarization_values():
+def test_exponential_2D_polarization_values():
     """Test valid polarizations."""
     for polarization in [0, 0.5, 1]:
-        result = pyspeckle.create_Exponential(10, 2, polarization=polarization)
+        result = pyspeckle.create_exponential_2D(10, 2, polarization=polarization)
         assert result.shape == (10, 10)
         assert np.max(result) <= 1.0
 
@@ -137,15 +137,15 @@ def test_Exponential_polarization_values():
         {"M": 64, "pix_per_speckle": 2, "alpha": 0.001},  # y radius rounds down to zero
     ],
 )
-def test_create_Exponential_invalid_geometry(kwargs):
+def test_create_exponential_2D_invalid_geometry(kwargs):
     """Bad geometry should raise ValueError instead of failing inside numpy."""
     with pytest.raises(ValueError):
-        pyspeckle.create_Exponential(**kwargs)
+        pyspeckle.create_exponential_2D(**kwargs)
 
 
-def test_create_Exponential_fractional_pix_per_speckle():
+def test_create_exponential_2D_fractional_pix_per_speckle():
     """Non-integer pixels per speckle used to raise TypeError from np.random.rand."""
-    result = pyspeckle.create_Exponential(64, 2.5)
+    result = pyspeckle.create_exponential_2D(64, 2.5)
     assert result.shape == (64, 64)
     assert np.max(result) <= 1.0
 
@@ -160,18 +160,18 @@ def test_create_Exponential_fractional_pix_per_speckle():
         {"M": 1},
     ],
 )
-def test_create_Exponential_3D_invalid_args(kwargs):
+def test_create_exponential_3D_invalid_args(kwargs):
     """The 3D generator should validate its arguments like the 2D one."""
     args = {"M": 8, "pix_per_speckle": 2}
     args.update(kwargs)
     with pytest.raises(ValueError):
-        pyspeckle.create_Exponential_3D(**args)
+        pyspeckle.create_exponential_3D(**args)
 
 
 # Tests for local_contrast_2D
 def test_local_contrast_2D_matches_global():
     """Local contrast over a large kernel should approach the global contrast."""
-    speckle = pyspeckle.create_Exponential(256, 2)
+    speckle = pyspeckle.create_exponential_2D(256, 2)
     n = 15
     C, K = pyspeckle.local_contrast_2D(speckle, np.ones((n, n)))
 
@@ -184,11 +184,11 @@ def test_local_contrast_2D_matches_global():
     assert abs(np.mean(C) - 1) < 0.2
 
 
-# Tests for create_Rayleigh_3D
-def test_create_Rayleigh_3D_uses_beta():
+# Tests for create_rayleigh_3D
+def test_create_rayleigh_3D_uses_beta():
     """Verify beta reaches the mask; the unpolarized recursion used to drop it."""
     M = 24
-    speckle = pyspeckle.create_Rayleigh_3D(M, 2, beta=3)
+    speckle = pyspeckle.create_rayleigh_3D(M, 2, beta=3)
     assert speckle.shape == (M, M, M)
 
     def half_width(line):

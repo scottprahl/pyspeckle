@@ -4,7 +4,7 @@ Changelog
 Unreleased ()
 -------------
 * fix local_contrast_2D variance normalization (contrast was low by sqrt(kernel sum))
-* fix create_Rayleigh_3D silently ignoring beta
+* fix create_rayleigh_3D silently ignoring beta
 * correct the alpha/beta docstrings, which described the anisotropy backwards
 * replace matplotlib.cm.get_cmap, removed in matplotlib 3.11, with plt.get_cmap
 * correct docstrings for local_contrast_2D, statistics_plot, zvalues, and tvalues
@@ -12,13 +12,20 @@ Unreleased ()
 * local_contrast_2D now returns only valid convolution pixels (shape change)
 * statistics_plot now normalizes the PDF so that it integrates to unity
 * seed numpy before every test so CI no longer fails intermittently
-* validate pix_per_speckle and image size in create_Exponential/create_Exponential_3D
+* validate pix_per_speckle and image size in create_exponential_2D/create_exponential_3D
 * support non-integer pix_per_speckle instead of raising TypeError from numpy
-* give create_Exponential_3D the polarization and shape checks the 2D version had
+* give create_exponential_3D the polarization and shape checks the 2D version had
 * _create_mask_3D now folds case, rejects unknown shapes, and checks its size
+* rename create_Rayleigh to create_rayleigh_2D (breaking)
+* rename create_Rayleigh_3D to create_rayleigh_3D (breaking)
+* split tests into test_core.py, test_1D.py, test_2D.py, and test_3D.py
+* move the numpy seeding fixture into tests/conftest.py
+* run the whole test suite in CI instead of only tests/test_basics.py
+* rename create_exp_1D to create_exp_corr_1D (breaking)
+* rename create_Exponential to create_exponential_2D (breaking)
 * split pyspeckle.py into core.py, speckle_1D.py, speckle_2D.py, and speckle_3D.py
-* the public API is unchanged, but pyspeckle.pyspeckle is gone; the private mask
-  helpers now live at pyspeckle.speckle_2D and pyspeckle.speckle_3D
+* pyspeckle.pyspeckle is gone; the private mask helpers now live at
+  pyspeckle.speckle_2D and pyspeckle.speckle_3D
 * seed numpy in each notebook so re-execution reproduces identical figures
 * add update-notebooks target to reformat and re-execute notebooks in place
 * add coverage target with a terminal-only report

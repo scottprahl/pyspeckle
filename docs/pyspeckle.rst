@@ -2,7 +2,7 @@ API for `pyspeckle` package
 ===========================
 
 Every function below is re-exported at the top level, so
-``pyspeckle.create_Exponential(...)`` works regardless of which module
+``pyspeckle.create_exponential_2D(...)`` works regardless of which module
 defines it.
 
 .. automodapi:: pyspeckle.core
