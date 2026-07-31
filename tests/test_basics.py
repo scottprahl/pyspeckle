@@ -129,6 +129,45 @@ def test_Exponential_polarization_values():
         assert np.max(result) <= 1.0
 
 
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"M": 64, "pix_per_speckle": 0.5},  # undersampled
+        {"M": 1, "pix_per_speckle": 2},  # x radius rounds down to zero
+        {"M": 64, "pix_per_speckle": 2, "alpha": 0.001},  # y radius rounds down to zero
+    ],
+)
+def test_create_Exponential_invalid_geometry(kwargs):
+    """Bad geometry should raise ValueError instead of failing inside numpy."""
+    with pytest.raises(ValueError):
+        pyspeckle.create_Exponential(**kwargs)
+
+
+def test_create_Exponential_fractional_pix_per_speckle():
+    """Non-integer pixels per speckle used to raise TypeError from np.random.rand."""
+    result = pyspeckle.create_Exponential(64, 2.5)
+    assert result.shape == (64, 64)
+    assert np.max(result) <= 1.0
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"polarization": -5},
+        {"polarization": 2},
+        {"shape": "banana"},
+        {"pix_per_speckle": 0.5},
+        {"M": 1},
+    ],
+)
+def test_create_Exponential_3D_invalid_args(kwargs):
+    """The 3D generator should validate its arguments like the 2D one."""
+    args = {"M": 8, "pix_per_speckle": 2}
+    args.update(kwargs)
+    with pytest.raises(ValueError):
+        pyspeckle.create_Exponential_3D(**args)
+
+
 # Tests for local_contrast_2D
 def test_local_contrast_2D_matches_global():
     """Local contrast over a large kernel should approach the global contrast."""
@@ -192,3 +231,22 @@ def test_annulus_mask():
     assert mask[4, 0]
     assert mask[4, 8]
     assert mask[8, 4]
+
+
+def test_mask_3D_case_insensitive():
+    """The 3D mask should fold case like the 2D one."""
+    upper = pyspeckle.pyspeckle._create_mask_3D(16, 4, 4, 4, shape="Ellipsoid")  # pylint: disable=protected-access
+    lower = pyspeckle.pyspeckle._create_mask_3D(16, 4, 4, 4, shape="ellipsoid")  # pylint: disable=protected-access
+    assert np.array_equal(upper, lower)
+
+
+def test_mask_3D_unknown_shape():
+    """Unknown 3D shapes used to fall through silently to an ellipsoid."""
+    with pytest.raises(ValueError):
+        pyspeckle.pyspeckle._create_mask_3D(16, 4, 4, 4, shape="banana")  # pylint: disable=protected-access
+
+
+def test_mask_3D_too_small():
+    """The 3D mask array must be at least twice the largest radius."""
+    with pytest.raises(ValueError):
+        pyspeckle.pyspeckle._create_mask_3D(8, 6, 4, 4)  # pylint: disable=protected-access

@@ -347,6 +347,9 @@ def create_Exponential(M, pix_per_speckle, alpha=1, shape="ellipse", polarizatio
     if polarization < 0 or polarization > 1:
         raise ValueError("bad polarization. It must be 0 <= polarization <= 1.")
 
+    if pix_per_speckle < 1:
+        raise ValueError("pix_per_speckle must be at least 1.")
+
     if polarization < 1:
         y1 = create_Exponential(M, pix_per_speckle, alpha=alpha, shape=shape, polarization=1)
         y2 = create_Exponential(M, pix_per_speckle, alpha=alpha, shape=shape, polarization=1)
@@ -355,7 +358,10 @@ def create_Exponential(M, pix_per_speckle, alpha=1, shape="ellipse", polarizatio
     x_radius = int(M / 2)
     y_radius = int(alpha * M / 2)
 
-    L = pix_per_speckle * 2 * max(x_radius, y_radius)
+    if x_radius < 1 or y_radius < 1:
+        raise ValueError("M and alpha must be big enough that both radii are at least one pixel.")
+
+    L = int(pix_per_speckle * 2 * max(x_radius, y_radius))
 
     # phases uniformly distributed from 0 to 2*pi
     phase = 2 * np.pi * np.random.rand(L, L)
@@ -501,20 +507,25 @@ def _create_mask_3D(M, x_radius, y_radius, z_radius, shape="ellipsoid"):
 
     Args:
         M:        dimension of desired image
-        x_radius: half the horizontal width of the ellipse
-        y_radius: half the vertical width of the ellipse
-        z_radius: half the vertical width of the ellipse
-        shape:    'ellipse', 'rectangle', or 'annulus' describing the laser shape
+        x_radius: half the width of the ellipsoid along x (in pixels)
+        y_radius: half the width of the ellipsoid along y (in pixels)
+        z_radius: half the width of the ellipsoid along z (in pixels)
+        shape:    'cube', 'shell', or 'ellipsoid' describing the laser shape
 
     Returns:
-        M x M boolean array
+        M x M x M boolean array
     """
+    if M < 2 * max(x_radius, y_radius, z_radius):
+        raise ValueError("Array size M must be at least twice the radius.")
+
     X, Y, Z = np.ogrid[:M, :M, :M]
 
-    if shape == "cube":
+    lshape = shape.lower()
+
+    if lshape == "cube":
         dist = np.floor(X / x_radius / 2) + np.floor(Y / y_radius / 2) + np.floor(Z / z_radius / 2)
         mask = dist < 1
-    elif shape == "shell":
+    elif lshape == "shell":
         rmax = max(x_radius, y_radius, z_radius)
         rmin = min(x_radius, y_radius, z_radius)
         dist1 = np.sqrt((X - rmax) ** 2 + (Y - rmax) ** 2 + (Z - rmax) ** 2) / rmax
@@ -522,11 +533,14 @@ def _create_mask_3D(M, x_radius, y_radius, z_radius, shape="ellipsoid"):
         dist2 = np.sqrt((X - rmax) ** 2 + (Y - rmax) ** 2 + (Z - rmax) ** 2) / rmin
         mask2 = dist2 > 1
         mask = np.logical_and(mask2, mask1)
-    else:
+    elif lshape == "ellipsoid":
         dist = np.sqrt(
             (X - x_radius) ** 2 / x_radius**2 + (Y - y_radius) ** 2 / y_radius**2 + (Z - z_radius) ** 2 / z_radius**2
         )
         mask = dist <= 1
+    else:
+        raise ValueError("shape must be 'cube', 'shell', or 'ellipsoid'")
+
     return mask
 
 
@@ -562,6 +576,12 @@ def create_Exponential_3D(M, pix_per_speckle, alpha=1, beta=1, shape="ellipsoid"
     Returns:
         M x M X M speckle image
     """
+    if polarization < 0 or polarization > 1:
+        raise ValueError("bad polarization. It must be 0 <= polarization <= 1.")
+
+    if pix_per_speckle < 1:
+        raise ValueError("pix_per_speckle must be at least 1.")
+
     if polarization < 1:
         y1 = create_Exponential_3D(M, pix_per_speckle, alpha=alpha, beta=beta, shape=shape, polarization=1)
         y2 = create_Exponential_3D(M, pix_per_speckle, alpha=alpha, beta=beta, shape=shape, polarization=1)
@@ -571,7 +591,10 @@ def create_Exponential_3D(M, pix_per_speckle, alpha=1, beta=1, shape="ellipsoid"
     y_radius = int(alpha * M / 2)
     z_radius = int(beta * M / 2)
 
-    L = pix_per_speckle * 2 * max(x_radius, y_radius, z_radius)
+    if x_radius < 1 or y_radius < 1 or z_radius < 1:
+        raise ValueError("M, alpha, and beta must be big enough that all radii are at least one pixel.")
+
+    L = int(pix_per_speckle * 2 * max(x_radius, y_radius, z_radius))
 
     # phases uniformly distributed from 0 to 2*pi
     phase = 2 * np.pi * np.random.rand(L, L, L)

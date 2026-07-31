@@ -12,6 +12,10 @@ Unreleased ()
 * local_contrast_2D now returns only valid convolution pixels (shape change)
 * statistics_plot now normalizes the PDF so that it integrates to unity
 * seed numpy before every test so CI no longer fails intermittently
+* validate pix_per_speckle and image size in create_Exponential/create_Exponential_3D
+* support non-integer pix_per_speckle instead of raising TypeError from numpy
+* give create_Exponential_3D the polarization and shape checks the 2D version had
+* _create_mask_3D now folds case, rejects unknown shapes, and checks its size
 * seed numpy in each notebook so re-execution reproduces identical figures
 * add update-notebooks target to reformat and re-execute notebooks in place
 * add coverage target with a terminal-only report
