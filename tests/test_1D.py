@@ -2,6 +2,7 @@
 
 import numpy as np
 import pytest
+import scipy.stats
 import pyspeckle
 
 
@@ -13,18 +14,29 @@ def test_create_exponential_1D_shape_and_range():
     assert np.max(result) <= 1.0
 
 
-def test_create_exponential_1D_is_fully_developed():
-    """Polarized speckle irradiance is exponential, so the contrast is unity."""
-    v = np.concatenate([pyspeckle.create_exponential_1D(4096, 2) for _ in range(20)])
-    v = v / np.mean(v)
-    assert abs(np.std(v) - 1) < 0.15  # exponential irradiance -> K = 1
+@pytest.mark.parametrize(
+    "generator,expected",
+    [
+        (pyspeckle.create_exponential_1D, 1.0),  # exponential irradiance
+        (pyspeckle.create_unpolarized_1D, 1 / np.sqrt(2)),  # gamma-2 irradiance
+    ],
+)
+def test_speckle_contrast_1D(generator, expected):
+    """Speckle contrast is unity when polarized and 1/sqrt(2) when not."""
+    speckle = generator(16384, 2)
+    contrast = np.std(speckle) / np.mean(speckle)
+    assert abs(contrast - expected) < 0.05
 
 
-def test_create_exponential_1D_unpolarized_contrast():
-    """Summing two independent patterns drops the contrast to 1/sqrt(2)."""
-    v = np.concatenate([pyspeckle.create_exponential_1D(4096, 2, polarization=0) for _ in range(20)])
-    v = v / np.mean(v)
-    assert abs(np.std(v) - 1 / np.sqrt(2)) < 0.15
+def test_create_exponential_1D_polarization_sweep():
+    """Contrast falls monotonically from 1 to 1/sqrt(2) as polarization goes to zero."""
+    contrasts = []
+    for polarization in (1.0, 0.75, 0.5, 0.25, 0.0):
+        speckle = pyspeckle.create_exponential_1D(16384, 2, polarization=polarization)
+        contrasts.append(np.std(speckle) / np.mean(speckle))
+    assert abs(contrasts[0] - 1) < 0.05
+    assert abs(contrasts[-1] - 1 / np.sqrt(2)) < 0.05
+    assert np.all(np.diff(contrasts) < 0.01)  # non-increasing
 
 
 def test_create_unpolarized_1D_matches_zero_polarization():
@@ -36,11 +48,12 @@ def test_create_unpolarized_1D_matches_zero_polarization():
     assert np.array_equal(wrapper, explicit)
 
 
-def test_create_unpolarized_1D_contrast():
-    """Unpolarized speckle has gamma-2 irradiance, so the contrast is 1/sqrt(2)."""
-    v = np.concatenate([pyspeckle.create_unpolarized_1D(4096, 2) for _ in range(20)])
-    v = v / np.mean(v)
-    assert abs(np.std(v) - 1 / np.sqrt(2)) < 0.15
+def test_create_unpolarized_1D_irradiance_is_gamma2():
+    """Unpolarized irradiance follows a gamma distribution with shape 2."""
+    speckle = pyspeckle.create_unpolarized_1D(16384, 2)
+    speckle = speckle / np.mean(speckle)
+    # decimate to near-independent samples; neighbours within a speckle correlate
+    assert scipy.stats.kstest(speckle[::16], "gamma", args=(2, 0, 0.5)).pvalue > 0.01
 
 
 def test_create_exponential_1D_speckle_size():

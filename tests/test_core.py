@@ -25,6 +25,34 @@ def test_autocorrelation_value2():
     assert autocorr[0] == 0  # It's normalized to have a max of 1
 
 
+# Tests for the private display helper used by the plotting routines
+def test_sqrt_matrix_scales_to_255():
+    """The largest value maps to 255 and the square root compresses the range."""
+    scaled = pyspeckle.core._sqrt_matrix(np.array([0.0, 0.25, 1.0]))  # pylint: disable=protected-access
+    assert scaled.dtype.kind == "i"
+    assert list(scaled) == [0, 127, 255]  # 255*sqrt(0.25) = 127.5 truncated
+
+
+def test_sqrt_matrix_is_scale_invariant():
+    """Only the ratio to the maximum matters, not the absolute values."""
+    small = pyspeckle.core._sqrt_matrix(np.array([0.0, 0.25, 1.0]))  # pylint: disable=protected-access
+    large = pyspeckle.core._sqrt_matrix(np.array([0.0, 25.0, 100.0]))  # pylint: disable=protected-access
+    assert np.array_equal(small, large)
+
+
+def test_sqrt_matrix_all_zeros():
+    """An all-zero pattern must not divide by zero."""
+    scaled = pyspeckle.core._sqrt_matrix(np.zeros(4))  # pylint: disable=protected-access
+    assert np.all(scaled == 0)
+
+
+def test_sqrt_matrix_preserves_shape():
+    """Two-dimensional input keeps its shape."""
+    scaled = pyspeckle.core._sqrt_matrix(np.array([[0.0, 1.0], [4.0, 9.0]]))  # pylint: disable=protected-access
+    assert scaled.shape == (2, 2)
+    assert scaled[1, 1] == 255
+
+
 # Tests for the Gaussian copula chain, Duncan & Kirkpatrick eqs. (5a), (7), (8)
 def test_box_muller_moments():
     """Both returned arrays are normal with the requested mean and stdev."""

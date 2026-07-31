@@ -7,6 +7,7 @@ Unreleased ()
 * fix create_unpolarized_3D silently ignoring beta
 * correct the alpha/beta docstrings, which described the anisotropy backwards
 * replace matplotlib.cm.get_cmap, removed in matplotlib 3.11, with plt.get_cmap
+* replace Colormap.set_bad, pending deprecation, with Colormap.with_extremes
 * correct docstrings for local_contrast_2D, statistics_plot, zvalues, and tvalues
 * cite the Duncan & Kirkpatrick copula equations in box_muller/zvalues/tvalues
 * local_contrast_2D now returns only valid convolution pixels (shape change)
@@ -20,6 +21,9 @@ Unreleased ()
 * add create_unpolarized_1D so every dimension has both speckle forms
 * export box_muller, zvalues, and tvalues, which were unreachable and undocumented
 * add local_contrast_1D and local_contrast_3D
+* test speckle contrast in every dimension: K=1 polarized, K=1/sqrt(2) unpolarized
+* cover the plotting routines and mask branches, reaching 100% test coverage
+* force the Agg backend and close figures between tests
 * local_contrast_2D now shares one N-dimensional implementation with them
 * rename create_gaussian_1D to create_gaussian_corr_1D (breaking)
 * rename create_Rayleigh to create_unpolarized_2D (breaking)

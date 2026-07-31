@@ -298,8 +298,8 @@ def statistics_plot(x, initialize=True):
     Returns:
         nothing
     """
-    mymap = plt.get_cmap("gray").copy()
-    mymap.set_bad("blue")
+    # with_extremes returns a new colormap, so the registered "gray" is untouched
+    mymap = plt.get_cmap("gray").with_extremes(bad="blue")
 
     try:
         y = x.compressed()  # if masked array

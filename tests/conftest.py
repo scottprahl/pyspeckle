@@ -1,7 +1,13 @@
 """Shared fixtures for the pyspeckle test suite."""
 
-import numpy as np
-import pytest
+import matplotlib
+
+# must precede any import of pyplot, which pyspeckle does at import time
+matplotlib.use("Agg")
+
+import matplotlib.pyplot as plt  # noqa: E402  pylint: disable=wrong-import-position
+import numpy as np  # noqa: E402  pylint: disable=wrong-import-position
+import pytest  # noqa: E402  pylint: disable=wrong-import-position
 
 
 @pytest.fixture(autouse=True)
@@ -15,3 +21,15 @@ def seed_rng():
     frequent enough to fail CI at random.
     """
     np.random.seed(0)
+
+
+@pytest.fixture(autouse=True)
+def close_figures():
+    """
+    Close any figures a test opened.
+
+    The plotting routines draw onto the current figure and never close it, so
+    without this matplotlib warns once more than 20 accumulate.
+    """
+    yield
+    plt.close("all")

@@ -209,8 +209,8 @@ def slice_plot(data, x, y, z, initialize=True, show_sqrt=True):
     Returns:
         nothing
     """
-    mymap = plt.get_cmap("gray").copy()
-    mymap.set_bad("blue")
+    # with_extremes returns a new colormap, so the registered "gray" is untouched
+    mymap = plt.get_cmap("gray").with_extremes(bad="blue")
 
     if initialize:
         plt.subplots(2, 2, figsize=(9, 9))

@@ -1,5 +1,6 @@
 """Tests for pyspeckle.speckle_3D."""
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 import pyspeckle
@@ -40,6 +41,20 @@ def test_create_unpolarized_3D_uses_beta():
     assert x_width / z_width > 1.4
 
 
+@pytest.mark.parametrize(
+    "generator,expected",
+    [
+        (pyspeckle.create_exponential_3D, 1.0),  # exponential irradiance
+        (pyspeckle.create_unpolarized_3D, 1 / np.sqrt(2)),  # gamma-2 irradiance
+    ],
+)
+def test_speckle_contrast_3D(generator, expected):
+    """Speckle contrast is unity when polarized and 1/sqrt(2) when not."""
+    speckle = generator(32, 2)
+    contrast = np.std(speckle) / np.mean(speckle)
+    assert abs(contrast - expected) < 0.05
+
+
 def test_local_contrast_3D_matches_global():
     """Local contrast over a large volume should approach the global contrast."""
     M, n = 32, 9
@@ -58,6 +73,48 @@ def test_local_contrast_3D_rejects_wrong_kernel_rank():
     speckle = pyspeckle.create_exponential_3D(16, 2)
     with pytest.raises(ValueError):
         pyspeckle.local_contrast_3D(speckle, np.ones((3, 3)))
+
+
+def test_mask_3D_cube():
+    """The cube aperture fills the corner block of side 2*radius."""
+    mask = pyspeckle.speckle_3D._create_mask_3D(16, 4, 4, 4, shape="cube")  # pylint: disable=protected-access
+    assert mask.shape == (16, 16, 16)
+    assert mask.sum() == 8**3
+    assert mask[0, 0, 0]
+    assert mask[7, 7, 7]
+    assert not mask[8, 0, 0]
+
+
+def test_mask_3D_shell():
+    """The shell aperture is hollow, keeping points between the two radii."""
+    mask = pyspeckle.speckle_3D._create_mask_3D(16, 2, 4, 4, shape="shell")  # pylint: disable=protected-access
+    assert mask.shape == (16, 16, 16)
+    assert not mask[4, 4, 4]  # centre is hollow
+    assert mask[4, 4, 7]  # inside the outer radius
+    assert not mask[0, 0, 0]  # outside the outer radius
+
+
+def test_slice_plot_draws_three_slices():
+    """slice_plot fills a 2x2 figure with one panel per axis and a blank fourth."""
+    data = pyspeckle.create_exponential_3D(16, 2)
+    pyspeckle.slice_plot(data, 8, 8, 8)
+    axes = plt.gcf().get_axes()
+    assert len(axes) == 4
+    assert axes[0].get_title() == "Constant Z=8 values"
+    assert axes[1].get_title() == "Constant Y=8 values"
+    assert axes[2].get_title() == "Constant X=8 values"
+    assert not axes[3].axison  # fourth panel is switched off
+
+
+def test_slice_plot_without_sqrt_or_initialize():
+    """show_sqrt=False plots raw irradiance; initialize=False reuses the figure."""
+    data = pyspeckle.create_exponential_3D(16, 2)
+    plt.subplots(2, 2)
+    pyspeckle.slice_plot(data, 8, 8, 8, initialize=False, show_sqrt=False)
+    axes = plt.gcf().get_axes()
+    assert len(axes) == 4
+    # raw irradiance is normalized to a max of one, not scaled to 0-255
+    assert axes[0].get_images()[0].get_array().max() <= 1.0
 
 
 def test_mask_3D_case_insensitive():
