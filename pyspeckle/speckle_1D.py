@@ -15,6 +15,7 @@ distribution.
 """
 
 import numpy as np
+import matplotlib.pyplot as plt
 
 from .core import _local_contrast
 
@@ -24,6 +25,7 @@ __all__ = (
     "create_exp_corr_1D",
     "create_gaussian_corr_1D",
     "local_contrast_1D",
+    "local_contrast_1D_plot",
 )
 
 
@@ -46,6 +48,68 @@ def local_contrast_1D(x, kernel):
         1D_contrast_array, total_contrast
     """
     return _local_contrast(x, kernel)
+
+
+def local_contrast_1D_plot(x, kernel):
+    """
+    Create a graph showing local and global speckle contrast.
+
+    This is the one-dimensional form of `local_contrast_2D_plot`.  The two
+    panels on the left show individual samples as small points rather than
+    images: the speckle trace above, the local contrast below.  Points rather
+    than a line because adjacent samples are discrete and a connecting line
+    turns solid once the trace is more than a few thousand points long.  The
+    two panels on the right are the matching histograms.
+
+    The kernel is a 1D array describing the window over which contrast is
+    calculated.  For example, `np.ones(5)` averages over five samples.
+
+    Because only valid positions of the correlation are returned, the contrast
+    trace is shorter than the speckle trace.  It is plotted against the centre
+    of its window so that the two left panels share a position axis.
+
+    Args:
+        x:       1D speckle pattern for which contrast is to be calculated
+        kernel:  1D window over which contrast is to be calculated
+
+    Returns:
+        nothing
+    """
+    C, K = local_contrast_1D(x, kernel)
+
+    plt.subplots(2, 2, figsize=(14, 12))
+    plt.subplot(221)
+
+    plt.plot(x, ".", markersize=2)
+    plt.xlabel("Position (pixels)")
+    plt.ylabel("Irradiance")
+    plt.title("Speckle Realization, Overall Contrast=%0.2f" % K)
+
+    plt.subplot(222)
+    # density=True scales the bins so that the PDF integrates to unity
+    pdf, bins = np.histogram(x, bins=30, density=True)
+    width = 0.7 * (bins[1] - bins[0])
+    center = (bins[:-1] + bins[1:]) / 2
+    plt.bar(center, pdf, align="center", width=width)
+    plt.title("PDF of Speckle Realization")
+    plt.xlabel("Gray level, g")
+    plt.ylabel("PDF")
+
+    plt.subplot(223)
+    # shift by half a kernel so each contrast lands at the centre of its window
+    plt.plot(np.arange(len(C)) + (len(kernel) - 1) / 2, C, ".", markersize=2)
+    plt.xlabel("Position (pixels)")
+    plt.ylabel("Local contrast, C")
+    plt.title("Local speckle contrast")
+
+    plt.subplot(224)
+    pdf, bins = np.histogram(C, bins=20, density=True)
+    width = 0.7 * (bins[1] - bins[0])
+    center = (bins[:-1] + bins[1:]) / 2
+    plt.bar(center, pdf, align="center", width=width)
+    plt.title("PDF of Local Speckle Contrast")
+    plt.xlabel("Local contrast, C")
+    plt.ylabel("PDF")
 
 
 def create_exponential_1D(M, pix_per_speckle, polarization=1):

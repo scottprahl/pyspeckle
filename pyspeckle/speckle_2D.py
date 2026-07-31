@@ -241,10 +241,11 @@ def local_contrast_2D_plot(x, kernel):
     plt.title("Speckle Realization, Overall Contrast=%0.2f" % K)
 
     plt.subplot(222)
-    hist, bins = np.histogram(x, bins=30)
+    # density=True scales the bins so that the PDF integrates to unity
+    pdf, bins = np.histogram(x, bins=30, density=True)
     width = 0.7 * (bins[1] - bins[0])
     center = (bins[:-1] + bins[1:]) / 2
-    plt.bar(center, hist, align="center", width=width)
+    plt.bar(center, pdf, align="center", width=width)
     plt.title("PDF of Speckle Realization")
     plt.xlabel("Gray level, g")
     plt.ylabel("PDF")
@@ -256,10 +257,10 @@ def local_contrast_2D_plot(x, kernel):
     plt.title("Local speckle contrast")
 
     plt.subplot(224)
-    hist, bins = np.histogram(C, bins=20)
+    pdf, bins = np.histogram(C, bins=20, density=True)
     width = 0.7 * (bins[1] - bins[0])
     center = (bins[:-1] + bins[1:]) / 2
-    plt.bar(center, hist, align="center", width=width)
+    plt.bar(center, pdf, align="center", width=width)
     plt.title("PDF of Local Speckle Contrast")
     plt.xlabel("Local contrast, C")
     plt.ylabel("PDF")

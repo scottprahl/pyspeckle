@@ -21,6 +21,8 @@ Unreleased ()
 * cite the Duncan & Kirkpatrick copula equations in box_muller/zvalues/tvalues
 * local_contrast_2D now returns only valid convolution pixels (shape change)
 * statistics_plot now normalizes the PDF so that it integrates to unity
+* local_contrast_2D_plot histograms are densities; they were labelled PDF but
+  showed raw counts
 * seed numpy before every test so CI no longer fails intermittently
 * validate pix_per_speckle and image size in create_exponential_2D/create_exponential_3D
 * support non-integer pix_per_speckle instead of raising TypeError from numpy
@@ -30,6 +32,7 @@ Unreleased ()
 * add create_unpolarized_1D so every dimension has both speckle forms
 * export box_muller, zvalues, and tvalues, which were unreachable and undocumented
 * add local_contrast_1D and local_contrast_3D
+* add local_contrast_1D_plot, plotting points where the 2D version has images
 * test speckle contrast in every dimension: K=1 polarized, K=1/sqrt(2) unpolarized
 * cover the plotting routines and mask branches, reaching 100% test coverage
 * force the Agg backend and close figures between tests

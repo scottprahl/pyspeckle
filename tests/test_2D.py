@@ -132,6 +132,16 @@ def test_local_contrast_2D_plot_draws_four_panels():
     assert axes[2].get_title() == "Local speckle contrast"
 
 
+def test_local_contrast_2D_plot_histograms_are_densities():
+    """Both panels labelled PDF must integrate to unity, not show raw counts."""
+    speckle = pyspeckle.create_exponential_2D(64, 2)
+    pyspeckle.local_contrast_2D_plot(speckle, np.ones((5, 5)))
+    for panel in (plt.gcf().get_axes()[1], plt.gcf().get_axes()[3]):
+        # bars are drawn at 70% of the bin width, so widen them back out
+        total = sum(p.get_height() * (p.get_width() / 0.7) for p in panel.patches)
+        assert abs(total - 1) < 0.01
+
+
 def test_statistics_plot_draws_four_panels():
     """The statistics routine fills a 2x2 figure and reports mean, stdev, contrast."""
     speckle = pyspeckle.create_exponential_2D(64, 2)

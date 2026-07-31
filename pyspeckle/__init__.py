@@ -13,6 +13,7 @@ One dimensional functions::
     pyspeckle.create_exp_corr_1D(M, mean, stdev, cl)
     pyspeckle.create_gaussian_corr_1D(M, mean, stdev, cl)
     pyspeckle.local_contrast_1D(x, kernel)
+    pyspeckle.local_contrast_1D_plot(x, kernel)
     pyspeckle.autocorrelation(x)
 
 Correlated random numbers, the Gaussian copula of Duncan & Kirkpatrick::
