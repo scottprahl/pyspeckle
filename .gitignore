@@ -34,6 +34,9 @@ docs/*pdf
 
 # Testing
 .pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
 
 # GitHub Pages
 .gh-pages/
