@@ -102,6 +102,9 @@ target-version = ["py310"]
 [tool.pylint]
 disable = [
     "C0103", "C0209", "C0302",
+    # R0801: the 2D and 3D generators are deliberately parallel, and most of what
+    # it flags is the shared prose describing pix_per_speckle in their docstrings
+    "R0801",
     "R0902", "R0904", "R0912", "R0913", "R0914", "R0915", "R0917", "R1702",
     "W0511"
 ]

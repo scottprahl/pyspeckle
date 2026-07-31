@@ -204,7 +204,7 @@ def test_create_Rayleigh_3D_uses_beta():
 
 def test_ellipse_mask():
     """Basic functionality for ellipse mask."""
-    mask = pyspeckle.pyspeckle._create_mask(10, 3, 4)  # pylint: disable=protected-access
+    mask = pyspeckle.speckle_2D._create_mask(10, 3, 4)  # pylint: disable=protected-access
     assert mask.shape == (10, 10)
     assert mask[5, 5]
     assert mask[0, 6] == 0
@@ -213,7 +213,7 @@ def test_ellipse_mask():
 
 def test_rectangle_mask():
     """Basic functionality for rect mask."""
-    mask = pyspeckle.pyspeckle._create_mask(10, 3, 4, shape="rectangle")  # pylint: disable=protected-access
+    mask = pyspeckle.speckle_2D._create_mask(10, 3, 4, shape="rectangle")  # pylint: disable=protected-access
     assert mask.shape == (10, 10)
     assert mask[0, 0]
     assert mask[7, 5]
@@ -223,7 +223,7 @@ def test_rectangle_mask():
 
 def test_annulus_mask():
     """Basic functionality for annular mask."""
-    mask = pyspeckle.pyspeckle._create_mask(10, 3, 4, shape="annulus")  # pylint: disable=protected-access
+    mask = pyspeckle.speckle_2D._create_mask(10, 3, 4, shape="annulus")  # pylint: disable=protected-access
     assert mask.shape == (10, 10)
     assert mask[0, 0] == 0
     assert mask[4, 4] == 0
@@ -235,18 +235,18 @@ def test_annulus_mask():
 
 def test_mask_3D_case_insensitive():
     """The 3D mask should fold case like the 2D one."""
-    upper = pyspeckle.pyspeckle._create_mask_3D(16, 4, 4, 4, shape="Ellipsoid")  # pylint: disable=protected-access
-    lower = pyspeckle.pyspeckle._create_mask_3D(16, 4, 4, 4, shape="ellipsoid")  # pylint: disable=protected-access
+    upper = pyspeckle.speckle_3D._create_mask_3D(16, 4, 4, 4, shape="Ellipsoid")  # pylint: disable=protected-access
+    lower = pyspeckle.speckle_3D._create_mask_3D(16, 4, 4, 4, shape="ellipsoid")  # pylint: disable=protected-access
     assert np.array_equal(upper, lower)
 
 
 def test_mask_3D_unknown_shape():
     """Unknown 3D shapes used to fall through silently to an ellipsoid."""
     with pytest.raises(ValueError):
-        pyspeckle.pyspeckle._create_mask_3D(16, 4, 4, 4, shape="banana")  # pylint: disable=protected-access
+        pyspeckle.speckle_3D._create_mask_3D(16, 4, 4, 4, shape="banana")  # pylint: disable=protected-access
 
 
 def test_mask_3D_too_small():
     """The 3D mask array must be at least twice the largest radius."""
     with pytest.raises(ValueError):
-        pyspeckle.pyspeckle._create_mask_3D(8, 6, 4, 4)  # pylint: disable=protected-access
+        pyspeckle.speckle_3D._create_mask_3D(8, 6, 4, 4)  # pylint: disable=protected-access

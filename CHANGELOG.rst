@@ -16,6 +16,9 @@ Unreleased ()
 * support non-integer pix_per_speckle instead of raising TypeError from numpy
 * give create_Exponential_3D the polarization and shape checks the 2D version had
 * _create_mask_3D now folds case, rejects unknown shapes, and checks its size
+* split pyspeckle.py into core.py, speckle_1D.py, speckle_2D.py, and speckle_3D.py
+* the public API is unchanged, but pyspeckle.pyspeckle is gone; the private mask
+  helpers now live at pyspeckle.speckle_2D and pyspeckle.speckle_3D
 * seed numpy in each notebook so re-execution reproduces identical figures
 * add update-notebooks target to reformat and re-execute notebooks in place
 * add coverage target with a terminal-only report

@@ -24,6 +24,11 @@ Three dimensional functions::
 
     pyspeckle.create_Exponential_3D(M, pix_per_speckle)
     pyspeckle.create_Rayleigh_3D(M, pix_per_speckle)
+    pyspeckle.slice_plot(data, x, y, z)
+
+The implementation is split across `core`, `speckle_1D`, `speckle_2D`, and
+`speckle_3D`, but every public function is re-exported here, so
+`pyspeckle.create_Exponential(...)` is the intended way to reach them.
 """
 
 __version__ = "0.6.1"
@@ -33,4 +38,7 @@ __copyright__ = "2018-26, Scott Prahl"
 __license__ = "MIT"
 __url__ = "https://github.com/scottprahl/pyspeckle"
 
-from .pyspeckle import *
+from .core import *
+from .speckle_1D import *
+from .speckle_2D import *
+from .speckle_3D import *
