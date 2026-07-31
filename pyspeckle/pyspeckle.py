@@ -51,7 +51,8 @@ def local_contrast_2D(x, kernel):
 
     Note that the dimensions of the `2D_contrast_image` will not be the same as for
     the speckle pattern as only valid pixels resulting from the convolution are
-    returned.
+    returned.  An M x M pattern with an N x N kernel yields (M-N+1) x (M-N+1)
+    values, none of which are contaminated by zero padding at the edges.
 
     Args:
         x: 2D speckle pattern
@@ -65,9 +66,12 @@ def local_contrast_2D(x, kernel):
     # contrast of raw image
     K = np.std(x) / np.mean(x)
 
-    # local speckle contrast
-    mu_x = scipy.signal.correlate2d(x, kernel, mode="same") / Nk
-    var_x = scipy.signal.correlate2d((x - mu_x) ** 2, kernel, mode="same") / Nk
+    # local mean and local mean square over the kernel
+    mu_x = scipy.signal.correlate2d(x, kernel, mode="valid") / Nk
+    mu_x2 = scipy.signal.correlate2d(x**2, kernel, mode="valid") / Nk
+
+    # local variance, clipped because rounding can push it slightly below zero
+    var_x = np.maximum(mu_x2 - mu_x**2, 0)
     C = np.sqrt(var_x) / mu_x
     return C, K
 
@@ -429,10 +433,11 @@ def statistics_plot(x, initialize=True):
     plt.subplot(2, 2, 2)
     num_bins = 30
     #    plt.gca().set_aspect('equal')
-    hist, bins = np.histogram(y, bins=num_bins)
+    # density=True scales the bins so that the PDF integrates to unity
+    pdf, bins = np.histogram(y, bins=num_bins, density=True)
     width = 0.7 * (bins[1] - bins[0])
     center = (bins[:-1] + bins[1:]) / 2
-    plt.bar(center, hist, align="center", width=width, color="gray")
+    plt.bar(center, pdf, align="center", width=width, color="gray")
     plt.xlabel("Irradiance (gray level/pixel)")
     plt.ylabel(r"Probability Distribution Function, $p_I(i)$")
     plt.title("Average = %.2f, Standard Deviation = %.2f" % (ave, std))
@@ -450,9 +455,7 @@ def statistics_plot(x, initialize=True):
     # Probability Distribution Function on Log Scale
     plt.subplot(2, 2, 4)
     #    plt.gca().set_aspect('equal')
-    #    pdf = hist / (np.sum(hist) * (bins[1] - bins[0]))
-
-    plt.semilogy(center, hist, "r.")
+    plt.semilogy(center, pdf, "r.")
     plt.title("Speckle Contrast, K=%.3f" % (std / ave))
     plt.xlabel("Irradiance")
     plt.ylabel(r"Probability Distribution Function, $p_I(i)$")
@@ -681,6 +684,11 @@ def box_muller(mu, sigma, N=1):
     normally distributed (zero expectation, unit variance) random numbers,
     given a source of uniformly distributed random numbers.
 
+    This is `Y1` and `Y2` in the Gaussian copula construction.
+
+    see Duncan & Kirkpatrick, "Algorithms for simulation of speckle," in SPIE
+    Vol. 6855 (2008), eq. (5a)
+
     Args:
         mu: average value
         sigma: standard deviation of normal distribution
@@ -699,17 +707,23 @@ def box_muller(mu, sigma, N=1):
 
 def zvalues(r, N=1):
     """
-    Generate random pairs for the CDF a normal distribution.
+    Generate correlated pairs of standard normal deviates.
 
-    The z-values are from the cumulative distribution function of the
-    normal distribution.
+    Each returned array is normally distributed with zero mean and unit
+    variance, and the two arrays have correlation coefficient `r`.
+
+    This is `Z1` and `Z2` in the Gaussian copula construction, obtained by
+    scaling and rotating the independent pair from `box_muller`.
+
+    see Duncan & Kirkpatrick, "Algorithms for simulation of speckle," in SPIE
+    Vol. 6855 (2008), eq. (7)
 
     Args:
-        r: radius of the CDF
+        r: correlation coefficient of the pair, -1 <= r <= 1
         N: number of pairs to generate
 
     Returns:
-        pairs of random numbers
+        pairs of correlated standard normal deviates
     """
     y1, y2 = box_muller(0, 1, N)
     z1 = (np.sqrt(1 + r) * y1 - np.sqrt(1 - r) * y2) / np.sqrt(2)
@@ -719,14 +733,27 @@ def zvalues(r, N=1):
 
 def tvalues(r, N=1):
     """
-    Generate random pairs for the student t-distribution.
+    Generate correlated pairs of uniformly distributed numbers.
+
+    Correlated standard normal deviates are mapped through the normal CDF,
+    so each returned array is uniform on [0, 1] while the pair remains
+    dependent.  This is `T1` and `T2`, the percentile transformation that
+    completes the Gaussian copula construction.
+
+    The `T` is the paper's variable name and has nothing to do with the
+    Student t-distribution.  Note also that `r` sets the correlation of the
+    underlying normal pair; the correlation of the returned uniforms is
+    (6/pi)*arcsin(r/2), which is 0.483 when r=0.5.
+
+    see Duncan & Kirkpatrick, "Algorithms for simulation of speckle," in SPIE
+    Vol. 6855 (2008), eq. (8)
 
     Args:
-        r: radius of the CDF
+        r: correlation coefficient of the underlying normal pair
         N: number of pairs to generate
 
     Returns:
-        pairs of random numbers
+        pairs of correlated numbers uniform on [0, 1]
     """
     z1, z2 = zvalues(r, N=N)
     t1 = scipy.stats.norm.cdf(z1)

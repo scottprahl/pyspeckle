@@ -7,6 +7,11 @@ Unreleased ()
 * fix create_Rayleigh_3D silently ignoring beta
 * correct the alpha/beta docstrings, which described the anisotropy backwards
 * replace matplotlib.cm.get_cmap, removed in matplotlib 3.11, with plt.get_cmap
+* correct docstrings for local_contrast_2D, statistics_plot, zvalues, and tvalues
+* cite the Duncan & Kirkpatrick copula equations in box_muller/zvalues/tvalues
+* local_contrast_2D now returns only valid convolution pixels (shape change)
+* statistics_plot now normalizes the PDF so that it integrates to unity
+* seed numpy before every test so CI no longer fails intermittently
 * seed numpy in each notebook so re-execution reproduces identical figures
 * add update-notebooks target to reformat and re-execute notebooks in place
 * add coverage target with a terminal-only report

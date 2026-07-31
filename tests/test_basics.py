@@ -5,6 +5,19 @@ import pytest
 import pyspeckle
 
 
+@pytest.fixture(autouse=True)
+def seed_rng():
+    """
+    Seed numpy before every test.
+
+    Several tests assert on sample statistics whose tolerances are only a few
+    standard deviations wide.  Unseeded, create_gaussian_1D(1000, 10, 2, 5)
+    lands outside its 0.5 tolerance in about one run per hundred, which is
+    frequent enough to fail CI at random.
+    """
+    np.random.seed(0)
+
+
 def test_create_exp_1D_output_length():
     """Test length of create_exp_1D."""
     arr = pyspeckle.create_exp_1D(100, 10, 2, 5)
@@ -122,16 +135,14 @@ def test_local_contrast_2D_matches_global():
     speckle = pyspeckle.create_Exponential(256, 2)
     n = 15
     C, K = pyspeckle.local_contrast_2D(speckle, np.ones((n, n)))
-    assert C.shape == speckle.shape
 
-    # ignore the edges where the convolution is biased by zero padding
-    m = n // 2
-    interior = np.mean(C[m:-m, m:-m])
+    # only valid pixels of the convolution are returned
+    assert C.shape == (speckle.shape[0] - n + 1, speckle.shape[1] - n + 1)
 
     # fully developed speckle has unity contrast, and a 15x15 window recovers
     # most of it; a missing kernel normalization drops this by a factor of n
     assert abs(K - 1) < 0.2
-    assert abs(interior - 1) < 0.2
+    assert abs(np.mean(C) - 1) < 0.2
 
 
 # Tests for create_Rayleigh_3D
