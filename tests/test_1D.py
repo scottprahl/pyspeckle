@@ -86,6 +86,62 @@ def test_create_exponential_1D_invalid_args(kwargs):
         pyspeckle.create_exponential_1D(**args)
 
 
+@pytest.mark.parametrize("sigma,cl", [(1.0, 8), (0.3, 20), (2.5, 4)])
+def test_create_phase_screen_1D_statistics(sigma, cl):
+    """The screen is zero mean with the requested standard deviation."""
+    screen = pyspeckle.create_phase_screen_1D(65536, sigma, cl)
+    assert screen.shape == (65536,)
+    assert abs(np.mean(screen)) < 0.01 * max(sigma, 0.1)
+    assert abs(np.std(screen) - sigma) < 0.01 * sigma
+
+
+def test_create_phase_screen_1D_is_gaussian():
+    """The phase is normally distributed, unlike the uniform phase of speckle."""
+    screen = pyspeckle.create_phase_screen_1D(65536, 1.0, 8)
+    assert abs(scipy.stats.skew(screen)) < 0.1
+    assert abs(scipy.stats.kurtosis(screen)) < 0.2
+
+
+@pytest.mark.parametrize("shape", ["gaussian", "exponential", "GAUSSIAN"])
+def test_create_phase_screen_1D_autocorrelation(shape):
+    """The screen reproduces the requested autocorrelation."""
+    cl = 8
+    screen = pyspeckle.create_phase_screen_1D(65536, 1.0, cl, shape=shape)
+    acf = pyspeckle.autocorrelation(screen)
+    lags = np.array([4, 8, 16])
+    if shape.lower() == "gaussian":
+        want = np.exp(-0.5 * (lags / cl) ** 2)
+    else:
+        want = np.exp(-lags / cl)
+    assert np.max(np.abs(acf[lags] - want)) < 0.05
+
+
+def test_create_phase_screen_1D_coherent_fraction():
+    """The unscattered fraction of the field is exp(-sigma**2)."""
+    for sigma in (0.5, 1.0, 2.0):
+        screen = pyspeckle.create_phase_screen_1D(65536, sigma, 8)
+        coherent = abs(np.mean(np.exp(1j * screen))) ** 2
+        assert abs(coherent - np.exp(-(sigma**2))) < 0.02
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"sigma": -1},
+        {"cl": 0},
+        {"cl": -5},
+        {"shape": "banana"},
+        {"M": 1},
+    ],
+)
+def test_create_phase_screen_1D_invalid_args(kwargs):
+    """Bad arguments raise ValueError rather than failing inside numpy."""
+    args = {"M": 64, "sigma": 1.0, "cl": 8}
+    args.update(kwargs)
+    with pytest.raises(ValueError):
+        pyspeckle.create_phase_screen_1D(**args)
+
+
 def test_local_contrast_1D_matches_global():
     """Local contrast over a long window should approach the global contrast."""
     speckle = pyspeckle.create_exponential_1D(8192, 2)

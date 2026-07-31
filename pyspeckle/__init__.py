@@ -12,6 +12,7 @@ One dimensional functions::
     pyspeckle.create_unpolarized_1D(M, pix_per_speckle)
     pyspeckle.create_exp_corr_1D(M, mean, stdev, cl)
     pyspeckle.create_gaussian_corr_1D(M, mean, stdev, cl)
+    pyspeckle.create_phase_screen_1D(M, sigma, cl)
     pyspeckle.local_contrast_1D(x, kernel)
     pyspeckle.local_contrast_1D_plot(x, kernel)
     pyspeckle.autocorrelation(x)
@@ -32,6 +33,7 @@ Two dimensional functions::
     pyspeckle.local_contrast_2D_plot(x, kernel)
     pyspeckle.create_exponential_2D(M, pix_per_speckle)
     pyspeckle.create_unpolarized_2D(M, pix_per_speckle)
+    pyspeckle.create_phase_screen_2D(M, sigma, cl)
     pyspeckle.statistics_plot(x)
 
 Three dimensional functions::

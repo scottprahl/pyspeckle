@@ -95,6 +95,45 @@ def test_speckle_contrast_2D_independent_of_resolution():
         assert abs(np.std(speckle) / np.mean(speckle) - 1) < 0.1
 
 
+def test_create_phase_screen_2D_statistics():
+    """The screen is square, zero mean, with the requested standard deviation."""
+    screen = pyspeckle.create_phase_screen_2D(256, 1.5, 8)
+    assert screen.shape == (256, 256)
+    assert abs(np.mean(screen)) < 0.02
+    assert abs(np.std(screen) - 1.5) < 0.02
+
+
+def test_create_phase_screen_2D_is_isotropic():
+    """Correlation must be radial, not the diamond a separable product gives."""
+    screen = pyspeckle.create_phase_screen_2D(512, 1.0, 8)
+    centred = screen - screen.mean()
+    power = np.abs(np.fft.fft2(centred)) ** 2
+    acf = np.fft.ifft2(power).real
+    acf /= acf[0, 0]
+
+    # the 6-8-10 triple puts all four lags at exactly the same radius, so an
+    # isotropic screen gives the same correlation at every one of them
+    same_radius = [acf[0, 10], acf[10, 0], acf[6, 8], acf[8, 6]]
+    assert max(same_radius) - min(same_radius) < 0.08
+
+
+def test_create_phase_screen_2D_coherent_fraction():
+    """The unscattered fraction of the field is exp(-sigma**2)."""
+    for sigma in (0.5, 1.0, 2.0):
+        screen = pyspeckle.create_phase_screen_2D(256, sigma, 4)
+        coherent = abs(np.mean(np.exp(1j * screen))) ** 2
+        assert abs(coherent - np.exp(-(sigma**2))) < 0.03
+
+
+@pytest.mark.parametrize("kwargs", [{"sigma": -1}, {"cl": 0}, {"shape": "banana"}, {"M": 1}])
+def test_create_phase_screen_2D_invalid_args(kwargs):
+    """Bad arguments raise ValueError rather than failing inside numpy."""
+    args = {"M": 64, "sigma": 1.0, "cl": 8}
+    args.update(kwargs)
+    with pytest.raises(ValueError):
+        pyspeckle.create_phase_screen_2D(**args)
+
+
 def test_local_contrast_2D_matches_global():
     """Local contrast over a large kernel should approach the global contrast."""
     speckle = pyspeckle.create_exponential_2D(256, 2)

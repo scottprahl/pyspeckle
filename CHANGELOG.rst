@@ -31,6 +31,8 @@ Unreleased ()
 * add create_exponential_1D, true 1D speckle with exponential irradiance
 * add create_unpolarized_1D so every dimension has both speckle forms
 * export box_muller, zvalues, and tvalues, which were unreachable and undocumented
+* add create_phase_screen_1D and create_phase_screen_2D for partially
+  developed speckle: correlated Gaussian phase, gaussian or exponential ACF
 * add local_contrast_1D and local_contrast_3D
 * add local_contrast_1D_plot, plotting points where the 2D version has images
 * test speckle contrast in every dimension: K=1 polarized, K=1/sqrt(2) unpolarized

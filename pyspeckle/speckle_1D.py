@@ -17,16 +17,46 @@ distribution.
 import numpy as np
 import matplotlib.pyplot as plt
 
-from .core import _local_contrast
+from .core import _local_contrast, _phase_screen
 
 __all__ = (
     "create_exponential_1D",
     "create_unpolarized_1D",
     "create_exp_corr_1D",
     "create_gaussian_corr_1D",
+    "create_phase_screen_1D",
     "local_contrast_1D",
     "local_contrast_1D_plot",
 )
+
+
+def create_phase_screen_1D(M, sigma, cl, shape="gaussian"):
+    """
+    Generate a length M correlated Gaussian phase screen.
+
+    The screen is a zero-mean Gaussian random process with standard deviation
+    `sigma` radians and a correlation length of `cl` pixels.  It models the
+    phase imposed by a rough surface, and is the input needed for partially
+    developed speckle: multiply `exp(1j*screen)` by an aperture and transform,
+    exactly as `create_exponential_1D` does with uniform random phase.
+
+    The fraction of the field left unscattered is exp(-sigma**2).  Large
+    `sigma` scrambles the phase completely and recovers the fully developed
+    limit that `create_exponential_1D` produces directly; small `sigma`
+    leaves a strong coherent component and the speckle is only partially
+    developed.  How that coherent component appears, and therefore what
+    contrast is measured, depends on the observing geometry.
+
+    Args:
+        M:     length of desired phase screen
+        sigma: standard deviation of the phase [radians]
+        cl:    correlation length [pixels]
+        shape: 'gaussian' or 'exponential' autocorrelation
+
+    Returns:
+        array of length M of phases in radians
+    """
+    return _phase_screen((M,), sigma, cl, shape=shape)
 
 
 def local_contrast_1D(x, kernel):

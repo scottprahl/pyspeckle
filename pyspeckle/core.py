@@ -18,6 +18,60 @@ __all__ = (
 )
 
 
+def _phase_screen(dims, sigma, cl, shape="gaussian"):
+    """
+    Generate a correlated Gaussian phase screen of any dimensionality.
+
+    This backs `create_phase_screen_1D` and `create_phase_screen_2D`.  White
+    noise is filtered by the square root of the power spectral density, which
+    by the Wiener-Khinchin theorem is the transform of the wanted
+    autocorrelation.  The result is isotropic, which matters in two dimensions
+    because `exp(-|x|/cl) * exp(-|y|/cl)` is diamond shaped rather than
+    radially symmetric.
+
+    Args:
+        dims:  tuple giving the shape of the screen, e.g. (M,) or (M, M)
+        sigma: standard deviation of the phase [radians]
+        cl:    correlation length [pixels]
+        shape: 'gaussian' or 'exponential' autocorrelation
+
+    Returns:
+        zero-mean array of phases with the requested shape
+    """
+    if sigma < 0:
+        raise ValueError("sigma must be non-negative.")
+
+    if cl <= 0:
+        raise ValueError("Correlation length cl must be positive.")
+
+    if min(dims) < 2:
+        raise ValueError("Screen must be at least 2 pixels across.")
+
+    lshape = shape.lower()
+
+    # signed lags, wrapped, so the autocorrelation is periodic on the grid
+    axes = [np.fft.fftfreq(n, d=1 / n) for n in dims]
+    grid = np.meshgrid(*axes, indexing="ij")
+    r = np.sqrt(sum(g**2 for g in grid))
+
+    if lshape == "gaussian":
+        acf = np.exp(-0.5 * (r / cl) ** 2)
+    elif lshape == "exponential":
+        acf = np.exp(-r / cl)
+    else:
+        raise ValueError("shape must be 'gaussian' or 'exponential'")
+
+    # power spectral density; tiny negative lobes are numerical noise
+    psd = np.maximum(np.fft.fftn(acf).real, 0)
+
+    white = np.fft.fftn(np.random.normal(size=dims))
+    screen = np.fft.ifftn(white * np.sqrt(psd)).real
+
+    screen -= screen.mean()
+    deviation = screen.std() or 1
+    return sigma * screen / deviation
+
+
 def _sqrt_matrix(x):
     """
     Generate the square root of x but scaled as integers from 0-255.

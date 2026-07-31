@@ -11,15 +11,51 @@ Vol. 6855 (2008)
 import numpy as np
 import matplotlib.pyplot as plt
 
-from .core import _local_contrast, _sqrt_matrix
+from .core import _local_contrast, _phase_screen, _sqrt_matrix
 
 __all__ = (
     "create_exponential_2D",
     "create_unpolarized_2D",
+    "create_phase_screen_2D",
     "local_contrast_2D",
     "local_contrast_2D_plot",
     "statistics_plot",
 )
+
+
+def create_phase_screen_2D(M, sigma, cl, shape="gaussian"):
+    """
+    Generate an M x M correlated Gaussian phase screen.
+
+    The screen is a zero-mean Gaussian random field with standard deviation
+    `sigma` radians and a correlation length of `cl` pixels.  It models the
+    phase imposed by a rough surface, and is the input needed for partially
+    developed speckle: multiply `exp(1j*screen)` by an aperture mask and
+    transform, exactly as `create_exponential_2D` does with uniform random
+    phase.
+
+    The correlation is isotropic.  Note that a separable product of
+    one-dimensional exponentials would give `exp(-(|x|+|y|)/cl)`, which is
+    diamond shaped rather than radially symmetric, so the screen is built by
+    filtering white noise with the square root of the power spectral density.
+
+    The fraction of the field left unscattered is exp(-sigma**2).  Large
+    `sigma` scrambles the phase completely and recovers the fully developed
+    limit that `create_exponential_2D` produces directly; small `sigma`
+    leaves a strong coherent component and the speckle is only partially
+    developed.  How that coherent component appears, and therefore what
+    contrast is measured, depends on the observing geometry.
+
+    Args:
+        M:     dimension of desired square phase screen
+        sigma: standard deviation of the phase [radians]
+        cl:    correlation length [pixels]
+        shape: 'gaussian' or 'exponential' autocorrelation
+
+    Returns:
+        M x M array of phases in radians
+    """
+    return _phase_screen((M, M), sigma, cl, shape=shape)
 
 
 def _create_mask(M, x_radius, y_radius, shape="ellipse"):
