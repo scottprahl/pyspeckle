@@ -12,6 +12,7 @@ One dimensional functions::
     pyspeckle.create_unpolarized_1D(M, pix_per_speckle)
     pyspeckle.create_exp_corr_1D(M, mean, stdev, cl)
     pyspeckle.create_gaussian_corr_1D(M, mean, stdev, cl)
+    pyspeckle.local_contrast_1D(x, kernel)
     pyspeckle.autocorrelation(x)
 
 Correlated random numbers, the Gaussian copula of Duncan & Kirkpatrick::
@@ -36,6 +37,7 @@ Three dimensional functions::
 
     pyspeckle.create_exponential_3D(M, pix_per_speckle)
     pyspeckle.create_unpolarized_3D(M, pix_per_speckle)
+    pyspeckle.local_contrast_3D(x, kernel)
     pyspeckle.slice_plot(data, x, y, z)
 
 The implementation is split across `core`, `speckle_1D`, `speckle_2D`, and

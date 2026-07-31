@@ -19,6 +19,8 @@ Unreleased ()
 * add create_exponential_1D, true 1D speckle with exponential irradiance
 * add create_unpolarized_1D so every dimension has both speckle forms
 * export box_muller, zvalues, and tvalues, which were unreachable and undocumented
+* add local_contrast_1D and local_contrast_3D
+* local_contrast_2D now shares one N-dimensional implementation with them
 * rename create_gaussian_1D to create_gaussian_corr_1D (breaking)
 * rename create_Rayleigh to create_unpolarized_2D (breaking)
 * rename create_Rayleigh_3D to create_unpolarized_3D (breaking)

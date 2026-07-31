@@ -72,6 +72,26 @@ def test_create_exponential_1D_invalid_args(kwargs):
         pyspeckle.create_exponential_1D(**args)
 
 
+def test_local_contrast_1D_matches_global():
+    """Local contrast over a long window should approach the global contrast."""
+    speckle = pyspeckle.create_exponential_1D(8192, 2)
+    n = 51
+    C, K = pyspeckle.local_contrast_1D(speckle, np.ones(n))
+
+    # only valid positions of the correlation are returned
+    assert C.shape == (speckle.size - n + 1,)
+
+    assert abs(K - 1) < 0.2
+    assert abs(np.mean(C) - 1) < 0.2
+
+
+def test_local_contrast_1D_rejects_wrong_kernel_rank():
+    """A 2D kernel cannot be used on a 1D pattern."""
+    speckle = pyspeckle.create_exponential_1D(256, 2)
+    with pytest.raises(ValueError):
+        pyspeckle.local_contrast_1D(speckle, np.ones((3, 3)))
+
+
 def test_create_exp_corr_1D_output_length():
     """Test length of create_exp_corr_1D."""
     arr = pyspeckle.create_exp_corr_1D(100, 10, 2, 5)

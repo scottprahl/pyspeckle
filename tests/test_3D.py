@@ -40,6 +40,26 @@ def test_create_unpolarized_3D_uses_beta():
     assert x_width / z_width > 1.4
 
 
+def test_local_contrast_3D_matches_global():
+    """Local contrast over a large volume should approach the global contrast."""
+    M, n = 32, 9
+    speckle = pyspeckle.create_exponential_3D(M, 2)
+    C, K = pyspeckle.local_contrast_3D(speckle, np.ones((n, n, n)))
+
+    # only valid positions of the correlation are returned
+    assert C.shape == (M - n + 1,) * 3
+
+    assert abs(K - 1) < 0.2
+    assert abs(np.mean(C) - 1) < 0.2
+
+
+def test_local_contrast_3D_rejects_wrong_kernel_rank():
+    """A 2D kernel cannot be used on a 3D pattern."""
+    speckle = pyspeckle.create_exponential_3D(16, 2)
+    with pytest.raises(ValueError):
+        pyspeckle.local_contrast_3D(speckle, np.ones((3, 3)))
+
+
 def test_mask_3D_case_insensitive():
     """The 3D mask should fold case like the 2D one."""
     upper = pyspeckle.speckle_3D._create_mask_3D(16, 4, 4, 4, shape="Ellipsoid")  # pylint: disable=protected-access

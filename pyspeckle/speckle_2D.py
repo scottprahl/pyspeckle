@@ -9,10 +9,9 @@ Vol. 6855 (2008)
 """
 
 import numpy as np
-import scipy.signal
 import matplotlib.pyplot as plt
 
-from .core import _sqrt_matrix
+from .core import _local_contrast, _sqrt_matrix
 
 __all__ = (
     "create_exponential_2D",
@@ -213,19 +212,7 @@ def local_contrast_2D(x, kernel):
     Returns:
         2D_contrast_image, total_contrast
     """
-    # normalization total for kernel
-    Nk = np.sum(kernel)
-    # contrast of raw image
-    K = np.std(x) / np.mean(x)
-
-    # local mean and local mean square over the kernel
-    mu_x = scipy.signal.correlate2d(x, kernel, mode="valid") / Nk
-    mu_x2 = scipy.signal.correlate2d(x**2, kernel, mode="valid") / Nk
-
-    # local variance, clipped because rounding can push it slightly below zero
-    var_x = np.maximum(mu_x2 - mu_x**2, 0)
-    C = np.sqrt(var_x) / mu_x
-    return C, K
+    return _local_contrast(x, kernel)
 
 
 def local_contrast_2D_plot(x, kernel):

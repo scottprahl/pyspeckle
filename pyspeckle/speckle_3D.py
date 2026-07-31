@@ -11,13 +11,35 @@ Vol. 6855 (2008)
 import numpy as np
 import matplotlib.pyplot as plt
 
-from .core import _sqrt_matrix
+from .core import _local_contrast, _sqrt_matrix
 
 __all__ = (
     "create_exponential_3D",
     "create_unpolarized_3D",
+    "local_contrast_3D",
     "slice_plot",
 )
+
+
+def local_contrast_3D(x, kernel):
+    """
+    Calculate local (3D) speckle contrast over a sliding volume.
+
+    The kernel is a 3D array describing the volume over which contrast is
+    calculated.  For example, `np.ones((5, 5, 5))` is a 5x5x5 cube.
+
+    Only valid positions of the correlation are returned, so an M x M x M
+    pattern with an N x N x N kernel yields (M-N+1) values per axis, none of
+    which are contaminated by zero padding at the faces.
+
+    Args:
+        x: 3D speckle pattern
+        kernel: 3D volume over which contrast is to be calculated
+
+    Returns:
+        3D_contrast_volume, total_contrast
+    """
+    return _local_contrast(x, kernel)
 
 
 def _create_mask_3D(M, x_radius, y_radius, z_radius, shape="ellipsoid"):

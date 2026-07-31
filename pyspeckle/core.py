@@ -7,6 +7,7 @@ Duncan & Kirkpatrick used to generate correlated random sequences.
 """
 
 import numpy as np
+import scipy.signal
 import scipy.stats
 
 __all__ = (
@@ -29,6 +30,43 @@ def _sqrt_matrix(x):
     mx = np.max(x) or 1
     y = 255 * np.sqrt(x / mx)
     return y.astype(int)
+
+
+def _local_contrast(x, kernel):
+    """
+    Calculate local speckle contrast over a sliding window.
+
+    This backs `local_contrast_1D`, `local_contrast_2D`, and
+    `local_contrast_3D`; the kernel must have the same number of dimensions
+    as the speckle pattern.
+
+    Only valid positions of the correlation are returned, so no value is
+    contaminated by zero padding at the edges.  An M-long pattern with an
+    N-long kernel yields M-N+1 values, and likewise per axis in 2D and 3D.
+
+    Args:
+        x: speckle pattern
+        kernel: region over which contrast is to be calculated
+
+    Returns:
+        local_contrast_image, total_contrast
+    """
+    if np.ndim(x) != np.ndim(kernel):
+        raise ValueError("kernel must have the same number of dimensions as the speckle pattern.")
+
+    # normalization total for kernel
+    Nk = np.sum(kernel)
+    # contrast of raw image
+    K = np.std(x) / np.mean(x)
+
+    # local mean and local mean square over the kernel
+    mu_x = scipy.signal.correlate(x, kernel, mode="valid") / Nk
+    mu_x2 = scipy.signal.correlate(x**2, kernel, mode="valid") / Nk
+
+    # local variance, clipped because rounding can push it slightly below zero
+    var_x = np.maximum(mu_x2 - mu_x**2, 0)
+    C = np.sqrt(var_x) / mu_x
+    return C, K
 
 
 def autocorrelation(x):

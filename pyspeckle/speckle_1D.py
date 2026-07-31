@@ -16,12 +16,36 @@ distribution.
 
 import numpy as np
 
+from .core import _local_contrast
+
 __all__ = (
     "create_exponential_1D",
     "create_unpolarized_1D",
     "create_exp_corr_1D",
     "create_gaussian_corr_1D",
+    "local_contrast_1D",
 )
+
+
+def local_contrast_1D(x, kernel):
+    """
+    Calculate local (1D) speckle contrast along a line.
+
+    The kernel is a 1D array describing the window over which contrast is
+    calculated.  For example, `np.ones(5)` averages over five samples.
+
+    Only valid positions of the correlation are returned, so an M-long
+    pattern with an N-long kernel yields M-N+1 values, none of which are
+    contaminated by zero padding at the ends.
+
+    Args:
+        x: 1D speckle pattern
+        kernel: 1D window over which contrast is to be calculated
+
+    Returns:
+        1D_contrast_array, total_contrast
+    """
+    return _local_contrast(x, kernel)
 
 
 def create_exponential_1D(M, pix_per_speckle, polarization=1):
