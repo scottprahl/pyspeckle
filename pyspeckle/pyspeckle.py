@@ -7,11 +7,9 @@ to track and analyze laser speckle.
 Documentation and examples are available at <https://pyspeckle2.readthedocs.io>
 """
 
-import copy
 import scipy.signal
 import scipy.stats
 import numpy as np
-import matplotlib.cm
 import matplotlib.pyplot as plt
 
 __all__ = (
@@ -406,7 +404,7 @@ def statistics_plot(x, initialize=True):
     Returns:
         nothing
     """
-    mymap = copy.copy(matplotlib.cm.get_cmap("gray"))
+    mymap = plt.get_cmap("gray").copy()
     mymap.set_bad("blue")
 
     try:
@@ -635,7 +633,7 @@ def slice_plot(data, x, y, z, initialize=True, show_sqrt=True):
     Returns:
         nothing
     """
-    mymap = copy.copy(matplotlib.cm.get_cmap("gray"))
+    mymap = plt.get_cmap("gray").copy()
     mymap.set_bad("blue")
 
     if initialize:
