@@ -1,17 +1,119 @@
 """
 Generation of one-dimensional speckle sequences.
 
-Both generators shape Gaussian deviates to a target autocorrelation length,
-`create_exp_corr_1D` with an AR(1) recursion and `create_gaussian_1D` by FFT
-convolution with a Gaussian kernel.
+This module holds two different kinds of generator, and the names say which.
+
+`create_exponential_1D` and `create_unpolarized_1D` are true speckle: a
+random-phase aperture is Fourier transformed and squared, exactly as in 2D.
+The word names the irradiance distribution.
+
+`create_exp_corr_1D` and `create_gaussian_corr_1D` instead shape Gaussian deviates
+to a target autocorrelation length -- the first with an AR(1) recursion, the
+second by FFT convolution with a Gaussian kernel.  Both return normally
+distributed values, and the word names the autocorrelation, not the amplitude
+distribution.
 """
 
 import numpy as np
 
 __all__ = (
+    "create_exponential_1D",
+    "create_unpolarized_1D",
     "create_exp_corr_1D",
-    "create_gaussian_1D",
+    "create_gaussian_corr_1D",
 )
+
+
+def create_exponential_1D(M, pix_per_speckle, polarization=1):
+    """
+    Generate a length M polarized, fully-developed speckle irradiance pattern.
+
+    This is the one-dimensional form of `create_exponential_2D`: uniformly
+    distributed phases fill a segment aperture, the result is Fourier
+    transformed, and the magnitude is squared.  The irradiance is therefore
+    exponentially distributed with unit speckle contrast.
+
+    The resolution is specified by the parameter `pix_per_speckle` and refers
+    to the smallest speckle size.  Thus `pix_per_speckle=2` means sampling is
+    at the Nyquist limit and `pix_per_speckle=4` will have four pixels across
+    the smallest speckle.
+
+    `polarization=0` sums two independent patterns to give unpolarized
+    speckle, whose irradiance is gamma distributed with shape 2 and whose
+    contrast is 1/sqrt(2).
+
+    Note that this is unrelated to `create_exp_corr_1D`, which returns
+    normally distributed values with an exponential autocorrelation.
+
+    see Duncan & Kirkpatrick, "Algorithms for simulation of speckle," in SPIE
+    Vol. 6855 (2008)
+
+    Args:
+        M:               length of desired speckle array
+        pix_per_speckle: number of pixels per smallest speckle
+        polarization:    degree of polarization
+
+    Returns:
+        array of length M
+    """
+    if polarization < 0 or polarization > 1:
+        raise ValueError("bad polarization. It must be 0 <= polarization <= 1.")
+
+    if pix_per_speckle < 1:
+        raise ValueError("pix_per_speckle must be at least 1.")
+
+    if polarization < 1:
+        y1 = create_exponential_1D(M, pix_per_speckle, polarization=1)
+        y2 = create_exponential_1D(M, pix_per_speckle, polarization=1)
+        return 0.5 * (1 + polarization) * y1 + 0.5 * (1 - polarization) * y2
+
+    x_radius = int(M / 2)
+
+    if x_radius < 1:
+        raise ValueError("M must be at least 2 so that the aperture is one pixel or more.")
+
+    L = int(pix_per_speckle * 2 * x_radius)
+
+    # phases uniformly distributed from 0 to 2*pi
+    phase = 2 * np.pi * np.random.rand(L)
+
+    # in one dimension every aperture is just a segment
+    mask = np.zeros(L, dtype=bool)
+    mask[: 2 * x_radius] = True
+
+    x = np.exp(1j * phase) * mask
+
+    # take the FFT and square it
+    x = np.fft.fftshift(np.fft.fft(x))
+    x = abs(x) ** 2
+
+    # extract the first M values and normalize
+    y = x[:M]
+    ymax = np.max(y) or 1
+    return y / ymax
+
+
+def create_unpolarized_1D(M, pix_per_speckle):
+    """
+    Generate a length M unpolarized speckle irradiance pattern.
+
+    The pattern is the incoherent sum of two independent fully-developed
+    speckle patterns, one per polarization state.  Its irradiance therefore
+    follows a gamma distribution with shape 2, and the speckle contrast is
+    1/sqrt(2) rather than the unity contrast of the polarized case.
+
+    This is the zero-polarization limit that Duncan & Kirkpatrick call
+    Rayleigh, and it is exactly
+    `create_exponential_1D(..., polarization=0)`.
+
+    Args:
+        M:               length of desired speckle array
+        pix_per_speckle: number of pixels per smallest speckle
+
+    Returns:
+        array of length M
+    """
+    return create_exponential_1D(M, pix_per_speckle, polarization=0)
 
 
 def create_exp_corr_1D(M, mean, stdev, cl):
@@ -57,7 +159,7 @@ def create_exp_corr_1D(M, mean, stdev, cl):
     return mean + stdev * r
 
 
-def create_gaussian_1D(M, mean, stdev, cl):
+def create_gaussian_corr_1D(M, mean, stdev, cl):
     """
     Generate an array of length M of values with Gaussian autocorrelation.
 

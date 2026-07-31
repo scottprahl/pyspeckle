@@ -23,10 +23,10 @@ def test_create_exponential_3D_invalid_args(kwargs):
         pyspeckle.create_exponential_3D(**args)
 
 
-def test_create_rayleigh_3D_uses_beta():
+def test_create_unpolarized_3D_uses_beta():
     """Verify beta reaches the mask; the unpolarized recursion used to drop it."""
     M = 24
-    speckle = pyspeckle.create_rayleigh_3D(M, 2, beta=3)
+    speckle = pyspeckle.create_unpolarized_3D(M, 2, beta=3)
     assert speckle.shape == (M, M, M)
 
     def half_width(line):

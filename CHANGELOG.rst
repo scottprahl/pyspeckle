@@ -4,7 +4,7 @@ Changelog
 Unreleased ()
 -------------
 * fix local_contrast_2D variance normalization (contrast was low by sqrt(kernel sum))
-* fix create_rayleigh_3D silently ignoring beta
+* fix create_unpolarized_3D silently ignoring beta
 * correct the alpha/beta docstrings, which described the anisotropy backwards
 * replace matplotlib.cm.get_cmap, removed in matplotlib 3.11, with plt.get_cmap
 * correct docstrings for local_contrast_2D, statistics_plot, zvalues, and tvalues
@@ -16,8 +16,12 @@ Unreleased ()
 * support non-integer pix_per_speckle instead of raising TypeError from numpy
 * give create_exponential_3D the polarization and shape checks the 2D version had
 * _create_mask_3D now folds case, rejects unknown shapes, and checks its size
-* rename create_Rayleigh to create_rayleigh_2D (breaking)
-* rename create_Rayleigh_3D to create_rayleigh_3D (breaking)
+* add create_exponential_1D, true 1D speckle with exponential irradiance
+* add create_unpolarized_1D so every dimension has both speckle forms
+* export box_muller, zvalues, and tvalues, which were unreachable and undocumented
+* rename create_gaussian_1D to create_gaussian_corr_1D (breaking)
+* rename create_Rayleigh to create_unpolarized_2D (breaking)
+* rename create_Rayleigh_3D to create_unpolarized_3D (breaking)
 * split tests into test_core.py, test_1D.py, test_2D.py, and test_3D.py
 * move the numpy seeding fixture into tests/conftest.py
 * run the whole test suite in CI instead of only tests/test_basics.py

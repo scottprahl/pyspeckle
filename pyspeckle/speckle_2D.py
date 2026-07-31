@@ -16,7 +16,7 @@ from .core import _sqrt_matrix
 
 __all__ = (
     "create_exponential_2D",
-    "create_rayleigh_2D",
+    "create_unpolarized_2D",
     "local_contrast_2D",
     "local_contrast_2D_plot",
     "statistics_plot",
@@ -156,12 +156,18 @@ def create_exponential_2D(M, pix_per_speckle, alpha=1, shape="ellipse", polariza
     return y / ymax
 
 
-def create_rayleigh_2D(N, pix_per_speckle, alpha=1, shape="ellipse"):
+def create_unpolarized_2D(N, pix_per_speckle, alpha=1, shape="ellipse"):
     """
     Generate an N x N unpolarized speckle irradiance pattern.
 
-    The speckle pattern will have a Rayleigh distribution and results from
-    the incoherent sum of two speckle patterns.
+    The pattern is the incoherent sum of two independent fully-developed
+    speckle patterns, one per polarization state.  Its irradiance therefore
+    follows a gamma distribution with shape 2, and the speckle contrast is
+    1/sqrt(2) rather than the unity contrast of the polarized case.
+
+    This is the zero-polarization limit that Duncan & Kirkpatrick call
+    Rayleigh, and it is exactly
+    `create_exponential_2D(..., polarization=0)`.
 
     The resolution is specified by the parameter `pix_per_speckle` and refers
     to the smallest speckle size.  Thus `pix_per_speckle=2` means sampling is

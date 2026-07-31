@@ -9,7 +9,12 @@ Duncan & Kirkpatrick used to generate correlated random sequences.
 import numpy as np
 import scipy.stats
 
-__all__ = ("autocorrelation",)
+__all__ = (
+    "autocorrelation",
+    "box_muller",
+    "zvalues",
+    "tvalues",
+)
 
 
 def _sqrt_matrix(x):
