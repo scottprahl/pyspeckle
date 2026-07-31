@@ -69,7 +69,7 @@ def local_contrast_2D(x, kernel):
 
     # local speckle contrast
     mu_x = scipy.signal.correlate2d(x, kernel, mode="same") / Nk
-    var_x = scipy.signal.correlate2d((x - mu_x) ** 2, kernel, mode="same") / Nk / Nk
+    var_x = scipy.signal.correlate2d((x - mu_x) ** 2, kernel, mode="same") / Nk
     C = np.sqrt(var_x) / mu_x
     return C, K
 

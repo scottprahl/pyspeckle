@@ -116,6 +116,24 @@ def test_Exponential_polarization_values():
         assert np.max(result) <= 1.0
 
 
+# Tests for local_contrast_2D
+def test_local_contrast_2D_matches_global():
+    """Local contrast over a large kernel should approach the global contrast."""
+    speckle = pyspeckle.create_Exponential(256, 2)
+    n = 15
+    C, K = pyspeckle.local_contrast_2D(speckle, np.ones((n, n)))
+    assert C.shape == speckle.shape
+
+    # ignore the edges where the convolution is biased by zero padding
+    m = n // 2
+    interior = np.mean(C[m:-m, m:-m])
+
+    # fully developed speckle has unity contrast, and a 15x15 window recovers
+    # most of it; a missing kernel normalization drops this by a factor of n
+    assert abs(K - 1) < 0.2
+    assert abs(interior - 1) < 0.2
+
+
 def test_ellipse_mask():
     """Basic functionality for ellipse mask."""
     mask = pyspeckle.pyspeckle._create_mask(10, 3, 4)  # pylint: disable=protected-access

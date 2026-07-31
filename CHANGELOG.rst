@@ -3,6 +3,7 @@ Changelog
 
 Unreleased ()
 -------------
+* fix local_contrast_2D variance normalization (contrast was low by sqrt(kernel sum))
 * switch Makefile workflows to uv run with dev/docs/lite extras
 * remove venv/.ready bootstrap prerequisites from Makefile targets
 * add shared Makefile command/file-list variables for consistency
