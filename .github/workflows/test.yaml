@@ -11,25 +11,54 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
-    name: Build and test
+    name: test ${{ matrix.os }} py${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
 
     strategy:
+      fail-fast: false  # let every platform report, don't cancel siblings
       matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: ["3.10", "3.14"]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install package and dependencies
-        run: |
-          pip install pytest
-          pip install -e .  # current package in editable mode
+      - name: Install uv
+        uses: astral-sh/setup-uv@v9.0.0
+        with:
+          enable-cache: true
 
+      # shell: bash gives the same line continuation on all three runners
+      # --extra dev matches `make test`, so CI resolves the same set of
+      # dependencies that the Makefile does locally
       - name: Test with pytest
-        run: pytest tests --ignore=tests/test_all_notebooks.py
+        shell: bash
+        run: |
+          uv run --python ${{ matrix.python-version }} --extra dev \
+            pytest tests --ignore=tests/test_all_notebooks.py
+
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.14'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v9.0.0
+        with:
+          enable-cache: true
+
+      # the same target used locally: ruff, black, pylint, rstcheck, yamllint
+      - name: Run every linter
+        run: make lint

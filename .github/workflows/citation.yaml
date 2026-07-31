@@ -12,23 +12,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           ref: ${{ github.event.release.target_commitish || github.ref }}
 
       - name: Install python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: 3.14
 
-      - name: Install dependencies needed for update_citation.py
-        run: |
-          pip install requests PyYAML
+      - name: Install uv
+        uses: astral-sh/setup-uv@v9.0.0
 
+      # --no-project because the script only reads __init__.py as text and
+      # never imports pyspeckle, so there is nothing to build here
       - name: Update CITATION.cff and README.rst
         run: |
-          python .github/scripts/update_citation.py
+          uv run --no-project --with requests --with pyyaml \
+            python .github/scripts/update_citation.py
 
       - name: Commit and Push CITATION.cff Update
         run: |

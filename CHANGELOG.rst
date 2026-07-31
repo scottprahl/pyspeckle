@@ -7,6 +7,11 @@ Unreleased ()
 * fix the Changelog URL, which pointed at docs/CHANGELOG.rst instead of the root
 * declare MIT in pyproject.toml and CITATION.cff, matching LICENSE.txt
 * refresh release.txt: CHANGELOG.rst not CHANGELOG.txt, and a version placeholder
+* drop wheel from build-system requires; setuptools>=70.1 provides bdist_wheel
+* drop the redundant setuptools pin from the dev extra
+* bump checkout and setup-python to v7, and build with uv in every workflow
+* test on macOS and Windows as well as Linux
+* run the linters in CI through the same make lint target used locally
 * fix local_contrast_2D variance normalization (contrast was low by sqrt(kernel sum))
 * fix create_unpolarized_3D silently ignoring beta
 * correct the alpha/beta docstrings, which described the anisotropy backwards
