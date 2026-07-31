@@ -57,6 +57,7 @@ docs = [
 dev = [
   # Testing
   "pytest",
+  "pytest-cov",
   "imageio",
   "requests",
 
