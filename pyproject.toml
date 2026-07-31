@@ -24,7 +24,7 @@ keywords = [
   "laser"
 ]
 readme = "README.rst"
-license = "BSD-3-Clause"
+license = "MIT"
 requires-python = ">=3.10"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
@@ -89,10 +89,10 @@ lite = [
 
 [project.urls]
 Homepage = "https://github.com/scottprahl/pyspeckle"
-Documentation = "https://pyspeckle.readthedocs.io"
+Documentation = "https://pyspeckle2.readthedocs.io"
 Source = "https://github.com/scottprahl/pyspeckle"
 Tracker = "https://github.com/scottprahl/pyspeckle/issues"
-Changelog = "https://github.com/scottprahl/pyspeckle/blob/main/docs/CHANGELOG.rst"
+Changelog = "https://github.com/scottprahl/pyspeckle/blob/main/CHANGELOG.rst"
 
 
 [tool.black]

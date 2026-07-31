@@ -9,13 +9,13 @@ Releasing a new version
 # update the version in __init__.py
   git commit pyspeckle/__init__.py -m 'update version'
 
-# update CHANGELOG.txt  `git shortlog 0.6.1..HEAD`
-  git commit -m 'update recent changes' CHANGELOG.txt
+# update CHANGELOG.rst  `git shortlog <last-tag>..HEAD`
+  git commit -m 'update recent changes' CHANGELOG.rst
   git push
 
-# create release tag on github
-  git tag 0.6.0
-  git push origin 0.6.0
+# create release tag on github, matching __version__ in pyspeckle/__init__.py
+  git tag <version>
+  git push origin <version>
 
 # manually publish release at
   open https://github.com/scottprahl/pyspeckle

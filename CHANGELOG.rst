@@ -3,6 +3,10 @@ Changelog
 
 Unreleased ()
 -------------
+* fix the Documentation URL, which pointed at a 404 (pyspeckle2.readthedocs.io)
+* fix the Changelog URL, which pointed at docs/CHANGELOG.rst instead of the root
+* declare MIT in pyproject.toml and CITATION.cff, matching LICENSE.txt
+* refresh release.txt: CHANGELOG.rst not CHANGELOG.txt, and a version placeholder
 * fix local_contrast_2D variance normalization (contrast was low by sqrt(kernel sum))
 * fix create_unpolarized_3D silently ignoring beta
 * correct the alpha/beta docstrings, which described the anisotropy backwards

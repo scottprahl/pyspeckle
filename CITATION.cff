@@ -7,7 +7,7 @@ doi: 10.5281/zenodo.8311677
 date-released: '2026-01-05'
 url: https://doi.org/10.5281/zenodo.8311677
 repository-code: https://github.com/scottprahl/pyspeckle
-license: BSD-3-Clause
+license: MIT
 authors:
 - family-names: Prahl
   given-names: Scott
