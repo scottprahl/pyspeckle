@@ -31,6 +31,13 @@ Unreleased ()
 * add create_exponential_1D, true 1D speckle with exponential irradiance
 * add create_unpolarized_1D so every dimension has both speckle forms
 * export box_muller, zvalues, and tvalues, which were unreachable and undocumented
+* split the correlated-sequence material into a new 0-Basics notebook
+* rewrite the 1D notebook around fully and partially developed speckle
+* reorganize the 2D notebook: apertures first, then fully and partially
+  developed speckle, then local contrast
+* fix 2D notebook headings that named the wrong pix_per_speckle
+* stop calling correlated Gaussian noise "speckle" in the notebooks; the old
+  text claimed speckle is Gaussian distributed, when it is exponential
 * add create_phase_screen_1D and create_phase_screen_2D for partially
   developed speckle: correlated Gaussian phase, gaussian or exponential ACF
 * add local_contrast_1D and local_contrast_3D

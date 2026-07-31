@@ -5,6 +5,12 @@
    :titlesonly:
 
 .. toctree::
+   :caption: Basics
+   :hidden:
+
+   0-Basics.ipynb
+
+.. toctree::
    :caption: 1D Speckle
    :hidden:
 
