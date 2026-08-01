@@ -1,9 +1,10 @@
 """
-Shared helpers for pyspeckle.
+Speckle generation and the machinery shared across dimensions.
 
-This module holds the pieces that are not specific to one dimensionality:
-the autocorrelation used throughout, and the Gaussian copula utilities from
-Duncan & Kirkpatrick used to generate correlated random sequences.
+`create_exponential` and `create_unpolarized` build speckle in one, two, or
+three dimensions from a numpy-style shape, so they live here rather than in a
+dimension-specific module.  This module also holds the autocorrelation used
+throughout and the Gaussian copula utilities from Duncan & Kirkpatrick.
 """
 
 import numpy as np
@@ -11,6 +12,10 @@ import scipy.signal
 import scipy.stats
 
 __all__ = (
+    "create_exponential",
+    "create_phase_screen",
+    "local_contrast",
+    "create_unpolarized",
     "autocorrelation",
     "box_muller",
     "zvalues",
@@ -18,48 +23,357 @@ __all__ = (
 )
 
 
-def _phase_screen(dims, sigma, cl, shape="gaussian"):
+def _create_mask(M, x_radius, y_radius, shape="ellipse"):
     """
-    Generate a correlated Gaussian phase screen of any dimensionality.
+    Create a MxM boolean mask for a particular beam shape.
 
-    This backs `create_phase_screen_1D` and `create_phase_screen_2D`.  White
-    noise is filtered by the square root of the power spectral density, which
-    by the Wiener-Khinchin theorem is the transform of the wanted
-    autocorrelation.  The result is isotropic, which matters in two dimensions
-    because `exp(-|x|/cl) * exp(-|y|/cl)` is diamond shaped rather than
-    radially symmetric.
+    The resulting shape is in the top left corner of the the returned array.
+
+    The points inside the mask will be set to True.  Three shapes
+    are supported: 'ellipse', 'rectangle', or 'annulus'.
+
+    For example `._create_mask(10,3,4,'ellipse').astype(int)` yields
+
+    [[0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+    [0, 0, 1, 1, 1, 0, 0, 0, 0, 0],
+    [0, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+    [0, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+    [1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
+    [0, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+    [0, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+    [0, 0, 1, 1, 1, 0, 0, 0, 0, 0],
+    [0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+
+    When shape is 'annulus' then the outer circle radius is the max(x_radius, y_radius)
+    and then inner radius is the other.
 
     Args:
-        dims:  tuple giving the shape of the screen, e.g. (M,) or (M, M)
-        sigma: standard deviation of the phase [radians]
-        cl:    correlation length [pixels]
-        shape: 'gaussian' or 'exponential' autocorrelation
+        M:        dimension of desired image
+        x_radius: half the horizontal width of the ellipse (in pixels)
+        y_radius: half the vertical width of the ellipse (in pixels)
+        shape:    'ellipse', 'rectangle', or 'annulus' describing the laser shape
 
     Returns:
-        zero-mean array of phases with the requested shape
+        M x M boolean array
     """
+    if M < 2 * max(x_radius, y_radius):
+        raise ValueError("Array size M must be at least twice the radius.")
+
+    Y, X = np.ogrid[:M, :M]
+
+    lshape = shape.lower()
+
+    if lshape in ("rectangle", "square"):
+        mask1 = X < 2 * x_radius
+        mask2 = Y < 2 * y_radius
+        mask = np.logical_and(mask2, mask1)
+
+    elif lshape == "annulus":
+        rmax = max(x_radius, y_radius)
+        rmin = min(x_radius, y_radius)
+        dist1 = np.sqrt((X - rmax) ** 2 + (Y - rmax) ** 2) / rmax
+        mask1 = dist1 <= 1
+        dist2 = np.sqrt((X - rmax) ** 2 + (Y - rmax) ** 2) / rmin
+        mask2 = dist2 > 1
+        mask = np.logical_and(mask2, mask1)
+
+    elif lshape == "ellipse":
+        dist = np.sqrt((X - x_radius) ** 2 / x_radius**2 + (Y - y_radius) ** 2 / y_radius**2)
+        mask = dist <= 1
+
+    else:
+        raise ValueError("shape must be 'ellipse', 'rectangle', or 'annulus'")
+
+    return mask
+
+
+def _create_mask_3D(M, x_radius, y_radius, z_radius, shape="ellipsoid"):
+    """
+    Create 3D boolean mask for designated shape.
+
+    The points inside the mask will be set to True.  Three shapes
+    are supported: 'cube', 'shell', or 'ellipsoid'.
+
+    Args:
+        M:        dimension of desired image
+        x_radius: half the width of the ellipsoid along x (in pixels)
+        y_radius: half the width of the ellipsoid along y (in pixels)
+        z_radius: half the width of the ellipsoid along z (in pixels)
+        shape:    'cube', 'shell', or 'ellipsoid' describing the laser shape
+
+    Returns:
+        M x M x M boolean array
+    """
+    if M < 2 * max(x_radius, y_radius, z_radius):
+        raise ValueError("Array size M must be at least twice the radius.")
+
+    X, Y, Z = np.ogrid[:M, :M, :M]
+
+    lshape = shape.lower()
+
+    if lshape == "cube":
+        dist = np.floor(X / x_radius / 2) + np.floor(Y / y_radius / 2) + np.floor(Z / z_radius / 2)
+        mask = dist < 1
+    elif lshape == "shell":
+        rmax = max(x_radius, y_radius, z_radius)
+        rmin = min(x_radius, y_radius, z_radius)
+        dist1 = np.sqrt((X - rmax) ** 2 + (Y - rmax) ** 2 + (Z - rmax) ** 2) / rmax
+        mask1 = dist1 < 1
+        dist2 = np.sqrt((X - rmax) ** 2 + (Y - rmax) ** 2 + (Z - rmax) ** 2) / rmin
+        mask2 = dist2 > 1
+        mask = np.logical_and(mask2, mask1)
+    elif lshape == "ellipsoid":
+        dist = np.sqrt(
+            (X - x_radius) ** 2 / x_radius**2 + (Y - y_radius) ** 2 / y_radius**2 + (Z - z_radius) ** 2 / z_radius**2
+        )
+        mask = dist <= 1
+    else:
+        raise ValueError("shape must be 'cube', 'shell', or 'ellipsoid'")
+
+    return mask
+
+
+def _validate_speckle(pix_per_speckle, polarization):
+    """
+    Check the two arguments every speckle generator shares.
+
+    Args:
+        pix_per_speckle: number of pixels per smallest speckle
+        polarization:    degree of polarization
+
+    Returns:
+        nothing
+    """
+    if polarization < 0 or polarization > 1:
+        raise ValueError("bad polarization. It must be 0 <= polarization <= 1.")
+
+    if pix_per_speckle < 1:
+        raise ValueError("pix_per_speckle must be at least 1.")
+
+
+def _speckle_from_mask(mask, dims, polarization=1):
+    """
+    Build a speckle pattern from an aperture mask of any dimensionality.
+
+    This backs `create_exponential`.  The aperture is filled with uniformly
+    distributed phase, transformed, and the magnitude squared; only the mask
+    differs between dimensions.
+
+    `polarization < 1` mixes two independent patterns built from the same
+    aperture, which at zero gives unpolarized speckle.
+
+    Args:
+        mask:         boolean aperture, the same length along every axis
+        dims:         tuple giving the shape of the pattern to extract
+        polarization: degree of polarization
+
+    Returns:
+        array with the requested shape
+    """
+    if polarization < 1:
+        y1 = _speckle_from_mask(mask, dims, polarization=1)
+        y2 = _speckle_from_mask(mask, dims, polarization=1)
+        return 0.5 * (1 + polarization) * y1 + 0.5 * (1 - polarization) * y2
+
+    # phases uniformly distributed from 0 to 2*pi
+    phase = 2 * np.pi * np.random.rand(*mask.shape)
+    x = np.exp(1j * phase) * mask
+
+    # take the FFT and square it
+    x = np.fft.fftshift(np.fft.fftn(x))
+    x = abs(x) ** 2
+
+    # extract the requested corner and normalize
+    y = x[tuple(slice(None, n) for n in dims)]
+    ymax = np.max(y) or 1
+    return y / ymax
+
+
+def _normalize_shape(shape):
+    """
+    Normalize a numpy-style shape into a tuple and check it.
+
+    Args:
+        shape: integer, or a tuple of 1, 2, or 3 integers
+
+    Returns:
+        tuple of dimensions
+    """
+    dims = (shape,) if np.isscalar(shape) else tuple(shape)
+
+    if len(dims) not in (1, 2, 3):
+        raise ValueError("shape must describe 1, 2, or 3 dimensions.")
+
+    if min(dims) < 2:
+        raise ValueError("every dimension must be at least 2 pixels.")
+
+    return dims
+
+
+def create_exponential(shape, pix_per_speckle, alpha=None, beta=None, aperture=None, polarization=1):
+    """
+    Generate a fully-developed speckle irradiance pattern.
+
+    `shape` follows the numpy convention used by `np.ones`: an integer gives a
+    one-dimensional pattern, and a tuple gives two or three dimensions::
+
+        create_exponential(1024, 8)             # 1024 samples
+        create_exponential((201, 201), 2)       # 201 x 201 image
+        create_exponential((32, 32, 32), 2)     # 32 x 32 x 32 volume
+
+    The irradiance is exponentially distributed with unit speckle contrast.
+    The resolution is set by `pix_per_speckle`, which refers to the smallest
+    speckle: 2 is the Nyquist limit and 4 puts four pixels across it.
+
+    Arguments that do not apply to the requested dimensionality are rejected
+    rather than quietly ignored:
+
+    * one dimension takes none of `alpha`, `beta`, or `aperture`, because a
+      one-dimensional aperture is always a segment
+    * two dimensions take `alpha` and `aperture`, one of 'ellipse',
+      'rectangle', or 'annulus', but not `beta`
+    * three dimensions take `alpha`, `beta`, and `aperture`, one of
+      'ellipsoid', 'cube', or 'shell'
+
+    `alpha` is the ratio of x speckle size to y, and `beta` the ratio of x to
+    z, so values above one stretch the speckle along x.  `polarization=0` sums
+    two independent patterns to give unpolarized speckle with contrast
+    1/sqrt(2).
+
+    see Duncan & Kirkpatrick, "Algorithms for simulation of speckle," in SPIE
+    Vol. 6855 (2008)
+
+    Args:
+        shape:           integer or tuple giving the shape of the pattern
+        pix_per_speckle: number of pixels per smallest speckle
+        alpha:           ratio of x to y speckle size (2D and 3D)
+        beta:            ratio of x to z speckle size (3D only)
+        aperture:        shape of the illuminated aperture (2D and 3D)
+        polarization:    degree of polarization
+
+    Returns:
+        array with the requested shape
+    """
+    dims = _normalize_shape(shape)
+    ndim = len(dims)
+    _validate_speckle(pix_per_speckle, polarization)
+
+    if ndim == 1 and (alpha is not None or beta is not None or aperture is not None):
+        raise ValueError("alpha, beta, and aperture do not apply in one dimension.")
+
+    if ndim == 2 and beta is not None:
+        raise ValueError("beta does not apply in two dimensions; use alpha.")
+
+    if alpha is None:
+        alpha = 1
+    if beta is None:
+        beta = 1
+
+    # the aperture is square; the requested shape is cropped out of the result
+    M = max(dims)
+    radii = [int(M / 2), int(alpha * M / 2), int(beta * M / 2)][:ndim]
+
+    if min(radii) < 1:
+        raise ValueError("shape, alpha, and beta must give radii of at least one pixel.")
+
+    L = int(pix_per_speckle * 2 * max(radii))
+
+    if ndim == 1:
+        # in one dimension every aperture is just a segment
+        mask = np.zeros(L, dtype=bool)
+        mask[: 2 * radii[0]] = True
+    elif ndim == 2:
+        mask = _create_mask(L, *radii, shape=aperture or "ellipse")
+    else:
+        mask = _create_mask_3D(L, *radii, shape=aperture or "ellipsoid")
+
+    return _speckle_from_mask(mask, dims, polarization)
+
+
+def create_unpolarized(shape, pix_per_speckle, alpha=None, beta=None, aperture=None):
+    """
+    Generate an unpolarized speckle irradiance pattern.
+
+    The pattern is the incoherent sum of two independent fully-developed
+    speckle patterns, one per polarization state.  Its irradiance therefore
+    follows a gamma distribution with shape 2, and the speckle contrast is
+    1/sqrt(2) rather than the unity contrast of the polarized case.
+
+    This is the zero-polarization limit that Duncan & Kirkpatrick call
+    Rayleigh, and it is exactly `create_exponential(..., polarization=0)`.
+    `shape` and the remaining arguments behave as they do there.
+
+    Args:
+        shape:           integer or tuple giving the shape of the pattern
+        pix_per_speckle: number of pixels per smallest speckle
+        alpha:           ratio of x to y speckle size (2D and 3D)
+        beta:            ratio of x to z speckle size (3D only)
+        aperture:        shape of the illuminated aperture (2D and 3D)
+
+    Returns:
+        array with the requested shape
+    """
+    return create_exponential(shape, pix_per_speckle, alpha=alpha, beta=beta, aperture=aperture, polarization=0)
+
+
+def create_phase_screen(shape, sigma, cl, correlation="gaussian"):
+    """
+    Generate a correlated Gaussian phase screen.
+
+    `shape` follows the numpy convention used by `np.ones`, exactly as in
+    `create_exponential`: an integer gives a one-dimensional screen and a
+    tuple gives two or three dimensions.
+
+    The screen is a zero-mean Gaussian random field measured in **radians**,
+    with standard deviation `sigma` and correlation length `cl` pixels.  It
+    models the phase imposed by a rough surface, and is the input needed for
+    partially developed speckle: multiply `exp(1j*screen)` by an aperture and
+    transform, exactly as `create_exponential` does with uniform random phase.
+
+    White noise is filtered by the square root of the power spectral density,
+    which by the Wiener-Khinchin theorem is the transform of the wanted
+    autocorrelation.  The result is isotropic, which matters beyond one
+    dimension because `exp(-|x|/cl) * exp(-|y|/cl)` is diamond shaped rather
+    than radially symmetric.
+
+    The fraction of the field left unscattered is exp(-sigma**2).  Large
+    `sigma` scrambles the phase completely and recovers the fully developed
+    limit that `create_exponential` produces directly; small `sigma` leaves a
+    strong coherent component and the speckle is only partially developed.
+    How that coherent component appears, and therefore what contrast is
+    measured, depends on the observing geometry.
+
+    Args:
+        shape:       integer or tuple giving the shape of the screen
+        sigma:       standard deviation of the phase [radians]
+        cl:          correlation length [pixels]
+        correlation: 'gaussian' or 'exponential' autocorrelation
+
+    Returns:
+        zero-mean array of phases in radians with the requested shape
+    """
+    dims = _normalize_shape(shape)
+
     if sigma < 0:
         raise ValueError("sigma must be non-negative.")
 
     if cl <= 0:
         raise ValueError("Correlation length cl must be positive.")
 
-    if min(dims) < 2:
-        raise ValueError("Screen must be at least 2 pixels across.")
-
-    lshape = shape.lower()
+    lcorrelation = correlation.lower()
 
     # signed lags, wrapped, so the autocorrelation is periodic on the grid
     axes = [np.fft.fftfreq(n, d=1 / n) for n in dims]
     grid = np.meshgrid(*axes, indexing="ij")
     r = np.sqrt(sum(g**2 for g in grid))
 
-    if lshape == "gaussian":
+    if lcorrelation == "gaussian":
         acf = np.exp(-0.5 * (r / cl) ** 2)
-    elif lshape == "exponential":
+    elif lcorrelation == "exponential":
         acf = np.exp(-r / cl)
     else:
-        raise ValueError("shape must be 'gaussian' or 'exponential'")
+        raise ValueError("correlation must be 'gaussian' or 'exponential'")
 
     # power spectral density; tiny negative lobes are numerical noise
     psd = np.maximum(np.fft.fftn(acf).real, 0)
@@ -86,13 +400,12 @@ def _sqrt_matrix(x):
     return y.astype(int)
 
 
-def _local_contrast(x, kernel):
+def local_contrast(x, kernel):
     """
     Calculate local speckle contrast over a sliding window.
 
-    This backs `local_contrast_1D`, `local_contrast_2D`, and
-    `local_contrast_3D`; the kernel must have the same number of dimensions
-    as the speckle pattern.
+    The kernel must have the same number of dimensions as the speckle
+    pattern, so the same function serves one, two, and three dimensions.
 
     Only valid positions of the correlation are returned, so no value is
     contaminated by zero padding at the edges.  An M-long pattern with an

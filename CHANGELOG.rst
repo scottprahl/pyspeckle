@@ -49,6 +49,21 @@ Unreleased ()
 * cover the plotting routines and mask branches, reaching 100% test coverage
 * force the Agg backend and close figures between tests
 * local_contrast_2D now shares one N-dimensional implementation with them
+* replace create_exponential_1D/2D/3D with a single create_exponential taking a
+  numpy-style shape, like np.ones (breaking)
+* likewise create_unpolarized_1D/2D/3D become create_unpolarized (breaking)
+* the aperture argument is now called `aperture`, freeing `shape` for the
+  array shape (breaking)
+* reject arguments that do not apply: alpha/aperture need 2D, beta needs 3D
+* non-square shapes now work, e.g. create_exponential((100, 200), 2)
+* the aperture masks moved to core as pyspeckle.core._create_mask*
+* replace create_phase_screen_1D/2D with create_phase_screen taking a shape,
+  which also makes 3D screens available (breaking)
+* its autocorrelation argument is now `correlation`, freeing `shape` (breaking)
+* replace local_contrast_1D/2D/3D with one local_contrast; it never needed a
+  dimension because it infers one from the arrays (breaking)
+* reorganize into core.py (generation and analysis), plots.py, and noise.py;
+  speckle_1D.py, speckle_2D.py, and speckle_3D.py are gone
 * rename create_gaussian_1D to create_gaussian_corr_1D (breaking)
 * rename create_Rayleigh to create_unpolarized_2D (breaking)
 * rename create_Rayleigh_3D to create_unpolarized_3D (breaking)
