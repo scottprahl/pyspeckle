@@ -76,7 +76,8 @@ Unreleased ()
 * rename create_gaussian_1D to create_gaussian_corr_1D (breaking)
 * rename create_Rayleigh to create_unpolarized_2D (breaking)
 * rename create_Rayleigh_3D to create_unpolarized_3D (breaking)
-* split tests into test_core.py, test_1D.py, test_2D.py, and test_3D.py
+* split tests into test_core.py, test_noise.py, and test_plots.py, mirroring the
+  package modules
 * move the numpy seeding fixture into tests/conftest.py
 * run the whole test suite in CI instead of only tests/test_basics.py
 * rename create_exp_1D to create_exp_corr_1D (breaking)
