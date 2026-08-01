@@ -19,13 +19,13 @@ case, measured in radians::
 
     pyspeckle.create_phase_screen(shape, sigma, cl)
 
-Analysis.  `local_contrast` and `autocorrelation` work in any dimension; the
-plots are necessarily dimension specific::
+Analysis.  Everything below takes the dimensionality from its argument, except
+`slice_plot`, which needs a volume::
 
     pyspeckle.autocorrelation(x)
     pyspeckle.local_contrast(x, kernel)
-    pyspeckle.local_contrast_1D_plot(x, kernel)     .._2D_plot
-    pyspeckle.statistics_plot_1D(x)                 .._2D
+    pyspeckle.local_contrast_plot(x, kernel)
+    pyspeckle.statistics_plot(x)
     pyspeckle.slice_plot(data, x, y, z)
 
 Correlated Gaussian fields, which are *not* speckle -- the name refers to the

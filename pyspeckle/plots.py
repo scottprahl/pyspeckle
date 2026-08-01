@@ -1,10 +1,10 @@
 """
 Plots of speckle patterns and their statistics.
 
-Everything here is dimension specific, because a trace, an image, and a volume
-need different presentation: `statistics_plot_1D` plots points where
-`statistics_plot_2D` shows an image, and a volume is shown as orthogonal
-slices by `slice_plot`.
+`statistics_plot` and `local_contrast_plot` take the dimensionality from the
+array they are given: a trace is drawn as points and an image as an image.
+A volume needs different treatment entirely and is shown as orthogonal slices
+by `slice_plot`.
 
 The generators themselves are dimension agnostic and live in `core`.
 """
@@ -15,22 +15,43 @@ import matplotlib.pyplot as plt
 from .core import _sqrt_matrix, local_contrast
 
 __all__ = (
-    "statistics_plot_1D",
-    "statistics_plot_2D",
-    "local_contrast_1D_plot",
-    "local_contrast_2D_plot",
+    "statistics_plot",
+    "local_contrast_plot",
     "slice_plot",
 )
 
 
-def statistics_plot_1D(x, initialize=True):
+def _pdf_bar(values, bins, title, color=None):
     """
-    Plot the first and second-order statistics of a 1D speckle pattern.
+    Draw a probability density histogram into the current subplot.
 
-    This is the one-dimensional form of `statistics_plot_2D`.  Four panels are
-    drawn: the trace itself, the probability density function of the
-    irradiance, the power spectral density, and the same density on a log
-    scale.
+    Args:
+        values: data to bin
+        bins:   number of bins
+        title:  title for the panel
+        color:  bar color, or None for the matplotlib default
+
+    Returns:
+        bin centers and the density in each bin
+    """
+    # density=True scales the bins so that the PDF integrates to unity
+    pdf, edges = np.histogram(values, bins=bins, density=True)
+    width = 0.7 * (edges[1] - edges[0])
+    center = (edges[:-1] + edges[1:]) / 2
+    plt.bar(center, pdf, align="center", width=width, color=color)
+    plt.title(title)
+    return center, pdf
+
+
+def statistics_plot(x, initialize=True):
+    """
+    Plot the first and second-order statistics of a speckle pattern.
+
+    The dimensionality is taken from `x`, so the same call works for a trace
+    and for an image.  A one-dimensional pattern is drawn as points and its
+    power spectral density as a curve; a two-dimensional one is drawn as an
+    image and its power spectral density as a log image.  The two histogram
+    panels are the same either way.
 
     The PDF conforms to the formal definition that it integrate to unity.
     Also displayed is the contrast defined as the quotient of the standard
@@ -40,98 +61,26 @@ def statistics_plot_1D(x, initialize=True):
     The power spectral density shows the bandwidth limit imposed by the
     aperture.  When it reaches the edge of the plot the pattern is sampled at
     Nyquist, two pixels per speckle; when it fills half the plot the smallest
-    speckle is four pixels across.
+    speckle is four pixels across.  In two dimensions the criterion applies
+    separately along each axis, so the pattern need not be isotropic.
+
+    In two dimensions the pattern is displayed as the square root of its
+    irradiance, which compresses the dynamic range; fully developed speckle
+    has such high contrast that displaying the irradiance itself hides the
+    detail.
+
+    For a volume use `slice_plot`, or pass a single slice here.
 
     Args:
-        x:          1D speckle pattern to be analyzed
+        x:          1D or 2D speckle pattern to be analyzed
         initialize: boolean to initialize the plot
 
     Returns:
         nothing
     """
-    try:
-        y = x.compressed()  # if masked array
-    except AttributeError:
-        y = x  # not a masked array
-
-    ave = np.mean(y)
-    std = np.std(y)
-
-    if initialize:
-        plt.subplots(2, 2, figsize=(14, 12))
-
-    # Speckle Realization
-    plt.subplot(2, 2, 1)
-    plt.plot(x, ".", markersize=2)
-    plt.title("Speckle Irradiance, Contrast K=%.2f" % (std / ave))
-    plt.xlabel("Position (pixels)")
-    plt.ylabel("Irradiance")
-
-    # Histogram of Probability Distribution Function
-    plt.subplot(2, 2, 2)
-    num_bins = 30
-    # density=True scales the bins so that the PDF integrates to unity
-    pdf, bins = np.histogram(y, bins=num_bins, density=True)
-    width = 0.7 * (bins[1] - bins[0])
-    center = (bins[:-1] + bins[1:]) / 2
-    plt.bar(center, pdf, align="center", width=width, color="gray")
-    plt.xlabel("Irradiance (gray level/pixel)")
-    plt.ylabel(r"Probability Distribution Function, $p_I(i)$")
-    plt.title("Average = %.2f, Standard Deviation = %.2f" % (ave, std))
-
-    # Power Spectral Density
-    plt.subplot(2, 2, 3)
-    psd = np.abs(np.fft.fftshift(np.fft.fft(x))) ** 2
-    freq = np.fft.fftshift(np.fft.fftfreq(len(x)))
-    plt.semilogy(freq, psd, lw=0.5)
-    plt.title("Power Spectral Density")
-    plt.xlabel("Spatial Frequency (1/pixels)")
-    plt.ylabel("PSD")
-    plt.xlim(-0.5, 0.5)
-
-    # Probability Distribution Function on Log Scale
-    plt.subplot(2, 2, 4)
-    plt.semilogy(center, pdf, "r.")
-    plt.title("Speckle Contrast, K=%.3f" % (std / ave))
-    plt.xlabel("Irradiance")
-    plt.ylabel(r"Probability Distribution Function, $p_I(i)$")
-
-
-def statistics_plot_2D(x, initialize=True):
-    """
-    Plot the first and second-order statistics of a speckle pattern.
-
-    This routine calculates and plots the probability density function,
-    PDF and the power spectral density, PSD.
-
-    The PDF conforms to the formal definition that it integrate to unity.
-    Also displayed is the contrast defined as the quotient of the standard
-    deviation and the mean.
-
-    Note that the PSD can be used to establish the dimensions of the
-    minimum speckle size. When the display reaches the edge of the image,
-    the speckle pattern (in that dimension) is at Nyquist, i.e., two
-    pixels per (minimum) speckle. When the display occupies half of the
-    image, the minimum speckle size is four pixels, etc. Of course this
-    criterion applies separately in each dimension (horizontal and
-    vertical); the speckle pattern need not be isotropic.
-
-    Finally note that the display of the speckle pattern is the square
-    root of its intensity. The square root operation has the effect of
-    compressing the dynamic range of the pattern. A fully developed
-    speckle pattern is of such high contrast (theoretically unity) that a
-    display of the intensity itself does not reveal the nuance of the
-    pattern.
-
-    Args:
-        x:       speckle pattern to be analyzed
-        initialize: boolean to initialize the plot
-
-    Returns:
-        nothing
-    """
-    # with_extremes returns a new colormap, so the registered "gray" is untouched
-    mymap = plt.get_cmap("gray").with_extremes(bad="blue")
+    ndim = np.ndim(x)
+    if ndim not in (1, 2):
+        raise ValueError("statistics_plot needs a 1D or 2D pattern; use slice_plot for a volume.")
 
     try:
         y = x.compressed()  # if masked array
@@ -146,152 +95,109 @@ def statistics_plot_2D(x, initialize=True):
 
     # Speckle Realization
     plt.subplot(2, 2, 1)
-    plt.imshow(_sqrt_matrix(x), cmap=mymap)
-    plt.title("Sqrt() of Speckle Irradiance")
+    if ndim == 1:
+        plt.plot(x, ".", markersize=2)
+        plt.title("Speckle Irradiance, Contrast K=%.2f" % (std / ave))
+        plt.ylabel("Irradiance")
+    else:
+        # with_extremes returns a new colormap, so the registered "gray" is untouched
+        mymap = plt.get_cmap("gray").with_extremes(bad="blue")
+        plt.imshow(_sqrt_matrix(x), cmap=mymap)
+        plt.title("Sqrt() of Speckle Irradiance")
+        plt.ylabel("Position (pixels)")
     plt.xlabel("Position (pixels)")
-    plt.ylabel("Position (pixels)")
 
     # Histogram of Probability Distribution Function
     plt.subplot(2, 2, 2)
-    num_bins = 30
-    #    plt.gca().set_aspect('equal')
-    # density=True scales the bins so that the PDF integrates to unity
-    pdf, bins = np.histogram(y, bins=num_bins, density=True)
-    width = 0.7 * (bins[1] - bins[0])
-    center = (bins[:-1] + bins[1:]) / 2
-    plt.bar(center, pdf, align="center", width=width, color="gray")
+    center, pdf = _pdf_bar(y, 30, "Average = %.2f, Standard Deviation = %.2f" % (ave, std), color="gray")
     plt.xlabel("Irradiance (gray level/pixel)")
     plt.ylabel(r"Probability Distribution Function, $p_I(i)$")
-    plt.title("Average = %.2f, Standard Deviation = %.2f" % (ave, std))
 
     # Power Spectral Density
     plt.subplot(2, 2, 3)
-    plt.gca().set_aspect("equal")
-    psd = np.fft.fftshift(np.fft.fft2(x))
-    psd = 2 * np.log(abs(psd))
-    plt.imshow(psd, cmap=mymap, extent=[-0.5, 0.5, -0.5, 0.5])
-    plt.title("Log() of Power Spectral Density")
+    if ndim == 1:
+        psd = np.abs(np.fft.fftshift(np.fft.fft(x))) ** 2
+        freq = np.fft.fftshift(np.fft.fftfreq(len(x)))
+        plt.semilogy(freq, psd, lw=0.5)
+        plt.title("Power Spectral Density")
+        plt.ylabel("PSD")
+        plt.xlim(-0.5, 0.5)
+    else:
+        plt.gca().set_aspect("equal")
+        psd = 2 * np.log(abs(np.fft.fftshift(np.fft.fft2(x))))
+        plt.imshow(psd, cmap=plt.get_cmap("gray").with_extremes(bad="blue"), extent=[-0.5, 0.5, -0.5, 0.5])
+        plt.title("Log() of Power Spectral Density")
+        plt.ylabel("Spatial Frequency (1/pixels)")
     plt.xlabel("Spatial Frequency (1/pixels)")
-    plt.ylabel("Spatial Frequency (1/pixels)")
 
     # Probability Distribution Function on Log Scale
     plt.subplot(2, 2, 4)
-    #    plt.gca().set_aspect('equal')
     plt.semilogy(center, pdf, "r.")
     plt.title("Speckle Contrast, K=%.3f" % (std / ave))
     plt.xlabel("Irradiance")
     plt.ylabel(r"Probability Distribution Function, $p_I(i)$")
 
 
-def local_contrast_1D_plot(x, kernel):
+def local_contrast_plot(x, kernel):
     """
     Create a graph showing local and global speckle contrast.
 
-    This is the one-dimensional form of `local_contrast_2D_plot`.  The two
-    panels on the left show individual samples as small points rather than
-    images: the speckle trace above, the local contrast below.  Points rather
-    than a line because adjacent samples are discrete and a connecting line
-    turns solid once the trace is more than a few thousand points long.  The
-    two panels on the right are the matching histograms.
+    The dimensionality is taken from `x`.  A one-dimensional pattern and its
+    contrast are drawn as points, because adjacent samples are discrete and a
+    connecting line turns solid once the trace is more than a few thousand
+    points long; a two-dimensional one is drawn as an image.  The two
+    histogram panels are the same either way.
 
-    The kernel is a 1D array describing the window over which contrast is
-    calculated.  For example, `np.ones(5)` averages over five samples.
+    The kernel must have the same number of dimensions as the pattern.  For
+    example, `np.ones(5)` for a trace and `np.ones((5, 5))` for an image.
 
     Because only valid positions of the correlation are returned, the contrast
-    trace is shorter than the speckle trace.  It is plotted against the centre
-    of its window so that the two left panels share a position axis.
+    is smaller than the pattern.  In one dimension it is plotted against the
+    centre of its window so that the two left panels share a position axis.
 
     Args:
-        x:       1D speckle pattern for which contrast is to be calculated
-        kernel:  1D window over which contrast is to be calculated
+        x:       1D or 2D speckle pattern for which contrast is calculated
+        kernel:  region over which contrast is to be calculated
 
     Returns:
         nothing
     """
+    ndim = np.ndim(x)
+    if ndim not in (1, 2):
+        raise ValueError("local_contrast_plot needs a 1D or 2D pattern.")
+
     C, K = local_contrast(x, kernel)
 
     plt.subplots(2, 2, figsize=(14, 12))
-    plt.subplot(221)
 
-    plt.plot(x, ".", markersize=2)
+    plt.subplot(221)
+    if ndim == 1:
+        plt.plot(x, ".", markersize=2)
+        plt.ylabel("Irradiance")
+    else:
+        plt.imshow(_sqrt_matrix(x), cmap="gray")
+        plt.ylabel("Position (pixels)")
     plt.xlabel("Position (pixels)")
-    plt.ylabel("Irradiance")
     plt.title("Speckle Realization, Overall Contrast=%0.2f" % K)
 
     plt.subplot(222)
-    # density=True scales the bins so that the PDF integrates to unity
-    pdf, bins = np.histogram(x, bins=30, density=True)
-    width = 0.7 * (bins[1] - bins[0])
-    center = (bins[:-1] + bins[1:]) / 2
-    plt.bar(center, pdf, align="center", width=width)
-    plt.title("PDF of Speckle Realization")
+    _pdf_bar(x, 30, "PDF of Speckle Realization")
     plt.xlabel("Gray level, g")
     plt.ylabel("PDF")
 
     plt.subplot(223)
-    # shift by half a kernel so each contrast lands at the centre of its window
-    plt.plot(np.arange(len(C)) + (len(kernel) - 1) / 2, C, ".", markersize=2)
+    if ndim == 1:
+        # shift by half a kernel so each contrast lands at the centre of its window
+        plt.plot(np.arange(len(C)) + (len(kernel) - 1) / 2, C, ".", markersize=2)
+        plt.ylabel("Local contrast, C")
+    else:
+        plt.imshow(_sqrt_matrix(C), cmap="gray")
+        plt.ylabel("Position (pixels)")
     plt.xlabel("Position (pixels)")
-    plt.ylabel("Local contrast, C")
     plt.title("Local speckle contrast")
 
     plt.subplot(224)
-    pdf, bins = np.histogram(C, bins=20, density=True)
-    width = 0.7 * (bins[1] - bins[0])
-    center = (bins[:-1] + bins[1:]) / 2
-    plt.bar(center, pdf, align="center", width=width)
-    plt.title("PDF of Local Speckle Contrast")
-    plt.xlabel("Local contrast, C")
-    plt.ylabel("PDF")
-
-
-def local_contrast_2D_plot(x, kernel):
-    """
-    Create a graph showing local and global spatial contrast.
-
-    The kernel is an N x N array that describes the region over which
-    contrast should be calculated.  For example, `np.ones((5,5))` would
-    represent a 5x5 square.
-
-    Args:
-        x:       speckle pattern for which contrast is to be calculated
-        kernel:  small region over which contrast is to be calculated
-
-    Returns:
-        nothing
-    """
-    C, K = local_contrast(x, kernel)
-
-    plt.subplots(2, 2, figsize=(14, 12))
-    plt.subplot(221)
-
-    plt.imshow(_sqrt_matrix(x), cmap="gray")
-    plt.xlabel("Position (pixels)")
-    plt.ylabel("Position (pixels)")
-    plt.title("Speckle Realization, Overall Contrast=%0.2f" % K)
-
-    plt.subplot(222)
-    # density=True scales the bins so that the PDF integrates to unity
-    pdf, bins = np.histogram(x, bins=30, density=True)
-    width = 0.7 * (bins[1] - bins[0])
-    center = (bins[:-1] + bins[1:]) / 2
-    plt.bar(center, pdf, align="center", width=width)
-    plt.title("PDF of Speckle Realization")
-    plt.xlabel("Gray level, g")
-    plt.ylabel("PDF")
-
-    plt.subplot(223)
-    plt.imshow(_sqrt_matrix(C), cmap="gray")
-    plt.xlabel("Position (pixels)")
-    plt.ylabel("Position (pixels)")
-    plt.title("Local speckle contrast")
-
-    plt.subplot(224)
-    pdf, bins = np.histogram(C, bins=20, density=True)
-    width = 0.7 * (bins[1] - bins[0])
-    center = (bins[:-1] + bins[1:]) / 2
-    plt.bar(center, pdf, align="center", width=width)
-    plt.title("PDF of Local Speckle Contrast")
+    _pdf_bar(C, 20, "PDF of Local Speckle Contrast")
     plt.xlabel("Local contrast, C")
     plt.ylabel("PDF")
 

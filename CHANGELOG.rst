@@ -62,6 +62,9 @@ Unreleased ()
 * its autocorrelation argument is now `correlation`, freeing `shape` (breaking)
 * replace local_contrast_1D/2D/3D with one local_contrast; it never needed a
   dimension because it infers one from the arrays (breaking)
+* merge statistics_plot_1D/2D into statistics_plot and local_contrast_1D/2D_plot
+  into local_contrast_plot, both inferring dimensionality from the input
+  (breaking)
 * reorganize into core.py (generation and analysis), plots.py, and noise.py;
   speckle_1D.py, speckle_2D.py, and speckle_3D.py are gone
 * replace create_exp_corr_1D and create_gaussian_corr_1D with create_correlated,
