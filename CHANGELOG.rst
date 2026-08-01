@@ -65,6 +65,8 @@ Unreleased ()
 * merge statistics_plot_1D/2D into statistics_plot and local_contrast_1D/2D_plot
   into local_contrast_plot, both inferring dimensionality from the input
   (breaking)
+* overlay the theoretical irradiance PDF on every generated-speckle plot in the
+  notebooks: exponential when polarized, gamma-2 when not
 * reorganize into core.py (generation and analysis), plots.py, and noise.py;
   speckle_1D.py, speckle_2D.py, and speckle_3D.py are gone
 * replace create_exp_corr_1D and create_gaussian_corr_1D with create_correlated,
