@@ -200,6 +200,51 @@ def test_local_contrast_1D_plot_aligns_the_two_traces():
     assert contrast_x[-1] == speckle.size - 1 - (n - 1) / 2
 
 
+def test_statistics_plot_1D_draws_four_panels():
+    """Four panels: the trace, its PDF, the PSD, and the PDF on a log scale."""
+    speckle = pyspeckle.create_exponential_1D(4096, 8)
+    pyspeckle.statistics_plot_1D(speckle)
+    axes = plt.gcf().get_axes()
+    assert len(axes) == 4
+    assert "Contrast" in axes[0].get_title()
+    assert "Standard Deviation" in axes[1].get_title()
+    assert axes[2].get_title() == "Power Spectral Density"
+    assert "Speckle Contrast" in axes[3].get_title()
+
+
+def test_statistics_plot_1D_normalized_pdf():
+    """The plotted histogram is a density, so its bars integrate to unity."""
+    speckle = pyspeckle.create_exponential_1D(4096, 8)
+    pyspeckle.statistics_plot_1D(speckle)
+    bars = plt.gcf().get_axes()[1].patches
+    # bars are drawn at 70% of the bin width, so widen them back out
+    total = sum(p.get_height() * (p.get_width() / 0.7) for p in bars)
+    assert abs(total - 1) < 0.01
+
+
+def test_statistics_plot_1D_psd_shows_band_limit():
+    """The PSD cuts off at 1/pix_per_speckle, which is what makes it useful."""
+    pix_per_speckle = 8
+    speckle = pyspeckle.create_exponential_1D(8192, pix_per_speckle)
+    pyspeckle.statistics_plot_1D(speckle)
+
+    freq, psd = plt.gcf().get_axes()[2].get_lines()[0].get_data()
+    significant = np.abs(freq[psd > psd.max() * 1e-6])
+    assert abs(significant.max() - 1 / pix_per_speckle) < 0.01
+
+
+def test_statistics_plot_1D_masked_and_no_initialize():
+    """A masked array uses compressed(); initialize=False reuses the figure."""
+    speckle = pyspeckle.create_exponential_1D(2048, 8)
+    masked = np.ma.masked_where(speckle > 0.8, speckle)
+    pyspeckle.statistics_plot_1D(masked)
+    assert len(plt.gcf().get_axes()) == 4
+
+    plt.subplots(2, 2)
+    pyspeckle.statistics_plot_1D(speckle, initialize=False)
+    assert len(plt.gcf().get_axes()) == 4
+
+
 def test_local_contrast_1D_rejects_wrong_kernel_rank():
     """A 2D kernel cannot be used on a 1D pattern."""
     speckle = pyspeckle.create_exponential_1D(256, 2)

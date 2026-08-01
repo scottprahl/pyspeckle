@@ -42,6 +42,9 @@ Unreleased ()
   developed speckle: correlated Gaussian phase, gaussian or exponential ACF
 * add local_contrast_1D and local_contrast_3D
 * add local_contrast_1D_plot, plotting points where the 2D version has images
+* add statistics_plot_1D and rename statistics_plot to statistics_plot_2D (breaking)
+* fix local_contrast for integer images: squaring a uint8 array wrapped and the
+  local contrast came out zero everywhere
 * test speckle contrast in every dimension: K=1 polarized, K=1/sqrt(2) unpolarized
 * cover the plotting routines and mask branches, reaching 100% test coverage
 * force the Agg backend and close figures between tests

@@ -149,6 +149,21 @@ def test_local_contrast_2D_matches_global():
     assert abs(np.mean(C) - 1) < 0.2
 
 
+def test_local_contrast_2D_integer_image():
+    """An 8-bit image must not overflow when squared; it used to give all zeros."""
+    speckle = pyspeckle.create_exponential_2D(128, 4)
+    as_uint8 = (255 * speckle).astype(np.uint8)
+
+    C, K = pyspeckle.local_contrast_2D(as_uint8, np.ones((10, 10)))
+    assert np.all(np.isfinite(C))
+    assert C.max() > 0.1  # was exactly 0 everywhere while uint8 wrapped
+    assert abs(K - 1) < 0.2
+
+    # the same data as float must give the same answer
+    C_float, _ = pyspeckle.local_contrast_2D(as_uint8.astype(float), np.ones((10, 10)))
+    assert np.allclose(C, C_float)
+
+
 def test_mask_2D_too_small():
     """The mask array must be at least twice the largest radius."""
     with pytest.raises(ValueError):
@@ -181,39 +196,39 @@ def test_local_contrast_2D_plot_histograms_are_densities():
         assert abs(total - 1) < 0.01
 
 
-def test_statistics_plot_draws_four_panels():
+def test_statistics_plot_2D_draws_four_panels():
     """The statistics routine fills a 2x2 figure and reports mean, stdev, contrast."""
     speckle = pyspeckle.create_exponential_2D(64, 2)
-    pyspeckle.statistics_plot(speckle)
+    pyspeckle.statistics_plot_2D(speckle)
     axes = plt.gcf().get_axes()
     assert len(axes) == 4
     assert "Standard Deviation" in axes[1].get_title()
     assert "Speckle Contrast" in axes[3].get_title()
 
 
-def test_statistics_plot_normalized_pdf():
+def test_statistics_plot_2D_normalized_pdf():
     """The plotted histogram is a density, so its bars integrate to unity."""
     speckle = pyspeckle.create_exponential_2D(64, 2)
-    pyspeckle.statistics_plot(speckle)
+    pyspeckle.statistics_plot_2D(speckle)
     bars = plt.gcf().get_axes()[1].patches
     # bars are drawn at 70% of the bin width, so widen them back out
     total = sum(patch.get_height() * (patch.get_width() / 0.7) for patch in bars)
     assert abs(total - 1) < 0.01
 
 
-def test_statistics_plot_accepts_masked_array():
+def test_statistics_plot_2D_accepts_masked_array():
     """A masked array uses compressed() for the statistics and blue for bad pixels."""
     speckle = pyspeckle.create_exponential_2D(64, 2)
     masked = np.ma.masked_where(speckle > 0.8, speckle)
-    pyspeckle.statistics_plot(masked)
+    pyspeckle.statistics_plot_2D(masked)
     assert len(plt.gcf().get_axes()) == 4
 
 
-def test_statistics_plot_without_initialize():
+def test_statistics_plot_2D_without_initialize():
     """initialize=False draws onto an existing figure instead of making one."""
     speckle = pyspeckle.create_exponential_2D(64, 2)
     plt.subplots(2, 2)
-    pyspeckle.statistics_plot(speckle, initialize=False)
+    pyspeckle.statistics_plot_2D(speckle, initialize=False)
     assert len(plt.gcf().get_axes()) == 4
 
 

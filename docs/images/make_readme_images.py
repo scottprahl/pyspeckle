@@ -47,6 +47,6 @@ plt.savefig("oneD_example.png", dpi=300)
 plt.show()
 
 y = pyspeckle.create_exponential_2D(201, 2)
-pyspeckle.statistics_plot(y)
+pyspeckle.statistics_plot_2D(y)
 plt.savefig("twoD_speckle.png", dpi=300)
 plt.show()

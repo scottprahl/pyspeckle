@@ -15,6 +15,7 @@ One dimensional functions::
     pyspeckle.create_phase_screen_1D(M, sigma, cl)
     pyspeckle.local_contrast_1D(x, kernel)
     pyspeckle.local_contrast_1D_plot(x, kernel)
+    pyspeckle.statistics_plot_1D(x)
     pyspeckle.autocorrelation(x)
 
 Correlated random numbers, the Gaussian copula of Duncan & Kirkpatrick::
@@ -34,7 +35,7 @@ Two dimensional functions::
     pyspeckle.create_exponential_2D(M, pix_per_speckle)
     pyspeckle.create_unpolarized_2D(M, pix_per_speckle)
     pyspeckle.create_phase_screen_2D(M, sigma, cl)
-    pyspeckle.statistics_plot(x)
+    pyspeckle.statistics_plot_2D(x)
 
 Three dimensional functions::
 

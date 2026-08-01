@@ -19,7 +19,7 @@ __all__ = (
     "create_phase_screen_2D",
     "local_contrast_2D",
     "local_contrast_2D_plot",
-    "statistics_plot",
+    "statistics_plot_2D",
 )
 
 
@@ -302,7 +302,7 @@ def local_contrast_2D_plot(x, kernel):
     plt.ylabel("PDF")
 
 
-def statistics_plot(x, initialize=True):
+def statistics_plot_2D(x, initialize=True):
     """
     Plot the first and second-order statistics of a speckle pattern.
 

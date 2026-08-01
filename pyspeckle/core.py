@@ -108,6 +108,10 @@ def _local_contrast(x, kernel):
     if np.ndim(x) != np.ndim(kernel):
         raise ValueError("kernel must have the same number of dimensions as the speckle pattern.")
 
+    # float, because squaring an integer image silently wraps: a uint8 255**2
+    # comes back as 1 and the variance then clips to zero everywhere
+    x = np.asarray(x, dtype=float)
+
     # normalization total for kernel
     Nk = np.sum(kernel)
     # contrast of raw image

@@ -27,7 +27,82 @@ __all__ = (
     "create_phase_screen_1D",
     "local_contrast_1D",
     "local_contrast_1D_plot",
+    "statistics_plot_1D",
 )
+
+
+def statistics_plot_1D(x, initialize=True):
+    """
+    Plot the first and second-order statistics of a 1D speckle pattern.
+
+    This is the one-dimensional form of `statistics_plot_2D`.  Four panels are
+    drawn: the trace itself, the probability density function of the
+    irradiance, the power spectral density, and the same density on a log
+    scale.
+
+    The PDF conforms to the formal definition that it integrate to unity.
+    Also displayed is the contrast defined as the quotient of the standard
+    deviation and the mean, which is one for fully developed polarized
+    speckle.
+
+    The power spectral density shows the bandwidth limit imposed by the
+    aperture.  When it reaches the edge of the plot the pattern is sampled at
+    Nyquist, two pixels per speckle; when it fills half the plot the smallest
+    speckle is four pixels across.
+
+    Args:
+        x:          1D speckle pattern to be analyzed
+        initialize: boolean to initialize the plot
+
+    Returns:
+        nothing
+    """
+    try:
+        y = x.compressed()  # if masked array
+    except AttributeError:
+        y = x  # not a masked array
+
+    ave = np.mean(y)
+    std = np.std(y)
+
+    if initialize:
+        plt.subplots(2, 2, figsize=(14, 12))
+
+    # Speckle Realization
+    plt.subplot(2, 2, 1)
+    plt.plot(x, ".", markersize=2)
+    plt.title("Speckle Irradiance, Contrast K=%.2f" % (std / ave))
+    plt.xlabel("Position (pixels)")
+    plt.ylabel("Irradiance")
+
+    # Histogram of Probability Distribution Function
+    plt.subplot(2, 2, 2)
+    num_bins = 30
+    # density=True scales the bins so that the PDF integrates to unity
+    pdf, bins = np.histogram(y, bins=num_bins, density=True)
+    width = 0.7 * (bins[1] - bins[0])
+    center = (bins[:-1] + bins[1:]) / 2
+    plt.bar(center, pdf, align="center", width=width, color="gray")
+    plt.xlabel("Irradiance (gray level/pixel)")
+    plt.ylabel(r"Probability Distribution Function, $p_I(i)$")
+    plt.title("Average = %.2f, Standard Deviation = %.2f" % (ave, std))
+
+    # Power Spectral Density
+    plt.subplot(2, 2, 3)
+    psd = np.abs(np.fft.fftshift(np.fft.fft(x))) ** 2
+    freq = np.fft.fftshift(np.fft.fftfreq(len(x)))
+    plt.semilogy(freq, psd, lw=0.5)
+    plt.title("Power Spectral Density")
+    plt.xlabel("Spatial Frequency (1/pixels)")
+    plt.ylabel("PSD")
+    plt.xlim(-0.5, 0.5)
+
+    # Probability Distribution Function on Log Scale
+    plt.subplot(2, 2, 4)
+    plt.semilogy(center, pdf, "r.")
+    plt.title("Speckle Contrast, K=%.3f" % (std / ave))
+    plt.xlabel("Irradiance")
+    plt.ylabel(r"Probability Distribution Function, $p_I(i)$")
 
 
 def create_phase_screen_1D(M, sigma, cl, shape="gaussian"):
