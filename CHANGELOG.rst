@@ -48,6 +48,12 @@ Unreleased ()
 * add create_boiling_speckle, a translation of SimSpeckle focal_plane_boil.m:
   a decorrelating sequence returned with its theoretical correlation
 * add a boiling speckle section to the 2D notebook
+* add create_from_aperture, a translation of SimSpeckle modulated_speckle.m:
+  speckle from any pupil, not just the named shapes.  Two separated openings
+  give speckle crossed by Young's fringes of period N/d
+* add an arbitrary aperture section to the 2D notebook
+* autocorrelation now works in one, two, or three dimensions and returns the
+  non-negative lags, so the result keeps the shape of its argument
 * fix local_contrast for integer images: squaring a uint8 array wrapped and the
   local contrast came out zero everywhere
 * test speckle contrast in every dimension: K=1 polarized, K=1/sqrt(2) unpolarized

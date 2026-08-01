@@ -19,6 +19,12 @@ returned with the correlation coefficient and its closed-form prediction::
 Arguments that do not apply to the requested dimensionality are rejected:
 `alpha` and `aperture` need two dimensions, `beta` needs three.
 
+When the pupil is not one of the named shapes, pass it directly.  Two
+separated openings, for example, give speckle crossed by interference
+fringes::
+
+    pyspeckle.create_from_aperture(aperture, shape)
+
 Rough-surface phase screens for partially developed speckle are the zero-mean
 case, measured in radians::
 

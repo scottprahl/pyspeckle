@@ -15,6 +15,7 @@ __all__ = (
     "create_exponential",
     "local_contrast",
     "create_unpolarized",
+    "create_from_aperture",
     "create_boiling_speckle",
     "autocorrelation",
     "box_muller",
@@ -291,6 +292,55 @@ def create_exponential(shape, pix_per_speckle, alpha=None, beta=None, aperture=N
     return _speckle_from_mask(mask, dims, polarization)
 
 
+def create_from_aperture(aperture, shape, polarization=1):
+    """
+    Generate speckle from an arbitrary illuminated aperture.
+
+    `create_exponential` builds the aperture itself from a handful of named
+    shapes.  This takes the aperture directly, so the pupil can be anything:
+    several separated openings, an obstruction, a measured pupil function.
+    The array is filled with uniform random phase, transformed, and the
+    magnitude squared, exactly as `create_exponential` does.
+
+    Speckle size is set by how large the illuminated region is relative to the
+    array it sits in, not by where it sits, since position only adds a phase
+    ramp that the magnitude squared discards.  A smaller opening in the same
+    array gives coarser speckle.
+
+    A pupil with two separated openings gives speckle crossed by interference
+    fringes, the speckle counterpart of Young's two-slit experiment.  The
+    fringe period is the array width divided by the separation, so pushing the
+    openings apart packs the fringes closer together.
+
+    Args:
+        aperture:     array describing the illuminated pupil, square, 1 to 3D
+        shape:        integer or tuple giving the shape of the pattern wanted
+        polarization: degree of polarization
+
+    Returns:
+        array with the requested shape
+    """
+    aperture = np.asarray(aperture)
+    dims = _normalize_shape(shape)
+
+    if polarization < 0 or polarization > 1:
+        raise ValueError("bad polarization. It must be 0 <= polarization <= 1.")
+
+    if aperture.ndim != len(dims):
+        raise ValueError("aperture must have the same number of dimensions as the requested shape.")
+
+    if len(set(aperture.shape)) != 1:
+        raise ValueError("aperture must be the same length along every axis.")
+
+    if any(n > a for n, a in zip(dims, aperture.shape)):
+        raise ValueError("the requested shape must fit inside the aperture array.")
+
+    if not np.any(aperture):
+        raise ValueError("aperture is empty; nothing is illuminated.")
+
+    return _speckle_from_mask(aperture, dims, polarization)
+
+
 def create_boiling_speckle(shape, pix_per_speckle, frames=None):
     """
     Generate a sequence of speckle patterns that decorrelate as they boil.
@@ -459,29 +509,33 @@ def local_contrast(x, kernel):
 
 def autocorrelation(x):
     """
-    Find the autocorrelation of a 1D array.
+    Find the autocorrelation of an array of any dimension.
 
     This is a little different from the standard autocorrelation because
     (1) the mean is subtracted before correlation
     (2) the autocorrelation is normalized to maximum value
-    (3) only the right hand side of the symmetric function is returned
+    (3) only non-negative lags are returned
+
+    The last point is what keeps the result the same shape as the input.  The
+    full correlation is symmetric about zero lag, so in one dimension the
+    right hand side carries everything; in two or three the same is true of
+    the quadrant or octant reaching out from the origin, and `result[0]`,
+    `result[0, 0]`, or `result[0, 0, 0]` is the zero-lag peak.
 
     Args:
-        x: 1D array
+        x: array of any dimension
 
     Returns:
-        autocorrelation array of same length
+        autocorrelation array of the same shape
     """
-    xx = x.astype(float)
-    mean = np.mean(x)
-    xx -= mean
-    result = np.correlate(xx, xx, mode="full")
-    # could also use the faster(?)
-    #   result = signal.fftconvolve(sig, sig[::-1], mode='full')
+    xx = np.asarray(x, dtype=float)
+    xx = xx - np.mean(xx)
+    result = scipy.signal.correlate(xx, xx, mode="full")
 
     mx = np.max(result) or 1
-    middle = len(result) // 2
-    return result[middle:] / mx
+    # zero lag sits at the middle of each axis, exactly where correlate puts it
+    middle = tuple(slice(n - 1, None) for n in xx.shape)
+    return result[middle] / mx
 
 
 def box_muller(mu, sigma, N=1):

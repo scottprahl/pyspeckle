@@ -26,6 +26,35 @@ def test_autocorrelation_value2():
     assert autocorr[0] == 0  # It's normalized to have a max of 1
 
 
+@pytest.mark.parametrize("shape", [(5,), (9, 7), (5, 6, 7)])
+def test_autocorrelation_keeps_its_shape(shape):
+    """Returning only non-negative lags makes the result match the input."""
+    autocorr = pyspeckle.autocorrelation(np.random.rand(*shape))
+    assert autocorr.shape == shape
+    assert autocorr[(0,) * len(shape)] == pytest.approx(1)
+
+
+def test_autocorrelation_2D_matches_direct_sum():
+    """The transform agrees with summing overlapping samples by hand."""
+    x = np.random.rand(9, 7)
+    centered = x - x.mean()
+    M, N = x.shape
+    direct = np.zeros((M, N))
+    for i in range(M):
+        for j in range(N):
+            direct[i, j] = np.sum(centered[i:, j:] * centered[: M - i, : N - j])
+    assert pyspeckle.autocorrelation(x) == pytest.approx(direct / direct.max())
+
+
+def test_autocorrelation_2D_is_isotropic():
+    """An isotropic field correlates the same in every direction."""
+    # the 6-8-10 triple keeps the compared lags exactly equidistant
+    field = pyspeckle.create_correlated((512, 512), 0, 1, 12, "gaussian")
+    autocorr = pyspeckle.autocorrelation(field)
+    lags = [autocorr[6, 8], autocorr[8, 6], autocorr[10, 0], autocorr[0, 10]]
+    assert max(lags) - min(lags) < 0.05
+
+
 def test_create_exponential_shape_and_range():
     """Output is length M, normalized to a maximum of one."""
     result = pyspeckle.create_exponential(64, 2)
@@ -520,6 +549,87 @@ def test_create_boiling_speckle_invalid_args(kwargs):
     args.update(kwargs)
     with pytest.raises(ValueError):
         pyspeckle.create_boiling_speckle(**args)
+
+
+def _two_circles(N, separation, radius):
+    """Build the pair of circular openings used by SimSpeckle's modulated_speckle."""
+    y, x = np.ogrid[:N, :N]
+    center = N // 2
+    inside = ((x - center) ** 2 + (y - center) ** 2) <= radius**2
+    offset = ((x - center - separation) ** 2 + (y - center) ** 2) <= radius**2
+    return inside | offset
+
+
+def test_create_from_aperture_shapes():
+    """A user-supplied pupil works in one, two, and three dimensions."""
+    assert pyspeckle.create_from_aperture(np.ones(512), 128).shape == (128,)
+    assert pyspeckle.create_from_aperture(np.ones((256, 256)), (64, 64)).shape == (64, 64)
+    assert pyspeckle.create_from_aperture(np.ones((64, 64, 64)), (16, 16, 16)).shape == (16, 16, 16)
+
+
+def test_create_from_aperture_is_fully_developed():
+    """A single opening gives ordinary speckle with unit contrast."""
+    aperture = _two_circles(512, 0, 32)  # separation of zero leaves one circle
+    speckle = pyspeckle.create_from_aperture(aperture, (256, 256))
+    assert abs(speckle.std() / speckle.mean() - 1) < 0.1
+
+
+def test_create_from_aperture_matches_create_exponential():
+    """The same circular pupil reproduces create_exponential's speckle size."""
+    M, pix_per_speckle = 256, 4
+    N = M * pix_per_speckle
+    aperture = _two_circles(N, 0, N / (2 * pix_per_speckle))
+    mine = pyspeckle.create_from_aperture(aperture, (M, M))
+    theirs = pyspeckle.create_exponential((M, M), pix_per_speckle)
+
+    def speckle_width(x):
+        """Row-averaged autocorrelation, measured at half its maximum."""
+        acf = np.mean([pyspeckle.autocorrelation(row) for row in x], axis=0)
+        return np.sum(acf > 0.5 * acf.max())
+
+    assert abs(speckle_width(mine) - speckle_width(theirs)) <= 2
+
+
+@pytest.mark.parametrize("separation", [1 / 8, 1 / 4])
+def test_create_from_aperture_fringe_period(separation):
+    """Two openings modulate the speckle with period = array width / separation."""
+    M, N = 128, 512
+    pixels = N * separation
+    aperture = _two_circles(N, pixels, 0.03 * N)
+    power = np.zeros((M, M))
+    for _ in range(40):
+        speckle = pyspeckle.create_from_aperture(aperture, (M, M))
+        power += np.abs(np.fft.fft2(speckle - speckle.mean())) ** 2
+    # skip the low frequencies, where the speckle envelope itself lives
+    lobe = power.mean(axis=0)[: M // 2]
+    peak = np.argmax(lobe[8:]) + 8
+    assert M / peak == pytest.approx(N / pixels, abs=0.5)
+
+
+def test_create_from_aperture_polarization():
+    """An unpolarized pupil halves the contrast, as everywhere else."""
+    aperture = _two_circles(512, 0, 32)
+    speckle = pyspeckle.create_from_aperture(aperture, (256, 256), polarization=0)
+    assert abs(speckle.std() / speckle.mean() - 1 / np.sqrt(2)) < 0.1
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"aperture": np.ones(256)},  # one dimension, but a 2D shape wanted
+        {"aperture": np.ones((256, 128))},  # not square
+        {"aperture": np.zeros((256, 256))},  # nothing illuminated
+        {"shape": (512, 512)},  # bigger than the aperture array
+        {"polarization": -0.5},
+        {"polarization": 1.5},
+    ],
+)
+def test_create_from_aperture_invalid_args(kwargs):
+    """Bad arguments raise ValueError rather than failing inside numpy."""
+    args = {"aperture": np.ones((256, 256)), "shape": (64, 64)}
+    args.update(kwargs)
+    with pytest.raises(ValueError):
+        pyspeckle.create_from_aperture(**args)
 
 
 def test_local_contrast_rejects_a_single_sample_kernel():
