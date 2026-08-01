@@ -461,3 +461,69 @@ def test_tvalues_are_uniform():
     # correlation of the uniforms is (6/pi)*arcsin(r/2), not r itself
     expected = (6 / np.pi) * np.arcsin(0.5 / 2)
     assert abs(np.corrcoef(t1, t2)[0, 1] - expected) < 0.02
+
+
+def test_create_boiling_speckle_shapes():
+    """The cube carries the frame on its last axis, with matching curves."""
+    M = 64
+    cube, correlation, theory = pyspeckle.create_boiling_speckle((M, M), 2)
+    assert cube.shape == (M, M, M + 1)
+    assert correlation.shape == (M + 1,)
+    assert theory.shape == (M + 1,)
+    assert np.max(cube) == 1.0
+
+
+def test_create_boiling_speckle_frames_are_fully_developed():
+    """Each frame is ordinary speckle, so its contrast is one."""
+    cube, _, _ = pyspeckle.create_boiling_speckle((96, 96), 2)
+    for k in (0, cube.shape[2] // 2, cube.shape[2] - 1):
+        frame = cube[:, :, k]
+        assert abs(np.std(frame) / np.mean(frame) - 1) < 0.15
+
+
+def test_create_boiling_speckle_decorrelates():
+    """Correlation starts at one, falls, and vanishes after a full diameter."""
+    _, correlation, _ = pyspeckle.create_boiling_speckle((96, 96), 2)
+    assert abs(correlation[0] - 1) < 1e-9
+    assert abs(correlation[-1]) < 0.15
+    # monotone apart from noise once the pattern is nearly decorrelated
+    assert np.all(np.diff(correlation) < 0.05)
+
+
+def test_create_boiling_speckle_matches_theory():
+    """The measured correlation follows the squared ACF of a circular disc."""
+    _, correlation, theory = pyspeckle.create_boiling_speckle((128, 128), 2)
+    assert np.max(np.abs(correlation - theory)) < 0.12
+
+
+def test_create_boiling_speckle_frames_argument():
+    """Asking for fewer frames returns a shorter sequence."""
+    cube, correlation, theory = pyspeckle.create_boiling_speckle((64, 64), 2, frames=10)
+    assert cube.shape == (64, 64, 10)
+    assert len(correlation) == len(theory) == 10
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"shape": 64},  # one dimension
+        {"shape": (64, 64, 64)},  # three
+        {"shape": (64, 32)},  # not square
+        {"pix_per_speckle": 1},  # pupil cannot slide a full diameter
+        {"frames": 0},
+        {"frames": 999},
+    ],
+)
+def test_create_boiling_speckle_invalid_args(kwargs):
+    """Bad arguments raise ValueError rather than failing inside numpy."""
+    args = {"shape": (64, 64), "pix_per_speckle": 2}
+    args.update(kwargs)
+    with pytest.raises(ValueError):
+        pyspeckle.create_boiling_speckle(**args)
+
+
+def test_local_contrast_rejects_a_single_sample_kernel():
+    """The unbiased variance divides by Nk-1, so one sample has no spread."""
+    speckle = pyspeckle.create_exponential(256, 2)
+    with pytest.raises(ValueError):
+        pyspeckle.local_contrast(speckle, np.ones(1))

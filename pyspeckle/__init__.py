@@ -11,6 +11,11 @@ so the same call works in one, two, or three dimensions::
     pyspeckle.create_exponential((M, M, M), pix_per_speckle)      # 3D
     pyspeckle.create_unpolarized(shape, pix_per_speckle)
 
+A sequence of speckle patterns that decorrelate as the pupil translates,
+returned with the correlation coefficient and its closed-form prediction::
+
+    pyspeckle.create_boiling_speckle(shape, pix_per_speckle)
+
 Arguments that do not apply to the requested dimensionality are rejected:
 `alpha` and `aperture` need two dimensions, `beta` needs three.
 

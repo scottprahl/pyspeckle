@@ -31,6 +31,7 @@ lite/
 docs/_build/
 docs/api/
 docs/*pdf
+docs/SimSpeckle/
 
 # Testing
 .pytest_cache/

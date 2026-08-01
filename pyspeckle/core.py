@@ -15,6 +15,7 @@ __all__ = (
     "create_exponential",
     "local_contrast",
     "create_unpolarized",
+    "create_boiling_speckle",
     "autocorrelation",
     "box_muller",
     "zvalues",
@@ -290,6 +291,86 @@ def create_exponential(shape, pix_per_speckle, alpha=None, beta=None, aperture=N
     return _speckle_from_mask(mask, dims, polarization)
 
 
+def create_boiling_speckle(shape, pix_per_speckle, frames=None):
+    """
+    Generate a sequence of speckle patterns that decorrelate as they boil.
+
+    A single fixed random-phase screen is illuminated through a circular
+    pupil, and the pupil is translated one column per frame.  The speckle
+    pattern changes continuously, and once the pupil has moved its own
+    diameter the pattern is completely decorrelated from where it started.
+    This is the back focal plane geometry of Duncan & Kirkpatrick, and it is
+    how object-plane motion appears when observed behind a lens.
+
+    The correlation between the first frame and each later one is returned
+    along with the closed-form prediction, which for focal-plane speckle is
+    the square of the autocorrelation of a circular disc::
+
+        ACF(a) = (2/pi) * (arccos(a) - a * sqrt(1 - a**2))
+        theory = ACF ** 2
+
+    where `a` is the pupil displacement as a fraction of its diameter.
+
+    The pupil edge is deliberately softened with a small Gaussian kernel.  A
+    hard edge makes the sequence alias in time, because the pupil then gains
+    and loses whole scatterers in single steps.
+
+    `shape` must be square and two dimensional.  The returned cube has the
+    frame as its last axis, so `cube[:, :, k]` is one pattern and `slice_plot`
+    can display the volume directly.
+
+    Args:
+        shape:           tuple giving the shape of each frame, e.g. (128, 128)
+        pix_per_speckle: number of pixels per smallest speckle, at least 2
+        frames:          number of frames, defaulting to a full decorrelation
+
+    Returns:
+        cube, correlation with the first frame, and the theoretical correlation
+    """
+    dims = _normalize_shape(shape)
+
+    if len(dims) != 2 or dims[0] != dims[1]:
+        raise ValueError("shape must be square and two dimensional, for example (128, 128).")
+
+    # the pupil slides a full diameter, so the phase screen must be twice as
+    # wide as the pupil
+    if pix_per_speckle < 2:
+        raise ValueError("pix_per_speckle must be at least 2 so the pupil can slide a full diameter.")
+
+    M = dims[0]
+    if frames is None:
+        frames = M + 1
+    if frames < 1 or frames > M + 1:
+        raise ValueError("frames must be between 1 and one more than the width of the pattern.")
+
+    L = int(pix_per_speckle * M)
+
+    # circular pupil, then soften the edge to avoid temporal aliasing
+    u = np.linspace(-1, 1, M)
+    X, Y = np.meshgrid(u, u, indexing="ij")
+    pupil = (np.hypot(X, Y) <= 1).astype(float)
+    smooth = np.array([[1, 4, 1], [4, 12, 4], [1, 4, 1]]) / 32
+    pupil = scipy.signal.convolve2d(pupil, smooth, mode="same")
+
+    # one fixed screen; the pupil moves across it
+    phase = np.exp(2j * np.pi * np.random.rand(L, L))
+
+    cube = np.empty((M, M, frames))
+    for n in range(frames):
+        window = np.zeros((L, L), dtype=complex)
+        window[:M, n : n + M] = phase[:M, n : n + M] * pupil
+        cube[:, :, n] = (abs(np.fft.fft2(window)) ** 2)[:M, :M]
+
+    cube /= np.max(cube) or 1
+
+    first = cube[:, :, 0].ravel()
+    correlation = np.array([np.corrcoef(first, cube[:, :, n].ravel())[0, 1] for n in range(frames)])
+
+    lag = np.arange(frames) / M
+    acf = (2 / np.pi) * (np.arccos(lag) - lag * np.sqrt(1 - lag**2))
+    return cube, correlation, acf**2
+
+
 def create_unpolarized(shape, pix_per_speckle, alpha=None, beta=None, aperture=None):
     """
     Generate an unpolarized speckle irradiance pattern.
@@ -351,21 +432,27 @@ def local_contrast(x, kernel):
     if np.ndim(x) != np.ndim(kernel):
         raise ValueError("kernel must have the same number of dimensions as the speckle pattern.")
 
+    # normalization total for kernel
+    Nk = np.sum(kernel)
+
+    if Nk < 2:
+        raise ValueError("kernel must cover at least two samples.")
+
     # float, because squaring an integer image silently wraps: a uint8 255**2
     # comes back as 1 and the variance then clips to zero everywhere
     x = np.asarray(x, dtype=float)
 
-    # normalization total for kernel
-    Nk = np.sum(kernel)
     # contrast of raw image
     K = np.std(x) / np.mean(x)
 
-    # local mean and local mean square over the kernel
+    # local mean and the summed square over the kernel
     mu_x = scipy.signal.correlate(x, kernel, mode="valid") / Nk
-    mu_x2 = scipy.signal.correlate(x**2, kernel, mode="valid") / Nk
+    sum_sq = scipy.signal.correlate(x**2, kernel, mode="valid")
 
-    # local variance, clipped because rounding can push it slightly below zero
-    var_x = np.maximum(mu_x2 - mu_x**2, 0)
+    # the unbiased sample variance, as in the SimSpeckle original; dividing by
+    # Nk instead would bias the contrast low by sqrt(Nk/(Nk-1)), which is 12%
+    # for a five-sample window.  Clipped because rounding can push it below zero
+    var_x = np.maximum((sum_sq - Nk * mu_x**2) / (Nk - 1), 0)
     C = np.sqrt(var_x) / mu_x
     return C, K
 

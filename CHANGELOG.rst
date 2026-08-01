@@ -43,6 +43,11 @@ Unreleased ()
 * add local_contrast_1D and local_contrast_3D
 * add local_contrast_1D_plot, plotting points where the 2D version has images
 * add statistics_plot_1D and rename statistics_plot to statistics_plot_2D (breaking)
+* local_contrast now uses the unbiased variance, as the SimSpeckle original
+  does; it was low by sqrt(Nk/(Nk-1)), or 12% for a five-sample window
+* add create_boiling_speckle, a translation of SimSpeckle focal_plane_boil.m:
+  a decorrelating sequence returned with its theoretical correlation
+* add a boiling speckle section to the 2D notebook
 * fix local_contrast for integer images: squaring a uint8 array wrapped and the
   local contrast came out zero everywhere
 * test speckle contrast in every dimension: K=1 polarized, K=1/sqrt(2) unpolarized
