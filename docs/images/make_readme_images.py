@@ -8,7 +8,7 @@ target_length = 50000
 target_std = 100
 
 target_ave = 1200
-y = pyspeckle.create_exp_corr_1D(target_length, target_ave, target_std, 20)
+y = pyspeckle.create_correlated(target_length, target_ave, target_std, 20, correlation="exponential")
 ave = np.mean(y)
 std = np.sqrt(np.var(y))
 plt.text(target_length, ave, "  %.0f ± %.0f" % (ave, std), fontsize=14)
@@ -16,7 +16,7 @@ plt.plot(y)
 plt.plot([0, target_length], [target_ave, target_ave], ":k")
 
 target_ave = 800
-y = pyspeckle.create_exp_corr_1D(target_length, target_ave, target_std, 50)
+y = pyspeckle.create_correlated(target_length, target_ave, target_std, 50, correlation="exponential")
 ave = np.mean(y)
 std = np.sqrt(np.var(y))
 plt.text(target_length, ave, "  %.0f ± %.0f" % (ave, std), fontsize=14)
@@ -24,7 +24,7 @@ plt.plot(y)
 plt.plot([0, target_length], [target_ave, target_ave], ":k")
 
 target_ave = 400
-y = pyspeckle.create_exp_corr_1D(target_length, target_ave, target_std, 100)
+y = pyspeckle.create_correlated(target_length, target_ave, target_std, 100, correlation="exponential")
 ave = np.mean(y)
 std = np.sqrt(np.var(y))
 plt.text(target_length, ave, "  %.0f ± %.0f" % (ave, std), fontsize=14)
@@ -32,7 +32,7 @@ plt.plot(y)
 plt.plot([0, target_length], [target_ave, target_ave], ":k")
 
 target_ave = 0
-y = pyspeckle.create_exp_corr_1D(target_length, target_ave, target_std, 500)
+y = pyspeckle.create_correlated(target_length, target_ave, target_std, 500, correlation="exponential")
 ave = np.mean(y)
 std = np.sqrt(np.var(y))
 plt.text(target_length, ave, "  %.0f ± %.0f" % (ave, std), fontsize=14)

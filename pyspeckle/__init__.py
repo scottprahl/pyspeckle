@@ -14,8 +14,8 @@ so the same call works in one, two, or three dimensions::
 Arguments that do not apply to the requested dimensionality are rejected:
 `alpha` and `aperture` need two dimensions, `beta` needs three.
 
-Rough-surface phase screens for partially developed speckle take the same
-shape argument::
+Rough-surface phase screens for partially developed speckle are the zero-mean
+case, measured in radians::
 
     pyspeckle.create_phase_screen(shape, sigma, cl)
 
@@ -28,11 +28,11 @@ plots are necessarily dimension specific::
     pyspeckle.statistics_plot_1D(x)                 .._2D
     pyspeckle.slice_plot(data, x, y, z)
 
-Correlated Gaussian sequences, which are *not* speckle -- the name refers to
-the autocorrelation, not the distribution of values::
+Correlated Gaussian fields, which are *not* speckle -- the name refers to the
+autocorrelation, not the distribution of values.  `cl` is the lag at which the
+autocorrelation falls to 1/e for both shapes::
 
-    pyspeckle.create_exp_corr_1D(M, mean, stdev, cl)
-    pyspeckle.create_gaussian_corr_1D(M, mean, stdev, cl)
+    pyspeckle.create_correlated(shape, mean, stdev, cl, correlation)
 
 Correlated random numbers, the Gaussian copula of Duncan & Kirkpatrick::
 

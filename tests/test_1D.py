@@ -105,15 +105,15 @@ def test_create_phase_screen_is_gaussian():
     assert abs(scipy.stats.kurtosis(screen)) < 0.2
 
 
-@pytest.mark.parametrize("shape", ["gaussian", "exponential", "GAUSSIAN"])
-def test_create_phase_screen_autocorrelation(shape):
+@pytest.mark.parametrize("correlation", ["gaussian", "exponential", "GAUSSIAN"])
+def test_create_phase_screen_autocorrelation(correlation):
     """The screen reproduces the requested autocorrelation."""
     cl = 8
-    screen = pyspeckle.create_phase_screen(65536, 1.0, cl, correlation=shape)
+    screen = pyspeckle.create_phase_screen(65536, 1.0, cl, correlation=correlation)
     acf = pyspeckle.autocorrelation(screen)
     lags = np.array([4, 8, 16])
-    if shape.lower() == "gaussian":
-        want = np.exp(-0.5 * (lags / cl) ** 2)
+    if correlation.lower() == "gaussian":
+        want = np.exp(-((lags / cl) ** 2))
     else:
         want = np.exp(-lags / cl)
     assert np.max(np.abs(acf[lags] - want)) < 0.05
@@ -256,43 +256,59 @@ def test_local_contrast_1D_rejects_wrong_kernel_rank():
         pyspeckle.local_contrast(speckle, np.ones((3, 3)))
 
 
-def test_create_exp_corr_1D_output_length():
-    """Test length of create_exp_corr_1D."""
-    arr = pyspeckle.create_exp_corr_1D(100, 10, 2, 5)
+@pytest.mark.parametrize("correlation", ["exponential", "gaussian"])
+def test_create_correlated_statistics(correlation):
+    """Length, mean, and standard deviation come out as requested."""
+    arr = pyspeckle.create_correlated(100, 10, 2, 5, correlation=correlation)
     assert len(arr) == 100
 
-
-def test_create_exp_corr_1D_mean_and_std():
-    """Test mean and stdev of create_exp_corr_1D."""
-    arr = pyspeckle.create_exp_corr_1D(1000, 10, 2, 5)
-    assert abs(np.mean(arr) - 10) < 0.8  # A small tolerance might be needed due to randomness
-    assert abs(np.std(arr) - 2) < 0.8
-
-
-@pytest.mark.parametrize("M,mean,stdev,cl", [(0, 10, 2, 5), (100, 10, -2, 5), (100, 10, 2, -5), (100, 10, 2, 51)])
-def test_create_exp_corr_1D_invalid_args(M, mean, stdev, cl):
-    """Test bad inputs to create_exp_corr_1D."""
-    with pytest.raises(ValueError):
-        pyspeckle.create_exp_corr_1D(M, mean, stdev, cl)
-
-
-def test_create_gaussian_corr_1D_output_length():
-    """Test length of create_gaussian_corr_1D."""
-    arr = pyspeckle.create_gaussian_corr_1D(100, 10, 2, 5)
-    assert len(arr) == 100
-
-
-def test_create_gaussian_corr_1D_mean_and_std():
-    """Test mean and stdev of create_gaussian_corr_1D output."""
-    arr = pyspeckle.create_gaussian_corr_1D(1000, 10, 2, 5)
+    arr = pyspeckle.create_correlated(10000, 10, 2, 5, correlation=correlation)
     assert abs(np.mean(arr) - 10) < 0.5
     assert abs(np.std(arr) - 2) < 0.5
 
 
+@pytest.mark.parametrize("correlation", ["exponential", "gaussian"])
+def test_create_correlated_length_is_the_1_over_e_lag(correlation):
+    """The cl argument means the same for both shapes: the lag where the ACF hits 1/e."""
+    cl = 32
+    field = pyspeckle.create_correlated(131072, 0, 1, cl, correlation=correlation)
+    acf = pyspeckle.autocorrelation(field)
+    assert abs(acf[cl] - np.exp(-1)) < 0.05
+
+
+@pytest.mark.parametrize("correlation", ["exponential", "gaussian"])
+def test_create_correlated_is_gaussian(correlation):
+    """The values are normally distributed whatever the correlation shape."""
+    field = pyspeckle.create_correlated(65536, 0, 1, 16, correlation=correlation)
+    assert abs(scipy.stats.skew(field)) < 0.1
+    assert abs(scipy.stats.kurtosis(field)) < 0.3
+
+
+def test_create_correlated_higher_dimensions():
+    """The same call works in two and three dimensions."""
+    surface = pyspeckle.create_correlated((256, 256), 8000, 800, 16)
+    assert surface.shape == (256, 256)
+    assert abs(np.mean(surface) - 8000) < 20
+    assert abs(np.std(surface) - 800) < 20
+
+    volume = pyspeckle.create_correlated((32, 32, 32), 0, 1, 4)
+    assert volume.shape == (32, 32, 32)
+
+
 @pytest.mark.parametrize(
-    "M,mean,stdev,cl", [(0, 10, 2, 5), (100, 10, -2, 5), (100, 10, 2, -5), (100, 10, 2, 51)]
-)  # M/cl < 2
-def test_create_gaussian_corr_1D_invalid_args(M, mean, stdev, cl):
-    """Test bad inputs to create_gaussian_corr_1D."""
-    with pytest.raises(ValueError):  # or another appropriate exception based on behavior
-        pyspeckle.create_gaussian_corr_1D(M, mean, stdev, cl)
+    "kwargs",
+    [
+        {"shape": 0},
+        {"stdev": -2},
+        {"cl": -5},
+        {"cl": 51},  # correlation longer than half the array
+        {"correlation": "banana"},
+        {"shape": (8, 8, 8, 8)},
+    ],
+)
+def test_create_correlated_invalid_args(kwargs):
+    """Bad arguments raise ValueError rather than failing inside numpy."""
+    args = {"shape": 100, "mean": 10, "stdev": 2, "cl": 5}
+    args.update(kwargs)
+    with pytest.raises(ValueError):
+        pyspeckle.create_correlated(**args)

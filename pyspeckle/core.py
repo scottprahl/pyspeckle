@@ -13,7 +13,6 @@ import scipy.stats
 
 __all__ = (
     "create_exponential",
-    "create_phase_screen",
     "local_contrast",
     "create_unpolarized",
     "autocorrelation",
@@ -315,75 +314,6 @@ def create_unpolarized(shape, pix_per_speckle, alpha=None, beta=None, aperture=N
         array with the requested shape
     """
     return create_exponential(shape, pix_per_speckle, alpha=alpha, beta=beta, aperture=aperture, polarization=0)
-
-
-def create_phase_screen(shape, sigma, cl, correlation="gaussian"):
-    """
-    Generate a correlated Gaussian phase screen.
-
-    `shape` follows the numpy convention used by `np.ones`, exactly as in
-    `create_exponential`: an integer gives a one-dimensional screen and a
-    tuple gives two or three dimensions.
-
-    The screen is a zero-mean Gaussian random field measured in **radians**,
-    with standard deviation `sigma` and correlation length `cl` pixels.  It
-    models the phase imposed by a rough surface, and is the input needed for
-    partially developed speckle: multiply `exp(1j*screen)` by an aperture and
-    transform, exactly as `create_exponential` does with uniform random phase.
-
-    White noise is filtered by the square root of the power spectral density,
-    which by the Wiener-Khinchin theorem is the transform of the wanted
-    autocorrelation.  The result is isotropic, which matters beyond one
-    dimension because `exp(-|x|/cl) * exp(-|y|/cl)` is diamond shaped rather
-    than radially symmetric.
-
-    The fraction of the field left unscattered is exp(-sigma**2).  Large
-    `sigma` scrambles the phase completely and recovers the fully developed
-    limit that `create_exponential` produces directly; small `sigma` leaves a
-    strong coherent component and the speckle is only partially developed.
-    How that coherent component appears, and therefore what contrast is
-    measured, depends on the observing geometry.
-
-    Args:
-        shape:       integer or tuple giving the shape of the screen
-        sigma:       standard deviation of the phase [radians]
-        cl:          correlation length [pixels]
-        correlation: 'gaussian' or 'exponential' autocorrelation
-
-    Returns:
-        zero-mean array of phases in radians with the requested shape
-    """
-    dims = _normalize_shape(shape)
-
-    if sigma < 0:
-        raise ValueError("sigma must be non-negative.")
-
-    if cl <= 0:
-        raise ValueError("Correlation length cl must be positive.")
-
-    lcorrelation = correlation.lower()
-
-    # signed lags, wrapped, so the autocorrelation is periodic on the grid
-    axes = [np.fft.fftfreq(n, d=1 / n) for n in dims]
-    grid = np.meshgrid(*axes, indexing="ij")
-    r = np.sqrt(sum(g**2 for g in grid))
-
-    if lcorrelation == "gaussian":
-        acf = np.exp(-0.5 * (r / cl) ** 2)
-    elif lcorrelation == "exponential":
-        acf = np.exp(-r / cl)
-    else:
-        raise ValueError("correlation must be 'gaussian' or 'exponential'")
-
-    # power spectral density; tiny negative lobes are numerical noise
-    psd = np.maximum(np.fft.fftn(acf).real, 0)
-
-    white = np.fft.fftn(np.random.normal(size=dims))
-    screen = np.fft.ifftn(white * np.sqrt(psd)).real
-
-    screen -= screen.mean()
-    deviation = screen.std() or 1
-    return sigma * screen / deviation
 
 
 def _sqrt_matrix(x):

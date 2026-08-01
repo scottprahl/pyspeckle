@@ -64,6 +64,15 @@ Unreleased ()
   dimension because it infers one from the arrays (breaking)
 * reorganize into core.py (generation and analysis), plots.py, and noise.py;
   speckle_1D.py, speckle_2D.py, and speckle_3D.py are gone
+* replace create_exp_corr_1D and create_gaussian_corr_1D with create_correlated,
+  which works in one, two, or three dimensions (breaking)
+* create_phase_screen is now the zero-mean case of create_correlated and moved
+  to noise.py
+* define cl as the lag where the autocorrelation reaches 1/e for both shapes;
+  create_gaussian_corr_1D documented exp(-0.5(x/cl)^2) but produced
+  exp(-(x/cl)^2), and create_phase_screen used the other convention
+* fix the gaussian autocorrelation curve in the basics notebook, which plotted
+  the documented shape rather than the one the code produces
 * rename create_gaussian_1D to create_gaussian_corr_1D (breaking)
 * rename create_Rayleigh to create_unpolarized_2D (breaking)
 * rename create_Rayleigh_3D to create_unpolarized_3D (breaking)
