@@ -52,6 +52,13 @@ Unreleased ()
   speckle from any pupil, not just the named shapes.  Two separated openings
   give speckle crossed by Young's fringes of period N/d
 * add an arbitrary aperture section to the 2D notebook
+* add create_oct_speckle, a translation of SimSpeckle OCT_speckle3.m: a B-scan
+  whose contrast falls from 1 to 1/sqrt(2) with depth while the mean irradiance
+  decays as exp(-mu_eff z).  The original blends the surface pattern against an
+  already unpolarized one, so three patterns contribute at intermediate depth
+  and its contrast dips to 1/sqrt(3) before climbing back; blending two
+  patterns falls monotonically, as its own comments describe
+* add an OCT speckle section to the 2D notebook
 * autocorrelation now works in one, two, or three dimensions and returns the
   non-negative lags, so the result keeps the shape of its argument
 * fix local_contrast for integer images: squaring a uint8 array wrapped and the

@@ -17,6 +17,7 @@ __all__ = (
     "create_unpolarized",
     "create_from_aperture",
     "create_boiling_speckle",
+    "create_oct_speckle",
     "autocorrelation",
     "box_muller",
     "zvalues",
@@ -419,6 +420,81 @@ def create_boiling_speckle(shape, pix_per_speckle, frames=None):
     lag = np.arange(frames) / M
     acf = (2 / np.pi) * (np.arccos(lag) - lag * np.sqrt(1 - lag**2))
     return cube, correlation, acf**2
+
+
+def create_oct_speckle(shape, pix_per_speckle, mua=2, musp=30, dz=1 / 300):
+    """
+    Generate an OCT B-scan whose speckle statistics change with depth.
+
+    Rows are depth and columns are lateral position.  Two things happen as the
+    beam goes deeper.  The speckle contrast falls, because light reaching depth
+    has been scattered many times and arrives as more than one independent
+    contribution, and the mean irradiance falls, because the tissue absorbs and
+    scatters the light away.
+
+    The contrast change is a sweep of the degree of polarization.  At the
+    surface the light is a single fully developed pattern, `polarization = 1`
+    and `K = 1`.  At the bottom two independent patterns add in irradiance,
+    `polarization = 0` and `K = 1/sqrt(2)`, which is what `create_unpolarized`
+    produces.  In between, the contrast of the returned image is::
+
+        K = sqrt((1 + polarization**2) / 2)
+
+    which is the third value returned.  The mean irradiance decays as
+    `exp(-mu_eff * z)`, with the diffusion approximation for the effective
+    attenuation coefficient::
+
+        mu_eff = sqrt(3 * mua * (mua + musp))
+
+    The defaults describe aorta and put one scattering event in each row.
+
+    This is a translation of SimSpeckle's `OCT_speckle3.m`, with one change.
+    That script blends the surface pattern against an already-unpolarized
+    pattern, so three independent patterns contribute at intermediate depth
+    with weights `1-a`, `a/2`, and `a/2`.  Its contrast therefore falls past
+    `1/sqrt(2)` to a minimum of `1/sqrt(3)` at two thirds depth and then climbs
+    back, which is not what its own comments describe.  Blending two patterns
+    instead falls monotonically to `1/sqrt(2)` and reaches exactly the
+    unpolarized pattern at the bottom.
+
+    Args:
+        shape:           tuple giving the depth and width of the image
+        pix_per_speckle: number of pixels per smallest speckle
+        mua:             absorption coefficient [1/cm]
+        musp:            reduced scattering coefficient [1/cm]
+        dz:              depth of one row [cm]
+
+    Returns:
+        image, depth of each row, and the expected contrast of each row
+    """
+    dims = _normalize_shape(shape)
+    _validate_speckle(pix_per_speckle, 1)
+
+    if len(dims) != 2:
+        raise ValueError("an OCT image is depth by width, so shape must have two dimensions.")
+
+    if mua < 0 or musp < 0:
+        raise ValueError("mua and musp must not be negative.")
+
+    if dz <= 0:
+        raise ValueError("dz must be positive.")
+
+    rows = dims[0]
+    surface = create_exponential(dims, pix_per_speckle)
+    deep = create_exponential(dims, pix_per_speckle)
+    deep = deep * (np.mean(surface) / np.mean(deep))  # equal means, as the original does
+
+    # depth sweeps the degree of polarization from one at the surface to zero
+    polarization = 1 - np.arange(rows) / (rows - 1)
+    p = polarization[:, np.newaxis]
+    image = 0.5 * (1 + p) * surface + 0.5 * (1 - p) * deep
+
+    depth = np.arange(rows) * dz
+    mu_eff = np.sqrt(3 * mua * (mua + musp))
+    image *= np.exp(-mu_eff * depth)[:, np.newaxis]
+
+    contrast = np.sqrt((1 + polarization**2) / 2)
+    return image, depth, contrast
 
 
 def create_unpolarized(shape, pix_per_speckle, alpha=None, beta=None, aperture=None):

@@ -16,6 +16,11 @@ returned with the correlation coefficient and its closed-form prediction::
 
     pyspeckle.create_boiling_speckle(shape, pix_per_speckle)
 
+An OCT B-scan whose contrast falls from 1 to 1/sqrt(2) with depth while the
+mean irradiance decays, returned with the depth and contrast of each row::
+
+    pyspeckle.create_oct_speckle(shape, pix_per_speckle)
+
 Arguments that do not apply to the requested dimensionality are rejected:
 `alpha` and `aperture` need two dimensions, `beta` needs three.
 

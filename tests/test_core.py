@@ -551,6 +551,72 @@ def test_create_boiling_speckle_invalid_args(kwargs):
         pyspeckle.create_boiling_speckle(**args)
 
 
+def test_create_oct_speckle_shapes():
+    """The image is depth by width, with one depth and contrast per row."""
+    image, depth, contrast = pyspeckle.create_oct_speckle((64, 128), 2)
+    assert image.shape == (64, 128)
+    assert depth.shape == contrast.shape == (64,)
+
+
+def test_create_oct_speckle_contrast_theory_endpoints():
+    """Contrast falls monotonically from fully developed to unpolarized."""
+    _, _, contrast = pyspeckle.create_oct_speckle((64, 128), 2)
+    assert contrast[0] == pytest.approx(1)
+    assert contrast[-1] == pytest.approx(1 / np.sqrt(2))
+    assert np.all(np.diff(contrast) < 0)
+
+
+def test_create_oct_speckle_contrast_follows_theory():
+    """Measured contrast tracks sqrt((1 + polarization**2) / 2) at every depth."""
+    rows, cols, trials = 64, 512, 8
+    measured = np.zeros(rows)
+    for _ in range(trials):
+        image, _, contrast = pyspeckle.create_oct_speckle((rows, cols), 2, mua=0)
+        measured += image.std(axis=1) / image.mean(axis=1)
+    measured /= trials
+    # the estimator sits a little low with only cols/2 independent speckles, so
+    # the tolerance is loose.  It still discriminates: the three-pattern blend of
+    # the SimSpeckle original dips to 1/sqrt(3) and misses theory by 0.19 here.
+    assert np.max(np.abs(measured - contrast)) < 0.10
+
+
+def test_create_oct_speckle_attenuation():
+    """The mean irradiance decays with the diffusion attenuation coefficient."""
+    mua, musp = 2, 30
+    image, depth, _ = pyspeckle.create_oct_speckle((256, 256), 2, mua=mua, musp=musp)
+    slope = np.polyfit(depth, np.log(image.mean(axis=1)), 1)[0]
+    assert -slope == pytest.approx(np.sqrt(3 * mua * (mua + musp)), rel=0.02)
+
+
+def test_create_oct_speckle_without_absorption_does_not_decay():
+    """With mua of zero there is nothing to attenuate the beam."""
+    image, _, _ = pyspeckle.create_oct_speckle((64, 256), 2, mua=0)
+    rows = np.log(image.mean(axis=1))
+    # the same tissue with absorption loses a factor of e^11.8 over these rows
+    total_decay = abs(np.polyfit(np.arange(len(rows)), rows, 1)[0]) * len(rows)
+    assert total_decay < 0.5
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"shape": 64},  # one dimension
+        {"shape": (64, 64, 64)},  # three
+        {"pix_per_speckle": 0},
+        {"mua": -1},
+        {"musp": -1},
+        {"dz": 0},
+        {"dz": -1},
+    ],
+)
+def test_create_oct_speckle_invalid_args(kwargs):
+    """Bad arguments raise ValueError rather than failing inside numpy."""
+    args = {"shape": (64, 64), "pix_per_speckle": 2}
+    args.update(kwargs)
+    with pytest.raises(ValueError):
+        pyspeckle.create_oct_speckle(**args)
+
+
 def _two_circles(N, separation, radius):
     """Build the pair of circular openings used by SimSpeckle's modulated_speckle."""
     y, x = np.ogrid[:N, :N]
